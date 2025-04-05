@@ -20,6 +20,22 @@ public class Player {
         this.flow = flow;
         this.username = username;
     }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public Flow getFlow() {
+        return flow;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setFlow(Flow flow) {
+        this.flow = flow;
+    }
     
     
     
