@@ -26,6 +26,7 @@ public class Server {
 
         if (serverSocket != null) {
             initConnection(serverSocket);
+            
         }
 
     }
@@ -55,9 +56,9 @@ public class Server {
                 String name = readFlow.readUTF();
                 System.out.println("Connection accepted " + name);
                 
-                //Flujo flujo = new Flujo(nsfd, nombre, creaCarton());
+                //Flow flow = new Flow();
                 
-                 //flujo.start();
+                 //flow.start();
 
             } catch (Exception e) {
                 System.out.println("Error: " + e);
@@ -66,5 +67,7 @@ public class Server {
         }
 
     }
+    
+    
 
 }

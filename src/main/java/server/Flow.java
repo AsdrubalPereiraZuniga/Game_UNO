@@ -4,6 +4,7 @@
  */
 package server;
 
+import cards.Card;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -11,6 +12,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Enumeration;
+import java.util.Stack;
 import players.Player;
 import server.Server;
 
@@ -45,6 +47,16 @@ public class Flow implements Runnable {
 
         Server.players.add(new Player(this, this.name));
 
+    }
+
+    public void distributeCards() {
+        
+       Stack<Card> stack = new Stack<>();
+        
+        
+
+        
+        
     }
 
     public void broadcast(String message) {
