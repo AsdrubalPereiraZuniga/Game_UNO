@@ -1,48 +1,36 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package cards;
 
-/**
- *
- * @author jorge
- */
-public class Card {
-    
-    private String color;
-    private String number;
-    private String type;
+public abstract class Card {
+    protected String color;
+    protected String value;
+    protected String imagePath;
 
-    public Card(String color, String number, String type) {
+    public Card(String color, String value, String imagePath) {
         this.color = color;
-        this.number = number;
-        this.type = type;
+        this.value = value;
+        this.imagePath = imagePath;
     }
 
-    public String getColor() {
-        return color;
+    public String getColor() { return color; }
+
+    public String getValue() { return value; }
+
+    public String getImagePath() { return imagePath; }
+
+    public abstract void play();
+
+    public boolean canBePlayedOver(Card topCard) {
+        return this.color.equals(topCard.getColor()) ||
+                this.value.equals(topCard.getValue()) ||
+                this.color.equals("wild");
     }
 
-    public String getNumber() {
-        return number;
+    public boolean isWildCard() {
+        return this.color.equals("wild");
     }
 
-    public String getType() {
-        return type;
+    @Override
+    public String toString() {
+        return color + " " + value;
     }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-    
-
 }
