@@ -11,6 +11,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Stack;
 import players.Player;
@@ -26,7 +27,8 @@ public class Flow implements Runnable {
     DataInputStream readFlow;
     DataOutputStream writeFlow;
     String name;
-    //Mazo de cartas para cada jugador
+    ArrayList<Card> playerCards = new ArrayList<>();
+    Stack<Card> cardsStack = new Stack<>();
 
     public Flow(Socket socket, String name) {
         this.socket = socket;
@@ -45,18 +47,22 @@ public class Flow implements Runnable {
     @Override
     public void run() {
 
-        Server.players.add(new Player(this, this.name));
+        Server.players.add(new Player(this, this.name, distributeCards()));
 
     }
 
-    public void distributeCards() {
-        
-       Stack<Card> stack = new Stack<>();
-        
-        
+    public ArrayList<Card> distributeCards() {
 
-        
-        
+        this.playerCards.clear();
+
+        if (cardsStack.size() >= 7 && !cardsStack.isEmpty()) {
+            for (int i = 0; i < 7; i++) {
+                Card card = cardsStack.pop();
+                this.playerCards.add(card);
+            }
+        }
+
+        return this.playerCards;
     }
 
     public void broadcast(String message) {

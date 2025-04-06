@@ -26,7 +26,6 @@ public class Server {
 
         if (serverSocket != null) {
             initConnection(serverSocket);
-            
         }
 
     }
@@ -56,9 +55,10 @@ public class Server {
                 String name = readFlow.readUTF();
                 System.out.println("Connection accepted " + name);
                 
-                //Flow flow = new Flow();
+                Thread flow = new Thread(new Flow(socket, name));
                 
-                 //flow.start();
+                flow.start();
+               
 
             } catch (Exception e) {
                 System.out.println("Error: " + e);
