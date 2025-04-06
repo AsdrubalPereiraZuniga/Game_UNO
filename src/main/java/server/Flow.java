@@ -23,16 +23,18 @@ import server.Server;
  */
 public class Flow implements Runnable {
 
-    Socket socket;
-    DataInputStream readFlow;
-    DataOutputStream writeFlow;
-    String name;
-    ArrayList<Card> playerCards = new ArrayList<>();
-    Stack<Card> cardsStack = new Stack<>();
+    private Socket socket;
+    private DataInputStream readFlow;
+    private DataOutputStream writeFlow;
+    private String name;
+    private ArrayList<Card> playerCards = new ArrayList<>();
+   // private Stack<Card> cardsStack = new Stack<>();
+    
 
     public Flow(Socket socket, String name) {
         this.socket = socket;
         this.name = name;
+       // this.cardsStack = cardsStack;
         try {
             readFlow = new DataInputStream(
                     new BufferedInputStream(socket.getInputStream()));
@@ -51,13 +53,13 @@ public class Flow implements Runnable {
 
     }
 
-    public ArrayList<Card> distributeCards() {
-
+    public synchronized ArrayList<Card> distributeCards() {
+        
         this.playerCards.clear();
 
-        if (cardsStack.size() >= 7 && !cardsStack.isEmpty()) {
+        if (Server.cardsStack.size() >= 7 && !Server.cardsStack.isEmpty()) {
             for (int i = 0; i < 7; i++) {
-                Card card = cardsStack.pop();
+                Card card = Server.cardsStack.pop();
                 this.playerCards.add(card);
             }
         }
