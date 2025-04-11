@@ -15,5 +15,6 @@
             <Font size="57.0" />
          </font>
       </Label>
+      <Label layoutX="212.0" layoutY="171.0" text="Jugador" />
    </children>
 </AnchorPane>

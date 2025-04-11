@@ -1,11 +1,11 @@
-<<<<<<< HEAD
-C:\Users\igmml\Documents\NetBeansProjects\Game_UNO\src\main\java\com\mycompany\game_uno_so\PrimaryController.java
-C:\Users\igmml\Documents\NetBeansProjects\Game_UNO\src\main\java\com\mycompany\game_uno_so\App.java
-C:\Users\igmml\Documents\NetBeansProjects\Game_UNO\src\main\java\module-info.java
-C:\Users\igmml\Documents\NetBeansProjects\Game_UNO\src\main\java\com\mycompany\game_uno_so\SecondaryController.java
-=======
 C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\com\mycompany\game_uno_so\App.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\cards\WildCard.java
 C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\com\mycompany\game_uno_so\PrimaryController.java
 C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\module-info.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\server\Flow.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\server\Server.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\cards\Card.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\cards\ActionCard.java
 C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\com\mycompany\game_uno_so\SecondaryController.java
->>>>>>> d23d9d9b15ec81fff04567f973ff80ef5d562fc7
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\players\Player.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\cards\NumberCard.java

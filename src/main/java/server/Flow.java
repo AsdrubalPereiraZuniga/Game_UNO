@@ -27,14 +27,12 @@ public class Flow implements Runnable {
     private DataInputStream readFlow;
     private DataOutputStream writeFlow;
     private String name;
-    private ArrayList<Card> playerCards = new ArrayList<>();
-   // private Stack<Card> cardsStack = new Stack<>();
-    
 
+    // private Stack<Card> cardsStack = new Stack<>();
     public Flow(Socket socket, String name) {
         this.socket = socket;
         this.name = name;
-       // this.cardsStack = cardsStack;
+        // this.cardsStack = cardsStack;
         try {
             readFlow = new DataInputStream(
                     new BufferedInputStream(socket.getInputStream()));
@@ -50,21 +48,36 @@ public class Flow implements Runnable {
     public void run() {
 
         Server.players.add(new Player(this, this.name, distributeCards()));
+        System.out.println("player added");
 
+        for (Player player : Server.players) {
+            System.out.println("Cartas de un player");
+            for (Card card : player.getCards()) {
+                System.out.println(card.toString());
+            }
+        }
     }
 
     public synchronized ArrayList<Card> distributeCards() {
-        
-        this.playerCards.clear();
 
+        ArrayList<Card> playerCards = new ArrayList<>();
+
+        System.out.println("entro a dis");
+        System.out.println(Server.cardsStack.size());
+
+        System.out.println(Server.cardsStack.size() >= 7);
+        System.out.println(!Server.cardsStack.isEmpty());
         if (Server.cardsStack.size() >= 7 && !Server.cardsStack.isEmpty()) {
+            System.out.println("Entro al if");
             for (int i = 0; i < 7; i++) {
                 Card card = Server.cardsStack.pop();
-                this.playerCards.add(card);
+                playerCards.add(card);
+                System.out.println("card" + card.toString());
+
             }
         }
 
-        return this.playerCards;
+        return playerCards;
     }
 
     public void broadcast(String message) {

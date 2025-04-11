@@ -4,8 +4,10 @@
  */
 package server;
 
+import cards.ActionCard;
 import cards.Card;
 import cards.NumberCard;
+import cards.WildCard;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Vector;
@@ -34,7 +36,7 @@ public class Server {
     public static Vector<Player> players = new Vector();
     public static Stack<Card> cardsStack = new Stack<>();
     public static ArrayList<String> colors = new ArrayList<>(Arrays.asList("R", "G", "B", "Y"));
-    public ArrayList<String> values = new ArrayList<>(Arrays.asList(""));//POCUPO SABER QUE VA TENER LOS VALUES PARA VER SI DEJO ESTA KK O QUE SE QUEDE EN UN FOR
+    public ArrayList<String> values = new ArrayList<>(Arrays.asList(""));
     public static int numberOfCardsByColor = 12;
 
     /**
@@ -48,7 +50,9 @@ public class Server {
 
         if (serverSocket != null) {
             initConnection(serverSocket);
+
         }
+
     }
 
     /**
@@ -88,11 +92,11 @@ public class Server {
                 Socket socket = serverSocket.accept();
                 DataInputStream readFlow = new DataInputStream(
                         new BufferedInputStream(socket.getInputStream()));
-                String name = readFlow.readUTF();
-                System.out.println("Connection accepted " + name);
+//               String name = readFlow.readUTF();
+                System.out.println("Connection accepted ");
 
                 // Thread flow = new Thread(new Flow(socket, name, cardsStack));
-                Thread flow = new Thread(new Flow(socket, name));
+                Thread flow = new Thread(new Flow(socket, "aux"));
 
                 flow.start();
 
@@ -107,25 +111,37 @@ public class Server {
     public static void initDeck() {
 
         System.out.println("Vamo a crear el mazo");
-        
-        addCardsToStack();
-        
-        while(!cardsStack.isEmpty()){
-            System.out.println(cardsStack.pop());
+
+        addCardsToStackAndShuffle();
+
+        for (int i = 0; i < cardsStack.size(); i++) {
+
+            System.out.println(cardsStack.get(i).toString());
         }
 
     }
 
-    
-    public static void addCardsToStack() { //Falta las cartas especiales que el culiao de fabian no me dice
+    public static void addCardsToStackAndShuffle() {
 
         for (String color : colors) {
-            for (int i = 0; i <= numberOfCardsByColor; i++) {
-                Card card = new NumberCard(color, Integer.toString(i));
-                cardsStack.push(card);
+            for (int i = 1; i <= numberOfCardsByColor; i++) {
+                if (i <= 9) {
+                    Card numberCard = new NumberCard(color, Integer.toString(i));
+                    cardsStack.push(numberCard);
+                } else {
+                    Card actionCard = new ActionCard(color, Integer.toString(i));
+                    cardsStack.push(actionCard);
+
+                }
             }
+            Card numberCardZero = new NumberCard(color, "0");
+            cardsStack.push(numberCardZero);
+            Card changeColor = new WildCard("C", "0");
+            cardsStack.push(changeColor);
+            Card addFour = new WildCard("C", "1");
+            cardsStack.push(addFour);
         }
-        
+
         Collections.shuffle(cardsStack);
 
     }

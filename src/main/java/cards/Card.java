@@ -31,6 +31,6 @@ public abstract class Card {
 
     @Override
     public String toString() {
-        return color + " " + value;
+        return this.color + " " + this.value;
     }
 }

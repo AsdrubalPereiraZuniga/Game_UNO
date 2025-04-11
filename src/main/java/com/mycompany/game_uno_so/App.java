@@ -1,5 +1,6 @@
 package com.mycompany.game_uno_so;
 
+import java.io.DataOutputStream;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -7,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.Socket;
 
 /**
  * JavaFX App
@@ -31,7 +33,19 @@ public class App extends Application {
         return fxmlLoader.load();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+
+        Socket socket = new Socket("localhost", 8000);
+        try {
+
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            
+            out.flush();
+        } catch (Exception e) {
+        } finally {
+            socket.close();
+        }
+
         launch();
     }
 
