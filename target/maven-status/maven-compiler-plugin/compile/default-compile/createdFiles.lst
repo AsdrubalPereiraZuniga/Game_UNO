@@ -1,4 +1,7 @@
-com\mycompany\game_uno_so\SecondaryController.class
 com\mycompany\game_uno_so\PrimaryController.class
-com\mycompany\game_uno_so\App.class
+players\Player.class
 module-info.class
+server\Flow.class
+com\mycompany\game_uno_so\SecondaryController.class
+com\mycompany\game_uno_so\App.class
+server\Server.class
