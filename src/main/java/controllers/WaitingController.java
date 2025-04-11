@@ -65,7 +65,8 @@ public class WaitingController implements Initializable {
         }
 
         this.btnReady.setDisable(true);
-        WaitingController.client.sendMessage("READY/");
+        String message = "READY/"+WaitingController.client.getPlayerName()+"/";
+        WaitingController.client.sendMessage(message);
         startWaitingAnimation();
         startPlayerReadyCheck();
     }

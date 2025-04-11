@@ -16,6 +16,7 @@ import java.util.Enumeration;
 import java.util.Stack;
 import players.Player;
 import server.Server;
+import static server.Server.players;
 
 /**
  *
@@ -27,6 +28,9 @@ public class Flow implements Runnable {
     private DataInputStream readFlow;
     private DataOutputStream writeFlow;
     private String name;
+    private Player player;
+    private static String playersReady = "READY/";
+    private static boolean doFunctionPlayersReady = true;
 
     // private Stack<Card> cardsStack = new Stack<>();
     public Flow(Socket socket, String name) {
@@ -46,8 +50,9 @@ public class Flow implements Runnable {
 
     @Override
     public void run() {
+        this.player = new Player(this, this.name, distributeCards());
 
-        Server.players.add(new Player(this, this.name, distributeCards()));
+        Server.players.add(this.player);
         System.out.println("player added");
 
         for (Player player : Server.players) {
@@ -56,6 +61,55 @@ public class Flow implements Runnable {
                 System.out.println(card.toString());
             }
         }
+
+        //envio las varas
+        sendInitialCards();
+
+        while (true) {
+            try {
+                if (Server.players.size() >= 2 && playersReady()) {
+                    broadcast(playersReady);
+                }
+            } catch (Exception e) {
+                Server.players.removeElement(this);
+                broadcast("El jugador " + this.name + "se ha desconectado");
+                System.out.println("El jugador " + this.name + "se ha desconectado");
+                break;
+            }
+
+        }
+
+    }
+
+    private static boolean playersReady() {
+        if (doFunctionPlayersReady) {
+            for (Player player : players) {
+                if (player.isReady() == false) {
+                    return false;
+                }
+            }
+            doFunctionPlayersReady = false;
+        }
+        return true;
+    }
+
+    private void sendInitialCards() { // mejorar para que sea general luego
+        String message = "CARDS/";
+
+        for (Card card : this.player.getCards()) {
+            message += card.toString() + "/";
+
+        }
+        System.out.println("kkkkk: " + message);
+
+        try {
+
+            this.writeFlow.writeUTF(message);
+            this.writeFlow.flush();
+        } catch (IOException ex) {
+            System.out.println("No se pudo enviar las cartas inciales, error:" + ex);
+        }
+
     }
 
     public synchronized ArrayList<Card> distributeCards() {

@@ -1,12 +1,14 @@
 package client;
 
 import cards.Card;
+import cards.NumberCard;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * @author Ismael Marchena Méndez.
@@ -21,7 +23,7 @@ public class Client {
     private boolean connect;
     private boolean ready;
     private int port;
-    private ArrayList<Card> cards;
+    private ArrayList<String> cards;
     private DataInputStream input;
     private DataOutputStream output;
     private Socket socket;
@@ -42,6 +44,7 @@ public class Client {
         this.host = host;
         this.port = port;
         this.ready = false;
+        this.cards = new ArrayList<>();
         
         initializeConnection();
         startListening();
@@ -102,9 +105,11 @@ public class Client {
       * Handle the message of the server.
       */
     private void processServerMessage(String message) {
+        System.out.println("message: "+ message);
         String messageCode = message.split("/")[0];
         switch (messageCode) {
-            case "CARDs":
+            case "CARDS":
+                setPlayerDeck(message);
                 break;
             case "READY":
                 this.ready = true;
@@ -112,7 +117,7 @@ public class Client {
             case "":
                 break;
             default:
-                throw new AssertionError();
+                System.out.println(message);
         }
     }
 
@@ -145,6 +150,26 @@ public class Client {
         } catch (IOException e) {
             System.out.println("Error closing connection: " + e.getMessage());
         }
+    }
+    
+    private void setPlayerDeck(String message){
+        String[] cards = message.split("/");
+        for (int i = 1; i< cards.length; i++){
+            this.cards.add(cards[i]);
+        }
+    }
+    
+    private String getCardUrl(String card){
+        String type = card.substring(0,1);
+        String url;
+        switch (type) {
+            case "B":
+                url = getClass().getResource("/images/blue/"+card+".png").toString();
+                break;
+            default:
+                throw new AssertionError();
+        }
+        return url;
     }
 
     /**
