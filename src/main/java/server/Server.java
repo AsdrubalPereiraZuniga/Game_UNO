@@ -50,7 +50,6 @@ public class Server {
 
         if (serverSocket != null) {
             initConnection(serverSocket);
-
         }
 
     }

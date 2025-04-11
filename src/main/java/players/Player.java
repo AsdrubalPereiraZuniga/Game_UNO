@@ -17,11 +17,13 @@ public class Player {
     private Flow flow;
     private String username;
     private ArrayList<Card> cards;
+    private boolean ready;
 
     public Player(Flow flow, String username, ArrayList<Card> cards) {
-        this.username = username;
         this.flow = flow;
+        this.username = username;
         this.cards = cards;
+        this.ready = false;
     }
 
     public Flow getFlow() {
@@ -36,6 +38,10 @@ public class Player {
         return cards;
     }
 
+    public boolean isReady() {
+        return ready;
+    }
+
     public void setFlow(Flow flow) {
         this.flow = flow;
     }
@@ -46,6 +52,15 @@ public class Player {
 
     public void setCards(ArrayList<Card> cards) {
         this.cards = cards;
+    }
+
+    public void setReady(boolean ready) {
+        this.ready = ready;
+    }
+
+    @Override
+    public String toString() {
+        return "Player{" + "flow=" + flow + ", username=" + username + ", cards=" + cards + ", ready=" + ready + '}';
     }
 
 }
