@@ -66,9 +66,17 @@ public class Flow implements Runnable {
         sendInitialCards();
 
         while (true) {
-            if (Server.players.size() >= 2 && playersReady()) {
-                broadcast(playersReady);
+            try {
+                if (Server.players.size() >= 2 && playersReady()) {
+                    broadcast(playersReady);
+                }
+            } catch (Exception e) {
+                Server.players.removeElement(this);
+                broadcast("El jugador " + this.name + "se ha desconectado");
+                System.out.println("El jugador " + this.name + "se ha desconectado");
+                break;
             }
+
         }
 
     }
