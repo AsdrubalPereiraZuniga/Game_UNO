@@ -14,7 +14,7 @@
       <AnchorPane fx:id="player" layoutX="219.0" layoutY="506.0" prefHeight="200.0" prefWidth="851.0">
          <children>
             <Label fx:id="lblPlayerName" layoutX="14.0" layoutY="14.0" text="Label" />
-            <GridPane fx:id="grdCards" gridLinesVisible="true" layoutX="42.0" layoutY="31.0" onMouseClicked="#getCardClicked" prefHeight="140.0" prefWidth="780.0">
+            <GridPane fx:id="grdCards" gridLinesVisible="true" layoutX="42.0" layoutY="31.0" prefHeight="140.0" prefWidth="780.0">
               <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>

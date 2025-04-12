@@ -38,7 +38,7 @@ public class LoginController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        this.host = "192.168.1.33";
+        this.host = "localhost";
         this.port = 8000;
     }
     

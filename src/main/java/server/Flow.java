@@ -16,6 +16,7 @@ import java.util.Enumeration;
 import java.util.Stack;
 import players.Player;
 import server.Server;
+import static server.Server.cardsStack;
 import static server.Server.players;
 
 /**
@@ -55,7 +56,7 @@ public class Flow implements Runnable {
         Server.players.add(this.player);
         System.out.println("player added");
 
-        for (Player player : Server.players) {
+        for (Player player : Server.players) { //luego quito esto
             System.out.println("Cartas de un player");
             for (Card card : player.getCards()) {
                 System.out.println(card.toString());
@@ -64,30 +65,51 @@ public class Flow implements Runnable {
 
         //envio las varas
         sendInitialCards();
+        
         starListening();
-       
 
     }
-    
-    private void starListening(){
-         while (true) {
+
+    private void starListening() {
+        while (true) {
             try {
                 if (Server.players.size() >= 2 && playersReady()) {
+                    System.out.println("entre check cantidad de players" + Server.players.size());
                     broadcast(playersReady);
                 }
                 String message = this.readFlow.readUTF();
                 handleMessage(message);
-            } catch (Exception e) {
-                Server.players.removeElement(this);
-                broadcast("El jugador " + this.name + "se ha desconectado");
-                System.out.println("El jugador " + this.name + "se ha desconectado");
-                break;
+            } catch (IOException e) {
+                if(disconectPlayer()) break;
             }
 
         }
     }
     
-    private void handleMessage(String message){
+    public void returnCardToTheStack(){
+        for(Card card : this.player.getCards()){
+            //Server.cardsStack.addLast(card); nose pork sirve esta pija
+            Server.cardsStack.add(card);
+        }
+    }
+
+    private boolean disconectPlayer() {
+
+        try {
+            returnCardToTheStack();
+            Server.players.removeElement(this.player);
+            broadcast("El jugador " + this.name + "se ha desconectado");
+            this.socket.close();
+            System.out.println("El jugador " + this.name + "se ha desconectado");
+        } catch (IOException ex) {
+            System.out.println("Erro cerrando la conexion :" + ex);
+        }
+
+        return true;
+
+    }
+
+    private void handleMessage(String message) {
         String code = message.split("/")[0];
         switch (code) {
             case "READY":
@@ -97,7 +119,7 @@ public class Flow implements Runnable {
                 System.out.println("Message");
         }
     }
-    
+
     private static boolean playersReady() {
         if (doFunctionPlayersReady) {
             for (Player player : players) {
