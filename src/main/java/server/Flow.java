@@ -64,12 +64,19 @@ public class Flow implements Runnable {
 
         //envio las varas
         sendInitialCards();
+        starListening();
+       
 
-        while (true) {
+    }
+    
+    private void starListening(){
+         while (true) {
             try {
                 if (Server.players.size() >= 2 && playersReady()) {
                     broadcast(playersReady);
                 }
+                String message = this.readFlow.readUTF();
+                handleMessage(message);
             } catch (Exception e) {
                 Server.players.removeElement(this);
                 broadcast("El jugador " + this.name + "se ha desconectado");
@@ -78,9 +85,19 @@ public class Flow implements Runnable {
             }
 
         }
-
     }
-
+    
+    private void handleMessage(String message){
+        String code = message.split("/")[0];
+        switch (code) {
+            case "READY":
+                this.player.setReady(true);
+                break;
+            default:
+                System.out.println("Message");
+        }
+    }
+    
     private static boolean playersReady() {
         if (doFunctionPlayersReady) {
             for (Player player : players) {
