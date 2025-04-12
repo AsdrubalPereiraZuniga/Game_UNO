@@ -18,6 +18,8 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Stack;
 
 /**
@@ -35,6 +37,8 @@ public class Server {
 
     public static Vector<Player> players = new Vector();
     public static Stack<Card> cardsStack = new Stack<>();
+    public static Queue<Card> cardsQueue = new LinkedList<>();
+
     public static ArrayList<String> colors = new ArrayList<>(Arrays.asList("R", "G", "B", "Y"));
     public ArrayList<String> values = new ArrayList<>(Arrays.asList(""));
     public static int numberOfCardsByColor = 12;
@@ -107,16 +111,22 @@ public class Server {
 
     }
 
+    public static void showStack() {
+        for (int i = 0; i < cardsStack.size(); i++) {
+
+            System.out.println(cardsStack.get(i).toString());
+        }
+    }
+
     public static void initDeck() {
 
         System.out.println("Vamo a crear el mazo");
 
         addCardsToStackAndShuffle();
 
-        for (int i = 0; i < cardsStack.size(); i++) {
-
-            System.out.println(cardsStack.get(i).toString());
-        }
+        cardsQueue.add(cardsStack.pop());
+        
+        showStack();
 
     }
 
@@ -144,5 +154,6 @@ public class Server {
         Collections.shuffle(cardsStack);
 
     }
+
 
 }

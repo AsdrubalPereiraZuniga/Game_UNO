@@ -4,7 +4,10 @@
  */
 package server;
 
+import cards.ActionCard;
 import cards.Card;
+import cards.NumberCard;
+import cards.WildCard;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -64,8 +67,10 @@ public class Flow implements Runnable {
         }
 
         //envio las varas
+        System.out.println("ultima card de la cola:" + Server.cardsQueue.peek().toString());
+        broadcast(Server.cardsQueue.peek().toString());
         sendInitialCards();
-        
+
         starListening();
 
     }
@@ -80,14 +85,57 @@ public class Flow implements Runnable {
                 String message = this.readFlow.readUTF();
                 handleMessage(message);
             } catch (IOException e) {
-                if(disconectPlayer()) break;
+                if (disconectPlayer()) {
+                    break;
+                }
             }
-
         }
     }
-    
-    public void returnCardToTheStack(){
-        for(Card card : this.player.getCards()){
+
+    private void handleMessage(String message) {
+        String code = message.split("/")[0];
+        switch (code) {
+            case "READY":
+                this.player.setReady(true);
+                break;
+            case "PUT":
+                putCardInQueue(message);
+                break;
+            default:
+                System.out.println("Message");
+        }
+    }
+
+    private void putCardInQueue(String message) { // Pregunta si se pueden poner mas de dos cartas a por turno
+
+        //int cant = message.split("/").length -1;
+        String card = message.split("/")[1];
+        
+        Server.cardsQueue.add(createObjectCard(card));
+
+    }
+
+    private Card createObjectCard(String card) {
+
+        String letterCard = card.substring(0, 1);
+        System.out.println("letterCar:   " + letterCard);
+
+        String number = card.substring(1);
+        System.out.println("kkaka:" + number);
+
+        if ("C".equals(letterCard)) {
+            return new WildCard(letterCard, number);
+        } else {
+            if (Integer.parseInt(number) <= 9) {
+                return new NumberCard(letterCard, number);
+            } else {
+                return new ActionCard(letterCard, number);
+            }
+        }
+    }
+
+    public void returnCardToTheStack() {
+        for (Card card : this.player.getCards()) {
             //Server.cardsStack.addLast(card); nose pork sirve esta pija
             Server.cardsStack.add(card);
         }
@@ -107,17 +155,6 @@ public class Flow implements Runnable {
 
         return true;
 
-    }
-
-    private void handleMessage(String message) {
-        String code = message.split("/")[0];
-        switch (code) {
-            case "READY":
-                this.player.setReady(true);
-                break;
-            default:
-                System.out.println("Message");
-        }
     }
 
     private static boolean playersReady() {
