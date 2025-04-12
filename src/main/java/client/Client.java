@@ -225,5 +225,15 @@ public class Client {
     public void setReady(boolean ready) {
         this.ready = ready;
     }
+
+    public ArrayList<String> getCards() {
+        return cards;
+    }
+
+    public void setCards(ArrayList<String> cards) {
+        this.cards = cards;
+    }
+    
+    
   
 }

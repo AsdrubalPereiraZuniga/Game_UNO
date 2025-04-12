@@ -1,15 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
 
 <AnchorPane fx:id="bgView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
    <children>
       <AnchorPane fx:id="usedCardsView" layoutX="640.0" layoutY="235.0" prefHeight="250.0" prefWidth="200.0" />
       <AnchorPane fx:id="deckView" layoutX="440.0" layoutY="235.0" prefHeight="250.0" prefWidth="200.0" />
       <AnchorPane fx:id="players" layoutX="23.0" layoutY="14.0" prefHeight="200.0" prefWidth="716.0" />
-      <AnchorPane fx:id="player" layoutX="390.0" layoutY="506.0" prefHeight="200.0" prefWidth="500.0" />
-      <Button fx:id="btnOne" layoutX="200.0" layoutY="633.0" mnemonicParsing="false" onAction="#callOne" prefHeight="73.0" prefWidth="181.0" text="UNO" />
-      <Button fx:id="btnConfirm" layoutX="901.0" layoutY="633.0" mnemonicParsing="false" onAction="#confirm" prefHeight="73.0" prefWidth="181.0" text="Confirmar" />
+      <AnchorPane fx:id="player" layoutX="219.0" layoutY="506.0" prefHeight="200.0" prefWidth="851.0">
+         <children>
+            <Label fx:id="lblPlayerName" layoutX="14.0" layoutY="14.0" text="Label" />
+            <GridPane fx:id="grdCards" gridLinesVisible="true" layoutX="42.0" layoutY="31.0" prefHeight="140.0" prefWidth="780.0">
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+            </GridPane>
+         </children></AnchorPane>
+      <Button fx:id="btnOne" layoutX="23.0" layoutY="633.0" mnemonicParsing="false" onAction="#callOne" prefHeight="73.0" prefWidth="181.0" text="UNO" />
+      <Button fx:id="btnConfirm" layoutX="1085.0" layoutY="633.0" mnemonicParsing="false" onAction="#confirm" prefHeight="73.0" prefWidth="181.0" text="Confirmar" />
    </children>
 </AnchorPane>
