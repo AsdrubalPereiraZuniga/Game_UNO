@@ -15,10 +15,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.util.Duration;
 
-
 /**
  * Login controller class.
- * 
+ *
  * @author Ismael Marchena Méndez.
  * @author Jorge Rojas Mena.
  * @author Asdrubal Pererira Zuñiga.
@@ -32,9 +31,12 @@ public class WaitingController implements Initializable {
     @FXML
     private Label lblWatingForPlayers;
     private Timeline animationTimeline;
+    private volatile boolean stopChecking = false;
+    private Thread readyCheckThread;
 
     /**
      * Initialize.
+     *
      * @param url url.
      * @param rb Resource Bundle.
      */
@@ -45,7 +47,7 @@ public class WaitingController implements Initializable {
 
     /**
      * Set the client.
-     * 
+     *
      * @param client client.
      */
     public static void setClient(Client client) {
@@ -54,7 +56,7 @@ public class WaitingController implements Initializable {
 
     /**
      * Handle the evento of ready.
-     * 
+     *
      * @param event event.
      */
     @FXML
@@ -65,10 +67,51 @@ public class WaitingController implements Initializable {
         }
 
         this.btnReady.setDisable(true);
-        String message = "READY/"+WaitingController.client.getPlayerName()+"/";
+        String message = "READY/" + WaitingController.client.getPlayerName() + "/";
         WaitingController.client.sendMessage(message);
         startWaitingAnimation();
         startPlayerReadyCheck();
+    }
+    /**
+     * Start verifying if all the players are ready.
+     */
+    private void startPlayerReadyCheck() {
+        stopChecking = false;
+        readyCheckThread = new Thread(() -> {
+            try {
+                while (!stopChecking && !client.isReady() && !client.isForbidden()) {
+                    TimeUnit.SECONDS.sleep(1);
+                }
+
+                Platform.runLater(() -> {
+                    if (client.isForbidden()) {
+                        lblWatingForPlayers.setText("El juego ya inició");
+
+                        new Timeline(new KeyFrame(
+                                Duration.seconds(1),
+                                e -> App.setRoot("LoginScreen")
+                        )).play();
+                    } else {
+                        if (animationTimeline != null) {
+                            animationTimeline.stop();
+                        }
+                        App.setRoot("MainScreen");
+                    }
+                });
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+        readyCheckThread.setDaemon(true);
+        readyCheckThread.start();
+    }
+
+// Método para detener la verificación cuando sea necesario
+    public void stopPlayerReadyCheck() {
+        stopChecking = true;
+        if (readyCheckThread != null) {
+            readyCheckThread.interrupt();
+        }
     }
 
     /**
@@ -76,41 +119,18 @@ public class WaitingController implements Initializable {
      */
     private void startWaitingAnimation() {
         String originalText = lblWatingForPlayers.getText();
-        
+
         animationTimeline = new Timeline(
-            new KeyFrame(Duration.seconds(0.5), 
-                    e -> lblWatingForPlayers.setText(originalText + " .")),
-            new KeyFrame(Duration.seconds(1.0), 
-                    e -> lblWatingForPlayers.setText(originalText + " ..")),
-            new KeyFrame(Duration.seconds(1.5), 
-                    e -> lblWatingForPlayers.setText(originalText + " ...")),
-            new KeyFrame(Duration.seconds(2.0), 
-                    e -> lblWatingForPlayers.setText(originalText))
+                new KeyFrame(Duration.seconds(0.5),
+                        e -> lblWatingForPlayers.setText(originalText + " .")),
+                new KeyFrame(Duration.seconds(1.0),
+                        e -> lblWatingForPlayers.setText(originalText + " ..")),
+                new KeyFrame(Duration.seconds(1.5),
+                        e -> lblWatingForPlayers.setText(originalText + " ...")),
+                new KeyFrame(Duration.seconds(2.0),
+                        e -> lblWatingForPlayers.setText(originalText))
         );
         animationTimeline.setCycleCount(Timeline.INDEFINITE);
         animationTimeline.play();
-    }
-
-    /**
-     * Start verifying if all the players are ready.
-     */
-    private void startPlayerReadyCheck() {
-        new Thread(() -> {
-            try {
-                while (!client.isReady() && 
-                        !Thread.currentThread().isInterrupted()) {
-                    TimeUnit.SECONDS.sleep(1);
-                }
-                
-                Platform.runLater(() -> {
-                    if (animationTimeline != null) {
-                        animationTimeline.stop();
-                    }
-                   App.setRoot("MainScreen");
-                });
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }).start();
     }
 }

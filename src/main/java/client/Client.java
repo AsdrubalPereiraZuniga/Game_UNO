@@ -34,6 +34,7 @@ public class Client {
     private String host;
     private Thread listenerThread;
     private ArrayList<OtherPlayers> otherPlayers;
+    private boolean forbidden;
 
     /**
      * @param playerName the name of the player.
@@ -49,6 +50,7 @@ public class Client {
         this.port = port;
         this.ready = false;
         this.cards = new ArrayList<>();
+        this.forbidden = false;
         this.otherPlayers = new ArrayList<>();
 
         initializeConnection();
@@ -117,8 +119,12 @@ public class Client {
                 setPlayerDeck(message);
                 break;
             case "READY":
-                initializeOtherPlayers(message);
                 this.ready = true;
+                break;
+            case "FORBIDDEN":
+                this.forbidden = true;
+            case "START":
+                initializeOtherPlayers(message);
                 break;
             case "":
                 break;
@@ -283,6 +289,14 @@ public class Client {
 
     public void setOtherPlayers(ArrayList<OtherPlayers> otherPlayers) {
         this.otherPlayers = otherPlayers;
+    }
+
+    public boolean isForbidden() {
+        return forbidden;
+    }
+
+    public void setForbidden(boolean forbidden) {
+        this.forbidden = forbidden;
     }
 
 }
