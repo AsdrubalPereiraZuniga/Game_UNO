@@ -62,7 +62,7 @@ public class LoginController implements Initializable {
     private void changeScreen() {
         if (client.isConnect()) {
             WaitingController.setClient(this.client);
-            MainController.setClient(client);
+            MainController.getInstance().setClient(client);
             App.setRoot("WaitingScreen");
         }
     }

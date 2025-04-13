@@ -4,13 +4,17 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 
 <AnchorPane fx:id="bgView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
    <children>
       <AnchorPane fx:id="usedCardsView" layoutX="640.0" layoutY="235.0" prefHeight="250.0" prefWidth="200.0" />
       <AnchorPane fx:id="deckView" layoutX="440.0" layoutY="235.0" prefHeight="250.0" prefWidth="200.0" />
-      <AnchorPane fx:id="players" layoutX="23.0" layoutY="14.0" prefHeight="200.0" prefWidth="716.0" />
+      <AnchorPane fx:id="players" layoutX="23.0" layoutY="14.0" prefHeight="200.0" prefWidth="716.0">
+         <children>
+            <HBox fx:id="hbxOtherPlayers" layoutX="14.0" layoutY="14.0" prefHeight="173.0" prefWidth="688.0" />
+         </children></AnchorPane>
       <AnchorPane fx:id="player" layoutX="219.0" layoutY="506.0" prefHeight="200.0" prefWidth="851.0">
          <children>
             <Label fx:id="lblPlayerName" layoutX="14.0" layoutY="14.0" text="Label" />
@@ -22,5 +26,14 @@
          </children></AnchorPane>
       <Button fx:id="btnOne" layoutX="23.0" layoutY="633.0" mnemonicParsing="false" onAction="#callOne" prefHeight="73.0" prefWidth="181.0" text="UNO" />
       <Button fx:id="btnConfirm" layoutX="1085.0" layoutY="633.0" mnemonicParsing="false" onAction="#confirm" prefHeight="73.0" prefWidth="181.0" text="Confirmar" />
+      <AnchorPane layoutX="914.0" layoutY="306.0" prefHeight="200.0" prefWidth="362.0">
+         <children>
+            <GridPane fx:id="grdPlayableCards" layoutX="27.0" layoutY="21.0" prefHeight="159.0" prefWidth="309.0">
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+            </GridPane>
+         </children>
+      </AnchorPane>
    </children>
 </AnchorPane>

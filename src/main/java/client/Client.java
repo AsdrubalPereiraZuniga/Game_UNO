@@ -1,7 +1,9 @@
 package client;
 
+import cards.ActionCard;
 import cards.Card;
 import cards.NumberCard;
+import cards.WildCard;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -15,45 +17,48 @@ import java.util.Arrays;
  * @author Jorge Rojas Mena.
  * @author Asdrubal Pererira Zuñiga.
  * @author Cesar Fabian Arguedas León.
- * 
- * This class is the one that handles the connection with the server en the 
+ *
+ * This class is the one that handles the connection with the server en the
  * frontend.
  */
 public class Client {
+
     private boolean connect;
     private boolean ready;
     private int port;
-    private ArrayList<String> cards;
+    private ArrayList<Card> cards;
     private DataInputStream input;
     private DataOutputStream output;
     private Socket socket;
     private String playerName;
     private String host;
     private Thread listenerThread;
-    
+    private ArrayList<OtherPlayers> otherPlayers;
+
     /**
      * @param playerName the name of the player.
      * @param host the IP of the server.
      * @param port the port of the server.
-     * 
+     *
      * Creates a client and initialize the connection to the server, after that
      * start listening for the server.
      */
     public Client(String playerName, String host, int port) {
-        this.playerName = playerName; 
+        this.playerName = playerName;
         this.host = host;
         this.port = port;
         this.ready = false;
         this.cards = new ArrayList<>();
-        
+        this.otherPlayers = new ArrayList<>();
+
         initializeConnection();
         startListening();
     }
-    
+
     /**
      * Initialize the connecction to the server.
      */
-    private void initializeConnection(){
+    private void initializeConnection() {
         try {
             socket = new Socket(this.host, this.port);
             output = new DataOutputStream(socket.getOutputStream());
@@ -64,11 +69,11 @@ public class Client {
         }
         connectToServer();
     }
-    
+
     /**
      * Connecto to the server.
      */
-    private void connectToServer(){
+    private void connectToServer() {
         try {
             output.writeUTF(playerName + "/");
             output.flush();
@@ -78,11 +83,11 @@ public class Client {
             this.connect = false;
         }
     }
-    
+
     /**
      * Start listening for the server messages.
      */
-     private void startListening() {
+    private void startListening() {
         listenerThread = new Thread(() -> {
             while (connect && !socket.isClosed()) {
                 try {
@@ -99,19 +104,20 @@ public class Client {
         listenerThread.start();
     }
 
-     /**
-      * @param message of the server.
-      * 
-      * Handle the message of the server.
-      */
+    /**
+     * @param message of the server.
+     *
+     * Handle the message of the server.
+     */
     private void processServerMessage(String message) {
-        System.out.println("message: "+ message);
+        System.out.println("message: " + message);
         String messageCode = message.split("/")[0];
         switch (messageCode) {
             case "CARDS":
                 setPlayerDeck(message);
                 break;
             case "READY":
+                initializeOtherPlayers(message);
                 this.ready = true;
                 break;
             case "":
@@ -123,7 +129,7 @@ public class Client {
 
     /**
      * @param message for the server.
-     * 
+     *
      * Send a message to the server.
      */
     public void sendMessage(String message) {
@@ -151,20 +157,43 @@ public class Client {
             System.out.println("Error closing connection: " + e.getMessage());
         }
     }
-    
-    private void setPlayerDeck(String message){
-        String[] cards = message.split("/");
-        for (int i = 1; i< cards.length; i++){
-            this.cards.add(cards[i]);
+
+    private void setPlayerDeck(String message) {
+        String[] deck = message.split("/");
+        for (int i = 1; i < deck.length; i++) {
+            this.cards.add(getCard(deck[i]));
         }
     }
-    
-    private String getCardUrl(String card){
-        String type = card.substring(0,1);
+
+    private Card getCard(String card) {
+        String code = card.substring(0, 1);
+        String value = card.substring(1);
+        switch (value) {
+            case "10":
+            case "11":
+            case "12":
+                return new ActionCard(code, value);
+            default:
+                switch (code) {
+                    case "B":
+                    case "G":
+                    case "R":
+                    case "Y":
+                        return new NumberCard(code, value);
+                    case "C":
+                        return new WildCard(code, value);
+                    default:
+                        return null;
+                }
+        }
+    }
+
+    private String getCardUrl(String card) {
+        String type = card.substring(0, 1);
         String url;
         switch (type) {
             case "B":
-                url = getClass().getResource("/images/blue/"+card+".png").toString();
+                url = getClass().getResource("/images/blue/" + card + ".png").toString();
                 break;
             default:
                 throw new AssertionError();
@@ -172,9 +201,23 @@ public class Client {
         return url;
     }
 
+    private void initializeOtherPlayers(String message) {
+        String[] players = message.split("/");
+        String name;
+        int amountOfCards;
+        String[] data;
+        for (int i = 1; i < players.length; i++) {
+            System.out.println("i: " + i);
+            data = players[i].split(";");
+            name = data[0];
+            amountOfCards = Integer.parseInt(data[1]);
+            this.otherPlayers.add(new OtherPlayers(name, amountOfCards));
+        }
+    }
+
     /**
      * @return the player name.
-     * 
+     *
      * Return the player name.
      */
     public String getPlayerName() {
@@ -183,7 +226,7 @@ public class Client {
 
     /**
      * @param playerName the player name.
-     * 
+     *
      * Sets the player name.
      */
     public void setPlayerName(String playerName) {
@@ -192,7 +235,7 @@ public class Client {
 
     /**
      * @return the connection of the player with the server.
-     * 
+     *
      * Handle the state of the connection of the player with the server.
      */
     public boolean isConnect() {
@@ -201,7 +244,7 @@ public class Client {
 
     /**
      * @param connect the new value of the connection.
-     * 
+     *
      * Change the state of the connection.
      */
     public void setConnect(boolean connect) {
@@ -210,7 +253,7 @@ public class Client {
 
     /**
      * @return if the player is ready to start.
-     * 
+     *
      * Handle if the player is ready to start.
      */
     public boolean isReady() {
@@ -219,21 +262,27 @@ public class Client {
 
     /**
      * @param ready new value of reeady.
-     * 
+     *
      * Change the state ready of the player.
      */
     public void setReady(boolean ready) {
         this.ready = ready;
     }
 
-    public ArrayList<String> getCards() {
+    public ArrayList<Card> getCards() {
         return cards;
     }
 
-    public void setCards(ArrayList<String> cards) {
+    public void setCards(ArrayList<Card> cards) {
         this.cards = cards;
     }
-    
-    
-  
+
+    public ArrayList<OtherPlayers> getOtherPlayers() {
+        return otherPlayers;
+    }
+
+    public void setOtherPlayers(ArrayList<OtherPlayers> otherPlayers) {
+        this.otherPlayers = otherPlayers;
+    }
+
 }
