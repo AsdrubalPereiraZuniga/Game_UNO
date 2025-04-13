@@ -95,13 +95,10 @@ public class Server {
                 Socket socket = serverSocket.accept();
                 DataInputStream readFlow = new DataInputStream(
                         new BufferedInputStream(socket.getInputStream()));
-//               String name = readFlow.readUTF();
-                System.out.println("Connection accepted ");
+                String playerName = readFlow.readUTF().split("/")[0];
+                System.out.println("Connection accepted by " + playerName);
 
-                // Thread flow = new Thread(new Flow(socket, name, cardsStack));
-                Thread flow = new Thread(new Flow(socket, "aux"));
-
-                flow.start();
+                createNewFlow(socket, playerName);
 
             } catch (Exception e) {
                 System.out.println("Error: " + e);
@@ -111,11 +108,28 @@ public class Server {
 
     }
 
-    public static void showStack() {
-        for (int i = 0; i < cardsStack.size(); i++) {
+    public static void createNewFlow(Socket socket, String playerName) {
+        if (Flow.doFunctionPlayersReady) {
+            Thread flow = new Thread(new Flow(socket, playerName));
 
-            System.out.println(cardsStack.get(i).toString());
+            flow.start();
+        } else {
+            gameHasAlreadyBugun(socket);
         }
+    }
+
+    public static void gameHasAlreadyBugun(Socket socket) {
+
+        try {
+            DataOutputStream writeFlow = new DataOutputStream(
+                    new BufferedOutputStream(socket.getOutputStream()));
+            writeFlow.writeUTF("FORBIDDEN/");
+            writeFlow.flush();
+        } catch (IOException ex) {
+            System.out.println("Error al indicar que el juego incio");
+            ex.printStackTrace();
+        }
+
     }
 
     public static void initDeck() {
@@ -125,9 +139,16 @@ public class Server {
         addCardsToStackAndShuffle();
 
         cardsQueue.add(cardsStack.pop());
-        
+
         showStack();
 
+    }
+
+    public static void showStack() {
+        for (int i = 0; i < cardsStack.size(); i++) {
+
+            System.out.println(cardsStack.get(i).toString());
+        }
     }
 
     public static void addCardsToStackAndShuffle() {
@@ -140,7 +161,6 @@ public class Server {
                 } else {
                     Card actionCard = new ActionCard(color, Integer.toString(i));
                     cardsStack.push(actionCard);
-
                 }
             }
             Card numberCardZero = new NumberCard(color, "0");
@@ -152,8 +172,6 @@ public class Server {
         }
 
         Collections.shuffle(cardsStack);
-
     }
-
 
 }
