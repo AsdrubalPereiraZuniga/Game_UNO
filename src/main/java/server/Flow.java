@@ -33,6 +33,7 @@ public class Flow implements Runnable {
     private DataOutputStream writeFlow;
     private String name;
     private Player player;
+    private int playerPosition = 0;
     private static String playersReadyMessage = "READY/";
     private static String responseStart = "START/";
     private static String responsePUT = "PUT/";
@@ -106,25 +107,28 @@ public class Flow implements Runnable {
                 System.out.println("Message");
         }
     }
-    
-//    private void putPlayersOnHold(){
+
+//    private void putPlayersOnHold() {
+//
+//       
 //        
-//        int position = 0;//test
-//        
+//
 //        int index;
 //        System.out.println("tam array playeers:" + Server.players.size());
-//        for(index = 0; index < Server.players.size(); index++){
-//            if(index != position){
-//                try {
-//                    //obtener el flujo del jugador y ponerlo wait
-//                    Server.players.get(index).getFlow().wait();
-//                } catch (InterruptedException ex) {
-//                    System.out.println("error colocando en espera al juagdor");
+//        for (index = 0; index < Server.players.size(); index++) {
+//            if (index != playerPosition) {
+//                //obtener el flujo del jugador y ponerlo wait
+//                Flow playerFlow = Server.players.get(index).getFlow();
+//                synchronized (playerFlow) {
+//                    try {
+//                        playerFlow.wait();
+//                    } catch (Exception e) {
+//                        System.out.println("Error al colocar en espera: " + e);
+//                    }
 //                }
 //            }
 //        }
 //    }
-
     private void checkPlayersReady() {
         System.out.println("mierda esta rady:" + playersReady());
 
@@ -178,13 +182,12 @@ public class Flow implements Runnable {
         return true;
     }
 
-    private void sendInitialCards() { // mejorar para que sea general luego
+    private void sendInitialCards() {
         //String message = "CARDS/";
 
         for (Card card : this.player.getCards()) {
             responseInitialCards += card.toString() + "/";
         }
-
         try {
 
             this.writeFlow.writeUTF(responseInitialCards);
@@ -198,17 +201,19 @@ public class Flow implements Runnable {
     private synchronized void putCardInQueue(String request) { // Pregunta si se pueden poner mas de dos cartas a por turno
         //String message = "PUT/";
 
-        
         //manejar el turno aqui, para ver si deja que ponga cartas
         
         
-        //int cant = message.split("/").length -1;
-        String card = request.split("/")[1];
+        String[] cards = request.split("/");
 
-        Server.cardsQueue.add(createObjectCard(card));
+        int index = 1;
+        while (index < cards.length) {
+            Server.cardsQueue.add(createObjectCard(cards[index]));
+            index++;
+        }
 
         //broadcast para que todos vean la carta que se ppuso
-        responsePUT += createObjectCard(card).toString();
+        responsePUT += createObjectCard(cards[index-1]).toString();
         broadcast(responsePUT);
 
     }
@@ -254,8 +259,8 @@ public class Flow implements Runnable {
         return playerCards;
     }
 
-    private void printPlayerCards() {
-        for (Player playerAux : Server.players) { //luego quito esto
+    private void printPlayerCards() { //luego quito esto
+        for (Player playerAux : Server.players) { 
             System.out.println("Cartas de un player");
             for (Card card : playerAux.getCards()) {
                 System.out.println(card.toString());
