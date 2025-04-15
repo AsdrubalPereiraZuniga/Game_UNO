@@ -139,6 +139,7 @@ public class Client {
      * Send a message to the server.
      */
     public void sendMessage(String message) {
+        System.out.println("message: "+message);
         if (connect) {
             try {
                 output.writeUTF(message);
@@ -174,40 +175,20 @@ public class Client {
     private Card getCard(String card) {
         String code = card.substring(0, 1);
         String value = card.substring(1);
-        switch (value) {
-            case "10":
-            case "11":
-            case "12":
-                return new ActionCard(code, value);
-            default:
-                switch (code) {
-                    case "B":
-                    case "G":
-                    case "R":
-                    case "Y":
-                        return new NumberCard(code, value);
-                    case "C":
-                        return new WildCard(code, value);
-                    default:
-                        return null;
-                }
+        if (code.equals("C")) {
+            return new WildCard(code, value);
         }
-    }
-
-    private String getCardUrl(String card) {
-        String type = card.substring(0, 1);
-        String url;
-        switch (type) {
-            case "B":
-                url = getClass().getResource("/images/blue/" + card + ".png").toString();
-                break;
-            default:
-                throw new AssertionError();
+        if (Integer.parseInt(value) > 9) {
+            return new ActionCard(code, value);
         }
-        return url;
+        if (Integer.parseInt(value) < 10) {
+            return new NumberCard(code, value);
+        }
+        return null;
     }
 
     private void initializeOtherPlayers(String message) {
+        this.otherPlayers.clear();
         String[] players = message.split("/");
         String name;
         int amountOfCards;

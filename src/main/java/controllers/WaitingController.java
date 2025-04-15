@@ -72,6 +72,7 @@ public class WaitingController implements Initializable {
         startWaitingAnimation();
         startPlayerReadyCheck();
     }
+
     /**
      * Start verifying if all the players are ready.
      */
@@ -82,28 +83,35 @@ public class WaitingController implements Initializable {
                 while (!stopChecking && !client.isReady() && !client.isForbidden()) {
                     TimeUnit.SECONDS.sleep(1);
                 }
+                handleStatusOfTheMessage();
 
-                Platform.runLater(() -> {
-                    if (client.isForbidden()) {
-                        lblWatingForPlayers.setText("El juego ya inició");
-
-                        new Timeline(new KeyFrame(
-                                Duration.seconds(1),
-                                e -> App.setRoot("LoginScreen")
-                        )).play();
-                    } else {
-                        if (animationTimeline != null) {
-                            animationTimeline.stop();
-                        }
-                        App.setRoot("MainScreen");
-                    }
-                });
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         });
         readyCheckThread.setDaemon(true);
         readyCheckThread.start();
+    }
+
+    private void handleStatusOfTheMessage() {
+        Platform.runLater(() -> {
+            if (client.isForbidden()) {
+                if (animationTimeline != null) {
+                    animationTimeline.stop();
+                }
+                lblWatingForPlayers.setText("El juego ya inició");
+
+                new Timeline(new KeyFrame(
+                        Duration.seconds(5),
+                        e -> App.setRoot("LoginScreen")
+                )).play();
+            } else {
+                if (animationTimeline != null) {
+                    animationTimeline.stop();
+                }
+                App.setRoot("MainScreen");
+            }
+        });
     }
 
 // Método para detener la verificación cuando sea necesario

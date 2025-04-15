@@ -16,6 +16,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
@@ -64,8 +65,19 @@ public class HandleCards {
         // Configurar columnas
         for (int i = 0; i < cardCount; i++) {
             ColumnConstraints cc = new ColumnConstraints();
-            cc.setHgrow(Priority.SOMETIMES);
-            cc.setFillWidth(true);
+            // Tamaño base deseado para cada carta (ej: 120px)
+            cc.setPrefWidth(120);
+
+            // Ancho mínimo para que no se deformen (ej: 80px)
+            cc.setMinWidth(80);
+
+            // Permite que las columnas se compriman si no hay espacio
+            cc.setMaxWidth(Region.USE_COMPUTED_SIZE);
+
+            // Opcional: Prioridad de crecimiento (para espacio extra)
+            cc.setHgrow(Priority.NEVER);
+
+            instance.grdCards.setAlignment(Pos.CENTER);
             instance.grdCards.getColumnConstraints().add(cc);
         }
 
@@ -73,29 +85,28 @@ public class HandleCards {
         for (int i = 0; i < cardCount; i++) {
             VBox cardContainer
                     = createCardContainer(
-                            instance.client.getCards().get(i).getColor()
-                            + instance.client.getCards().get(i).getValue(), i);
+                            instance.client.getCards().get(i).toString(),
+                            i, instance.client.getCards());
             instance.grdCards.add(cardContainer, i, 0);
         }
     }
 
-    private VBox createCardContainer(String cardText, int cardIndex) {
+    private VBox createCardContainer(String cardText, int cardIndex, 
+            ArrayList<Card> cards) {
         VBox cardContainer = new VBox();
         cardContainer.setPrefSize(NORMAL_WIDTH, CARD_HEIGHT);
         cardContainer.setStyle("-fx-background-color: white; -fx-border-color: "
                 + "#333; -fx-border-radius: 5;");
         cardContainer.setAlignment(Pos.CENTER);
 
-        // Usar ImageView si tienes imágenes de cartas
         try {
             ImageView cardImage = new ImageView(new Image(
-                    instance.client.getCards().get(cardIndex).getImagePath()
-                    + ".png"));
+                    cards.get(cardIndex).getImagePath()));
             cardImage.setPreserveRatio(true);
             cardImage.setFitWidth(NORMAL_WIDTH - 10);
             cardContainer.getChildren().add(cardImage);
         } catch (Exception e) {
-            // Fallback a Label si no hay imagen
+            // Si no hay imagen
             Label label = new Label(cardText);
             label.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
             cardContainer.getChildren().add(label);
@@ -105,7 +116,8 @@ public class HandleCards {
         setupHoverEffects(cardContainer);
 
         // Configurar evento click
-        cardContainer.setOnMouseClicked(e -> handleCardClick(cardIndex, cardText));
+        cardContainer.setOnMouseClicked(e -> handleCardClick(cardIndex, 
+                cardText));
 
         return cardContainer;
     }
@@ -120,7 +132,6 @@ public class HandleCards {
         cardContainer.setOnMouseEntered(e -> {
             ScaleTransition st = new ScaleTransition(ANIMATION_DURATION,
                     cardContainer);
-            cardContainer.setPrefWidth(HOVER_WIDTH);
             st.setToX(1.2);
             st.setToY(1.1);
             st.play();
@@ -134,7 +145,6 @@ public class HandleCards {
         cardContainer.setOnMouseExited(e -> {
             ScaleTransition st = new ScaleTransition(ANIMATION_DURATION,
                     cardContainer);
-            cardContainer.setPrefWidth(normalSize);
             st.setToX(1.0);
             st.setToY(1.0);
             st.play();
@@ -157,8 +167,19 @@ public class HandleCards {
         // Configurar columnas
         for (int i = 0; i < cardCount; i++) {
             ColumnConstraints cc = new ColumnConstraints();
-            cc.setHgrow(Priority.SOMETIMES);
-            cc.setFillWidth(true);
+            // Tamaño base deseado para cada carta (ej: 120px)
+            cc.setPrefWidth(120);
+
+            // Ancho mínimo para que no se deformen (ej: 80px)
+            cc.setMinWidth(80);
+
+            // Permite que las columnas se compriman si no hay espacio
+            cc.setMaxWidth(Region.USE_COMPUTED_SIZE);
+
+            // Opcional: Prioridad de crecimiento (para espacio extra)
+            cc.setHgrow(Priority.NEVER);
+
+            grid.setAlignment(Pos.CENTER);
             grid.getColumnConstraints().add(cc);
         }
 
@@ -166,8 +187,7 @@ public class HandleCards {
         for (int i = 0; i < cardCount; i++) {
             VBox cardContainer
                     = createCardContainer(
-                            cards.get(i).getColor()
-                            + cards.get(i).getValue(), i);
+                            cards.get(i).toString(), i, cards);
             grid.add(cardContainer, i, 0);
         }
     }
@@ -221,7 +241,8 @@ public class HandleCards {
     private boolean verifiedCanPlayWithOtherCards(int cardIndex) {
         boolean canPlay = false;
         for (Card playableCard : instance.playableCards) {
-            if (instance.client.getCards().get(cardIndex).getValue().equals(playableCard.getValue())) {
+            if (instance.client.getCards().get(cardIndex).getValue()
+                    .equals(playableCard.getValue())) {
                 canPlay = true;
             }
         }
