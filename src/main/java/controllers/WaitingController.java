@@ -24,7 +24,7 @@ import javafx.util.Duration;
  * @author Cesar Fabian Arguedas León.
  */
 public class WaitingController implements Initializable {
-    
+
     private static Client client;
     @FXML
     private Button btnReady;
@@ -33,8 +33,6 @@ public class WaitingController implements Initializable {
     private Timeline animationTimeline;
     private volatile boolean stopChecking = false;
     private Thread readyCheckThread;
-    private static WaitingController instance;
-    public static boolean active = true;
 
     /**
      * Initialize.
@@ -44,10 +42,7 @@ public class WaitingController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Inicialización si es necesaria
-        if (active) {
-            this.btnReady.setDisable(true);
-        }
+        
     }
 
     /**
@@ -66,15 +61,17 @@ public class WaitingController implements Initializable {
      */
     @FXML
     private void setReady(ActionEvent event) {
-        if (client == null || instance.active) {
+        if (client == null) {
             System.err.println("Player client is not set!");
             return;
         }
-        this.btnReady.setDisable(true);
-        String message = "READY/" + WaitingController.client.getPlayerName() + "/";
-        WaitingController.client.sendMessage(message);
-        startWaitingAnimation();
-        startPlayerReadyCheck();
+        if (client.isActiveButton()) {
+            this.btnReady.setDisable(true);
+            String message = "READY/" + WaitingController.client.getPlayerName() + "/";
+            WaitingController.client.sendMessage(message);
+            startWaitingAnimation();
+            startPlayerReadyCheck();
+        }
     }
 
     /**
@@ -88,7 +85,7 @@ public class WaitingController implements Initializable {
                     TimeUnit.SECONDS.sleep(1);
                 }
                 handleStatusOfTheMessage();
-                
+
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -96,7 +93,7 @@ public class WaitingController implements Initializable {
         readyCheckThread.setDaemon(true);
         readyCheckThread.start();
     }
-    
+
     private void handleStatusOfTheMessage() {
         Platform.runLater(() -> {
             if (client.isForbidden()) {
@@ -104,7 +101,7 @@ public class WaitingController implements Initializable {
                     animationTimeline.stop();
                 }
                 lblWatingForPlayers.setText("El juego ya inició");
-                
+
                 new Timeline(new KeyFrame(
                         Duration.seconds(5),
                         e -> App.setRoot("LoginScreen")
@@ -131,7 +128,7 @@ public class WaitingController implements Initializable {
      */
     private void startWaitingAnimation() {
         String originalText = lblWatingForPlayers.getText();
-        
+
         animationTimeline = new Timeline(
                 new KeyFrame(Duration.seconds(0.5),
                         e -> lblWatingForPlayers.setText(originalText + " .")),
@@ -144,16 +141,5 @@ public class WaitingController implements Initializable {
         );
         animationTimeline.setCycleCount(Timeline.INDEFINITE);
         animationTimeline.play();
-    }
-    
-    public void activeButtom() {
-        this.btnReady.setDisable(false);
-    }
-    
-    public static WaitingController getInstance() {
-        if (WaitingController.instance == null) {
-            return new WaitingController();
-        }
-        return WaitingController.instance;
     }
 }

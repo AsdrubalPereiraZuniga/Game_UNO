@@ -130,7 +130,7 @@ public class MainController implements Initializable {
         }
         int last = HandleCards.getInstace().getPlayCards().size() - 1;
         Card card = HandleCards.getInstace().getPlayCards().get(last);
-            
+                
         if (canPlay(HandleCards.getInstace().getPlayCards())) {
             setTopCard(card);
             instance.client.sendMessage(createMessage());
