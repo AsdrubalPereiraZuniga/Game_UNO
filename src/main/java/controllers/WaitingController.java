@@ -33,6 +33,8 @@ public class WaitingController implements Initializable {
     private Timeline animationTimeline;
     private volatile boolean stopChecking = false;
     private Thread readyCheckThread;
+    private static WaitingController instance;
+    private boolean active;
 
     /**
      * Initialize.
@@ -61,11 +63,10 @@ public class WaitingController implements Initializable {
      */
     @FXML
     private void setReady(ActionEvent event) {
-        if (client == null) {
+        if (client == null || instance.active) {
             System.err.println("Player client is not set!");
             return;
         }
-
         this.btnReady.setDisable(true);
         String message = "READY/" + WaitingController.client.getPlayerName() + "/";
         WaitingController.client.sendMessage(message);
@@ -140,5 +141,17 @@ public class WaitingController implements Initializable {
         );
         animationTimeline.setCycleCount(Timeline.INDEFINITE);
         animationTimeline.play();
+    }
+    
+    public void activeButtom(){
+        instance.active = false;
+    }
+    
+    public static WaitingController getInstance(){
+        if(WaitingController.instance == null){
+            return new WaitingController();
+        }
+        WaitingController.instance.active = true;
+        return WaitingController.instance;
     }
 }

@@ -130,13 +130,9 @@ public class MainController implements Initializable {
         }
         int last = HandleCards.getInstace().getPlayCards().size() - 1;
         Card card = HandleCards.getInstace().getPlayCards().get(last);
-        System.out.println("intance: "+HandleCards.getInstace());
-
+            
         if (canPlay(HandleCards.getInstace().getPlayCards())) {
-            this.usedCardsView.getChildren().clear();
-            this.usedCardsView.getChildren().add(getNewCard(card));
-            this.grdPlayableCards.getChildren().clear();
-            instance.lastCard = card;
+            setTopCard(card);
             instance.client.sendMessage(createMessage());
             HandleCards.getInstace().getPlayCards().clear();
         } else {
@@ -146,6 +142,13 @@ public class MainController implements Initializable {
             HandleCards.getInstace().getPlayCards().clear();
             HandleCards.getInstace().setClient(instance.client);
         }
+    }
+
+    public void setTopCard(Card card) {
+        this.usedCardsView.getChildren().clear();
+        this.usedCardsView.getChildren().add(getNewCard(card));
+        this.grdPlayableCards.getChildren().clear();
+        instance.lastCard = card;
     }
 
     private String createMessage() {
@@ -186,6 +189,7 @@ public class MainController implements Initializable {
                 equals(card.getValue())) {
             return true;
         }
+        //verificar si la puede colocar sobre una de cambio de color o los +4
         return false;
     }
 
