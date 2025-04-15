@@ -39,7 +39,7 @@ public class Flow implements Runnable {
     private static String responsePUT = "PUT/";
     private static String responseInitialCards = "CARDS/";
     private static String responseActiveButtom = "ACTIVE";
-
+    
 
     public static boolean doFunctionPlayersReady = true;
 
@@ -68,12 +68,12 @@ public class Flow implements Runnable {
         System.out.println("player added");
 
         printPlayerCards();
-        
+
         enableReadyButtom();
 
         //envio las varas
-        System.out.println("ultima card de la cola:" + Server.cardsQueue.peek().toString());// peek envia la primera pero solo hay 1
-        broadcast(Server.cardsQueue.peek().toString());//
+     
+        broadcast("TOP/"+Server.cardsQueue.peek().toString());//
 
         sendInitialCards();
 
@@ -101,7 +101,7 @@ public class Flow implements Runnable {
         System.out.println("codee: " + code);
         switch (code) {
             case "READY":
-                
+
                 this.player.setReady(true);
                 broadcast(numberOfCardsPerPlayer());
                 //poner aqui todos los jugadores con wait menos el primero
@@ -117,9 +117,9 @@ public class Flow implements Runnable {
                 System.out.println("No se reccibio nah");
         }
     }
-    
-    public void enableReadyButtom(){
-        if(Server.players.size() >= 2){
+
+    public void enableReadyButtom() {
+        if (Server.players.size() >= 2) {
             broadcast(responseActiveButtom);
         }
     }
@@ -191,17 +191,16 @@ public class Flow implements Runnable {
     private String numberOfCardsPerPlayer() {
         //String message = "START/";
         responseStart = "START/";
-            
-        for (Player playerAux : Server.players) {
-            if (!playerAux.getUsername().equals(this.name)) {
 
-                responseStart += playerAux.getUsername() + ";";
-                int cont = 0;
-                while (cont < playerAux.getCards().size()) {
-                    cont++;
-                }
-                responseStart += cont + "/";
+        for (Player playerAux : Server.players) {
+            if(!playerAux.getUsername().equals(this.name)){
+                
+            responseStart += playerAux.getUsername() + ";";
+      
+         
+            responseStart += (playerAux.getCards().size() +1) + "/";
             }
+
         }
         System.out.println("responseStar: " + responseStart);
         return responseStart;
@@ -220,7 +219,7 @@ public class Flow implements Runnable {
 
     private void sendInitialCards() {
         //String message = "CARDS/";
-        
+
         responseInitialCards = "CARDS/";
 
         for (Card card : this.player.getCards()) {
@@ -238,7 +237,7 @@ public class Flow implements Runnable {
 
     private synchronized void putCardInQueue(String request) { // Pregunta si se pueden poner mas de dos cartas a por turno
         //String message = "PUT/";
-        
+
         responsePUT = "PUT/";
 
         //manejar el turno aqui, para ver si deja que ponga cartas
