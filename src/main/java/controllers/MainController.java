@@ -40,6 +40,7 @@ import javafx.util.Duration;
 public class MainController implements Initializable {
 
     private static MainController instance;
+
     private Client client;
     @FXML
     private AnchorPane bgView;
