@@ -5,6 +5,7 @@ import client.Client;
 import client.HandleCards;
 import client.OtherPlayers;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javafx.animation.ScaleTransition;
 import javafx.event.ActionEvent;
@@ -123,15 +124,20 @@ public class MainController implements Initializable {
      */
     @FXML
     private void confirm(ActionEvent event) {
-        if(HandleCards.getInstace().getPlayCards().isEmpty()) return;
+        if (HandleCards.getInstace().getPlayCards().isEmpty()) {
+            return;
+        }
         int last = HandleCards.getInstace().getPlayCards().size() - 1;
         Card card = HandleCards.getInstace().getPlayCards().get(last);
-        if (canPlay(card)) {
+        System.out.println("intance: "+HandleCards.getInstace());
+
+        if (canPlay(HandleCards.getInstace().getPlayCards())) {
             this.usedCardsView.getChildren().clear();
             this.usedCardsView.getChildren().add(getNewCard(card));
-            HandleCards.getInstace().getPlayCards().clear();
             this.grdPlayableCards.getChildren().clear();
             instance.lastCard = card;
+            instance.client.sendMessage(createMessage());
+            HandleCards.getInstace().getPlayCards().clear();
         } else {
             for (Card playCard : HandleCards.getInstace().getPlayCards()) {
                 instance.client.getCards().add(playCard);
@@ -141,19 +147,54 @@ public class MainController implements Initializable {
         }
     }
 
-    private boolean canPlay(Card card) {
+    private String createMessage() {
+        String message = "";
+        String code;
+
+        message = "PUT/" + getCardsValue();
+
+        System.out.println("message: " + message);
+        return message;
+    }
+
+    private String getCardsValue() {
+        String cardsValue = "";
+        for (Card playableCard : HandleCards.getInstace().getPlayCards()) {
+            cardsValue = cardsValue + playableCard.toString() + "/";
+        }
+        return cardsValue;
+    }
+
+    private boolean canPlay(ArrayList<Card> cards) {
         if (instance.lastCard == null) {
             return true;
         }
+        if (cards.size() == 1) {
+            return handleOnePlayedCard(cards.get(0));
+        } else {
+            return handleManyPlayedCards(cards.get(0));
+        }
+    }
+
+    private boolean handleOnePlayedCard(Card card) {
+        if (instance.lastCard.getColor().
+                equals(card.getColor())) {
+            return true;
+        }
+        if (instance.lastCard.getValue().
+                equals(card.getValue())) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean handleManyPlayedCards(Card card) {
         if (instance.lastCard.getColor().equals(card.getColor())) {
             return true;
         }
         if (instance.lastCard.getValue().equals(card.getValue())) {
             return true;
         }
-        
-        //si la primera carta es del mismo color o numero se debe de porder jugar y colocar la última del array
-        //más comprobaciones
         return false;
     }
 
@@ -166,11 +207,9 @@ public class MainController implements Initializable {
                 + "#333; -fx-border-radius: 5;");
         cardContainer.setAlignment(Pos.CENTER);
 
-        // Usar ImageView si tienes imágenes de cartas
         try {
             ImageView cardImage = new ImageView(new Image(
-                    card.getImagePath()
-                    + ".png"));
+                    card.getImagePath()));
             cardImage.setPreserveRatio(true);
             cardImage.setFitWidth(NORMAL_WIDTH - 10);
             cardContainer.getChildren().add(cardImage);
