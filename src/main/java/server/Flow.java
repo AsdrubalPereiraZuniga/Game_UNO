@@ -73,7 +73,7 @@ public class Flow implements Runnable {
 
         //envio las varas
      
-        broadcast("TOP/"+Server.cardsQueue.peek().toString());//
+       // broadcast("TOP/"+Server.cardsQueue.peek().toString());//
 
         sendInitialCards();
 
@@ -103,7 +103,8 @@ public class Flow implements Runnable {
             case "READY":
 
                 this.player.setReady(true);
-                broadcast(numberOfCardsPerPlayer());
+                sendMenssage();
+                
                 //poner aqui todos los jugadores con wait menos el primero
 //                if (aux()) {
 //                    putPlayersOnHold();
@@ -115,6 +116,15 @@ public class Flow implements Runnable {
                 break;
             default:
                 System.out.println("No se reccibio nah");
+        }
+    }
+    
+    public void sendMenssage(){
+        try {
+            this.writeFlow.writeUTF(numberOfCardsPerPlayer());
+            this.writeFlow.flush();
+        } catch (IOException ex) {
+            System.out.println("Error al envia mensaje: " + ex);
         }
     }
 
@@ -198,7 +208,7 @@ public class Flow implements Runnable {
             responseStart += playerAux.getUsername() + ";";
       
          
-            responseStart += (playerAux.getCards().size() +1) + "/";
+            responseStart += playerAux.getCards().size() + "/";
             }
 
         }
