@@ -131,7 +131,9 @@ public class Client {
             case "TOP":
                 setTopCard(message);
             case "Active":
+                WaitingController.active = false;
                 WaitingController.getInstance().activeButtom();
+                
             case "":
                 break;
             default:
