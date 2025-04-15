@@ -4,6 +4,8 @@ import cards.ActionCard;
 import cards.Card;
 import cards.NumberCard;
 import cards.WildCard;
+import controllers.MainController;
+import controllers.WaitingController;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -126,11 +128,21 @@ public class Client {
             case "START":
                 initializeOtherPlayers(message);
                 break;
+            case "TOP":
+                setTopCard(message);
+            case "Active":
+                WaitingController.getInstance().activeButtom();
             case "":
                 break;
             default:
                 System.out.println(message);
         }
+    }
+    
+    private void setTopCard(String message){
+        String value = message.split("/")[1];
+        Card card = getCard(value);
+        MainController.getInstance().setTopCard(card);
     }
 
     /**
