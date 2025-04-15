@@ -68,7 +68,7 @@ public class Flow implements Runnable {
         printPlayerCards();
 
         //envio las varas
-        System.out.println("ultima card de la cola:" + Server.cardsQueue.peek().toString());
+        System.out.println("ultima card de la cola:" + Server.cardsQueue.peek().toString());// peek envia la primera pero solo hay 1
         broadcast(Server.cardsQueue.peek().toString());//
 
         sendInitialCards();
@@ -99,6 +99,7 @@ public class Flow implements Runnable {
                 this.player.setReady(true);
                 broadcast(numberOfCardsPerPlayer());
                 //poner aqui todos los jugadores con wait menos el primero
+                //putPlayersOnHold();
                 break;
             case "PUT":
                 putCardInQueue(request);
@@ -108,27 +109,30 @@ public class Flow implements Runnable {
         }
     }
 
-//    private void putPlayersOnHold() {
-//
-//       
-//        
-//
-//        int index;
-//        System.out.println("tam array playeers:" + Server.players.size());
-//        for (index = 0; index < Server.players.size(); index++) {
-//            if (index != playerPosition) {
-//                //obtener el flujo del jugador y ponerlo wait
-//                Flow playerFlow = Server.players.get(index).getFlow();
-//                synchronized (playerFlow) {
-//                    try {
-//                        playerFlow.wait();
-//                    } catch (Exception e) {
-//                        System.out.println("Error al colocar en espera: " + e);
-//                    }
-//                }
-//            }
-//        }
-//    }
+    private synchronized void putPlayersOnHold() {
+
+        int index;
+        System.out.println("tam array playeers:" + Server.players.size());
+        for (index = 0; index < Server.players.size(); index++) {
+            if (index != playerPosition) {
+                //obtener el flujo del jugador y ponerlo wait
+                Flow playerFlow = Server.players.get(index).getFlow();
+                synchronized (playerFlow) {
+                    try {
+                        playerFlow.wait();
+                    } catch (Exception e) {
+                        System.out.println("Error al colocar en espera: " + e);
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    private synchronized void handlePlayerTurns(){
+        
+    }
+    
     private void checkPlayersReady() {
         System.out.println("mierda esta rady:" + playersReady());
 
