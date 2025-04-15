@@ -37,6 +37,7 @@ public class Client {
     private Thread listenerThread;
     private ArrayList<OtherPlayers> otherPlayers;
     private boolean forbidden;
+    private boolean activeButton;
 
     /**
      * @param playerName the name of the player.
@@ -54,6 +55,7 @@ public class Client {
         this.cards = new ArrayList<>();
         this.forbidden = false;
         this.otherPlayers = new ArrayList<>();
+        this.activeButton = false;
 
         initializeConnection();
         startListening();
@@ -130,10 +132,8 @@ public class Client {
                 break;
             case "TOP":
                 setTopCard(message);
-            case "Active":
-                WaitingController.active = false;
-                WaitingController.getInstance().activeButtom();
-                
+            case "ACTIVE":
+                this.activeButton = true;
             case "":
                 break;
             default:
@@ -294,4 +294,11 @@ public class Client {
         this.forbidden = forbidden;
     }
 
+    public boolean isActiveButton() {
+        return activeButton;
+    }
+
+    public void setActiveButton(boolean activeButton) {
+        this.activeButton = activeButton;
+    }
 }
