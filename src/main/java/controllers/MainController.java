@@ -185,6 +185,7 @@ public class MainController implements Initializable {
                 equals(card.getValue())) {
             return true;
         }
+        //verificar si la puede colocar sobre una de cambio de color o los +4
         return false;
     }
 
