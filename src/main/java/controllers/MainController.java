@@ -80,6 +80,7 @@ public class MainController implements Initializable {
                 this.grdPlayableCards);
         setOtherPlayers();
         instance.lastCard = null;
+        setTopCard(instance.client.getTopCard());
     }
 
     private void setOtherPlayers() {
