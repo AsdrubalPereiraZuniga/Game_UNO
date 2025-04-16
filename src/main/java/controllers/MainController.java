@@ -84,7 +84,9 @@ public class MainController implements Initializable {
     }
 
     private void setOtherPlayers() {
+        System.out.println("Nombre del men:" + instance.client.getPlayerName());
         for (OtherPlayers otherPlayer : instance.client.getOtherPlayers()) {
+            System.out.println("LOLAAAAAAAAAAAAAAAAAAA:" + otherPlayer.toString());
             if (!otherPlayer.getName().equals(instance.client.getPlayerName())) {
                 this.hbxOtherPlayers.getChildren().add(new Label(
                         otherPlayer.getName() + ": "

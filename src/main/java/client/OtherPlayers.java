@@ -32,4 +32,11 @@ public class OtherPlayers {
         this.name = name;
         this.amountOfCards = amountOfCards;
     }
+
+    @Override
+    public String toString() {
+        return name + " : " + amountOfCards;
+    }
+    
+    
 }
