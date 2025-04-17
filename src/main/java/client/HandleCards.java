@@ -91,7 +91,7 @@ public class HandleCards {
         }
     }
 
-    private VBox createCardContainer(String cardText, int cardIndex, 
+    private VBox createCardContainer(String cardText, int cardIndex,
             ArrayList<Card> cards) {
         VBox cardContainer = new VBox();
         cardContainer.setPrefSize(NORMAL_WIDTH, CARD_HEIGHT);
@@ -116,7 +116,7 @@ public class HandleCards {
         setupHoverEffects(cardContainer);
 
         // Configurar evento click
-        cardContainer.setOnMouseClicked(e -> handleCardClick(cardIndex, 
+        cardContainer.setOnMouseClicked(e -> handleCardClick(cardIndex,
                 cardText));
 
         return cardContainer;
@@ -224,6 +224,10 @@ public class HandleCards {
     }
 
     private void handleCardClick(int cardIndex, String cardText) {
+        System.out.println("waiting?: "+instance.client.isWaiting());
+        if (instance.client.isWaiting()) {
+            return;
+        }
         if (removeFromPlayableCards(cardIndex, cardText)) {
             return;
         }
