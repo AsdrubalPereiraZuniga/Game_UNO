@@ -224,7 +224,6 @@ public class HandleCards {
     }
 
     private void handleCardClick(int cardIndex, String cardText) {
-        System.out.println("waiting?: "+instance.client.isWaiting());
         if (instance.client.isWaiting()) {
             return;
         }
