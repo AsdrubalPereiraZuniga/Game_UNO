@@ -40,8 +40,9 @@ public class Flow implements Runnable {
     private static String responseStart = "START/";
     private static String responsePUT = "PUT/";
     private static String responseInitialCards = "CARDS/";
+
     private static String responseActiveButtom = "ACTIVE/";
-        private static String responseWAIT = "WAIT/";
+    private static String responseWAIT = "WAIT/";
 
     private static ArrayList<String> invertCards
             = new ArrayList<>(Arrays.asList("B12", "G12", "R12", "Y12"));
@@ -78,7 +79,7 @@ public class Flow implements Runnable {
 
         enableReadyButtom();
 
-        broadcast("TOP/"+Server.cardsQueue.peek().toString());//
+        broadcast("TOP/" + Server.cardsQueue.peek().toString());//
         sendInitialCards();
 
         startListening();
@@ -173,8 +174,7 @@ public class Flow implements Runnable {
         //check cancelation of tunr
         checkLimitsOfVectorPlayers();// falta con la de skip
 
-      //  putPlayersOnHold();
-
+        //  putPlayersOnHold();
     }
 
     private void checkSkipCards(Card topCard, int aux) {
