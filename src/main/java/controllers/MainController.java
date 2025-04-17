@@ -22,6 +22,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.ColumnConstraints;
+import java.io.IOException;
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -81,6 +85,7 @@ public class MainController implements Initializable {
         setOtherPlayers();
         instance.lastCard = null;
         setTopCard(instance.client.getTopCard());
+
     }
 
     private void setOtherPlayers() {
@@ -133,7 +138,7 @@ public class MainController implements Initializable {
         }
         int last = HandleCards.getInstace().getPlayCards().size() - 1;
         Card card = HandleCards.getInstace().getPlayCards().get(last);
-                
+
         if (canPlay(HandleCards.getInstace().getPlayCards())) {
             setTopCard(card);
             instance.client.sendMessage(createMessage());
@@ -230,5 +235,4 @@ public class MainController implements Initializable {
         }
         return cardContainer;
     }
-
 }

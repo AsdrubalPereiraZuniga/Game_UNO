@@ -8,6 +8,7 @@ cards\ActionCard.class
 cards\Card.class
 controllers\MainController.class
 client\OtherPlayers.class
+client\TopCardListener.class
 players\Player.class
 module-info.class
 controllers\WaitingController.class

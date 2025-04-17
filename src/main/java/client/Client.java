@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 /**
  * @author Ismael Marchena Méndez.
@@ -40,6 +43,8 @@ public class Client {
     private boolean activeButton;
     private Card topCard;
     private boolean waiting;
+    private boolean myTurn = false;
+    private final Object turnLock = new Object();
 
     /**
      * @param playerName the name of the player.
@@ -148,7 +153,11 @@ public class Client {
                 break;
             case "WAIT":
                 this.waiting = true;
+                setWaitingMode(this.waiting);
                 break;
+            case "TURN":
+                this.waiting = false;
+                setWaitingMode(this.waiting);
             case "":
                 break;
             default:
@@ -227,6 +236,29 @@ public class Client {
             name = data[0];
             amountOfCards = Integer.parseInt(data[1]);
             this.otherPlayers.add(new OtherPlayers(name, amountOfCards));
+        }
+    }
+
+    private void setWaitingMode(boolean waiting) {
+        synchronized (turnLock) {
+            myTurn = !waiting;
+            if (!waiting) {
+                turnLock.notifyAll(); // Despertar al hilo principal
+            }
+        }
+        // Actualizar UI (disable/enable controles)
+    }
+
+    public void waitForTurn() {
+        synchronized (turnLock) {
+            while (!myTurn) {
+                try {
+                    turnLock.wait();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+            }
         }
     }
 
