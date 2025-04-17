@@ -39,6 +39,7 @@ public class Client {
     private boolean forbidden;
     private boolean activeButton;
     private Card topCard;
+    private boolean waiting;
 
     /**
      * @param playerName the name of the player.
@@ -58,6 +59,7 @@ public class Client {
         this.otherPlayers = new ArrayList<>();
         this.activeButton = false;
         this.topCard = null;
+        this.waiting = false;
 
         initializeConnection();
         startListening();
@@ -136,6 +138,8 @@ public class Client {
                 setTopCard(message);
             case "ACTIVE":
                 this.activeButton = true;
+            case "WAIT":
+                this.waiting = true;
             case "":
                 break;
             default:
@@ -310,6 +314,15 @@ public class Client {
     public void setTopCard(Card topCard) {
         this.topCard = topCard;
     }
+
+    public boolean isWaiting() {
+        return waiting;
+    }
+
+    public void setWaiting(boolean waiting) {
+        this.waiting = waiting;
+    }
+    
     
     
 }
