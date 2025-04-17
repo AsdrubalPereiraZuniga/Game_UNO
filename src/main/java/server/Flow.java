@@ -17,11 +17,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.Stack;
 import players.Player;
-import server.Server;
-import static server.Server.cardsStack;
-import static server.Server.players;
 
 /**
  *
@@ -34,30 +30,26 @@ public class Flow implements Runnable {
     private DataOutputStream writeFlow;
     private String name;
     private Player player;
-    private boolean invertOrder = true;
-    
-    private static String playersReadyMessage = "READY/";
-    private static String responseStart = "START/";
-    private static String responsePUT = "PUT/";
-    private static String responseInitialCards = "CARDS/";
 
+    private static boolean invertOrder = false;
+    public static boolean doFunctionPlayersReady = true;
+    private static String playersReadyMessage = "READY/";
     private static String responseActiveButtom = "ACTIVE/";
     private static String responseWAIT = "WAIT/";
+    private static String responseTURN = "TURN/";
+    private static String responseTOP = "TOP/";
+
+    private static int currentPlayerIndex = 0;
+    private static final Object turnLock = new Object();//para que solo un hilo a la vez lo pueda usar
 
     private static ArrayList<String> invertCards
             = new ArrayList<>(Arrays.asList("B12", "G12", "R12", "Y12"));
     private static ArrayList<String> skipCards
-            = new ArrayList<>(Arrays.asList("B12", "G12", "R12", "Y12"));
-
-    public static boolean doFunctionPlayersReady = true;
-
-    private static final Object turnLock = new Object();
-    private static int currentPlayerIndex = 0;
+            = new ArrayList<>(Arrays.asList("B11", "G11", "R11", "Y11"));
 
     public Flow(Socket socket, String name) {
         this.socket = socket;
         this.name = name;
-        // this.cardsStack = cardsStack;
         try {
             readFlow = new DataInputStream(
                     new BufferedInputStream(socket.getInputStream()));
@@ -66,7 +58,6 @@ public class Flow implements Runnable {
         } catch (IOException ioe) {
             System.out.println("IOException(Flujo): " + ioe);
         }
-
     }
 
     @Override
@@ -82,18 +73,18 @@ public class Flow implements Runnable {
 
         enableReadyButtom();
 
-        broadcast("TOP/" + Server.cardsQueue.peek().toString());//
+        broadcast(responseTOP + Server.cardsQueue.peek().toString());//
+
         sendInitialCards();
 
         startListening();
-
     }
 
     private void startListening() {
         while (true) {
             try {
                 String request = this.readFlow.readUTF();
-                System.out.println("lola:" + request);
+                System.out.println("lola: " + request);
                 handleMessage(request);
             } catch (IOException e) {
                 if (disconectPlayer()) {
@@ -108,15 +99,15 @@ public class Flow implements Runnable {
         System.out.println("codee: " + code);
         switch (code) {
             case "READY":
-
                 this.player.setReady(true);
                 checkPlayersReady();
-                sendMenssageToClient(numberOfCardsPerPlayer(), "Error al envia mensaje: ");
+                sendMenssageToClient(numberOfCardsPerPlayer(),
+                        "Error al envia mensaje: ");
 
-                if (playersReady()) {
-                    System.out.println("sppopo" + this.currentPlayerIndex);
-                    putPlayersOnHold();
-                }
+                putPlayersOnHold();
+                
+                //al iniciar mandar broadcast del player con el turno actual
+
                 break;
             case "PUT":
                 putCardInQueue(request);
@@ -142,32 +133,43 @@ public class Flow implements Runnable {
     }
 
     private void putPlayersOnHold() {
-        synchronized (turnLock) {
-            for (int i = 0; i < Server.players.size(); i++) {
-                if (i != currentPlayerIndex) {
-                    Flow playerFlow = Server.players.get(i).getFlow();
-                    playerFlow.sendMenssageToClient(responseWAIT, "Error al poner en espera");
-                } else {
-                    
-                    Flow currentFlow = Server.players.get(currentPlayerIndex).getFlow();
-                    currentFlow.sendMenssageToClient("YOUR_TURN/", "Error al notificar turno");
+        if (playersReady()) {
+            synchronized (turnLock) {
+                for (int i = 0; i < Server.players.size(); i++) {
+                    if (i != currentPlayerIndex) {
+                        Flow playerFlow = Server.players.get(i).getFlow();
+                        playerFlow.sendMenssageToClient(responseWAIT,
+                                "Error al poner en espera");
+                    } else {
+                        Flow currentFlow
+                                = Server.players.get(currentPlayerIndex).getFlow();
+                        currentFlow.sendMenssageToClient(responseTURN,
+                                "Error al notificar turno");
+                    }
                 }
             }
         }
     }
 
-    private synchronized void changeTurn(Card playedCard) {
+    private synchronized void changeTurn(Card topCard, String responsePUT) {
+
         synchronized (turnLock) {
             Server.players.get(currentPlayerIndex).getFlow()
-                    .sendMenssageToClient(responseWAIT, "Error al poner en espera");
-           
-            handlePlayerTurns(playedCard);
+                    .sendMenssageToClient(responseWAIT,
+                            "Error al poner en espera");
+
+            handlePlayerTurns(topCard);
 
             Flow nextPlayerFlow = Server.players.get(currentPlayerIndex).getFlow();
-            nextPlayerFlow.sendMenssageToClient("TURN/", "Error al notificar turno");
+
+            nextPlayerFlow.sendMenssageToClient(responseTURN,
+                    "Error al notificar turno");
 
             turnLock.notifyAll();
         }
+        broadcast(responsePUT);
+        broadcast(responseTURN + Server.players.get(currentPlayerIndex).getUsername()); //*no se ha probado* le envio al cliente el jugador que tiene el turno
+
     }
 
     private synchronized void handlePlayerTurns(Card topCard) {
@@ -183,7 +185,6 @@ public class Flow implements Runnable {
         //check cancelation of tunr
         checkLimitsOfVectorPlayers();// falta con la de skip
 
-        //  putPlayersOnHold();
     }
 
     private void checkSkipCards(Card topCard, int aux) {
@@ -198,31 +199,31 @@ public class Flow implements Runnable {
 
         for (String invertCard : invertCards) {
             if (invertCard.equals(topCard.toString())) {
-                this.invertOrder = !this.invertOrder;
+                invertOrder = !invertOrder;
             }
         }
     }
 
     private void handlePosition(int aux) {
-        if (this.invertOrder) {
-            this.currentPlayerIndex -= aux;
+        if (invertOrder) {
+            currentPlayerIndex -= aux;
         } else {
-            this.currentPlayerIndex += aux;
+            currentPlayerIndex += aux;
         }
+        System.out.println("cueeeeeeeeeeeee:" + currentPlayerIndex);
     }
 
-    private void checkLimitsOfVectorPlayers() { //esto le falta que si esata con el ultimo y es un skip se brinque al 0
-        if (this.currentPlayerIndex > Server.players.size()) {
-            this.currentPlayerIndex = 0;
-        } else if (this.currentPlayerIndex < 0) {
-            this.currentPlayerIndex = Server.players.size();
+    private void checkLimitsOfVectorPlayers() { //esto le falta que si esata con el ultimo y es un skip se brinque al 0 para que pase a 1
+
+        if (currentPlayerIndex > Server.players.size() - 1) {
+            currentPlayerIndex = 0;
+        } else if (currentPlayerIndex < 0) {
+            currentPlayerIndex = Server.players.size() - 1;
         }
     }
 
     private synchronized void putCardInQueue(String request) {
-        responsePUT = "PUT/";
-
-        //manejar el turno aqui, para ver si deja que ponga cartas
+        String responsePUT = "PUT/";
         String[] cards = request.split("/");
 
         int index = 1; //1 pork 0 es la peticion
@@ -231,13 +232,15 @@ public class Flow implements Runnable {
             index++;
         }
 
-        //broadcast para que todos vean la carta que se ppuso
         responsePUT += createObjectCard(cards[index - 1]).toString();
-        broadcast(responsePUT);
+        //broadcast para que todos vean la carta que se ppuso
+        //Creo que no le va a notificar a todos porque los demas estan en wait,
+        //quiza mejor lo muevo a que haga el broadcast cuando se despierta todos los hilos
+        //broadcast(responsePUT);
 
         //O despues de colocar una carta cambiar de turno dependiendo de la carta puesta
-//        handlePlayerTurns(createObjectCard(cards[index - 1]));
-        changeTurn(createObjectCard(cards[index - 1]));
+        //handlePlayerTurns(createObjectCard(cards[index - 1]));
+        changeTurn(createObjectCard(cards[index - 1]), responsePUT);
 
     }
 
@@ -266,7 +269,7 @@ public class Flow implements Runnable {
     }
 
     private String numberOfCardsPerPlayer() {
-        responseStart = "START/";
+        String responseStart = "START/";
 
         for (Player playerAux : Server.players) {
             if (!playerAux.getUsername().equals(this.name)) {
@@ -287,7 +290,7 @@ public class Flow implements Runnable {
     }
 
     private void sendInitialCards() {
-        responseInitialCards = "CARDS/";
+        String responseInitialCards = "CARDS/";
 
         for (Card card : this.player.getCards()) {
             responseInitialCards += card.toString() + "/";
