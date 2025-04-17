@@ -41,7 +41,7 @@ public class Flow implements Runnable {
     private static String responsePUT = "PUT/";
     private static String responseInitialCards = "CARDS/";
     private static String responseActiveButtom = "ACTIVE";
-        private static String responseWAIT = "WAIT";
+        private static String responseWAIT = "WAIT/";
 
     private static ArrayList<String> invertCards
             = new ArrayList<>(Arrays.asList("B12", "G12", "R12", "Y12"));

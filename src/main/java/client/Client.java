@@ -122,6 +122,7 @@ public class Client {
     private void processServerMessage(String message) {
         System.out.println("message: " + message);
         String messageCode = message.split("/")[0];
+        System.out.println("wait: " + this.waiting);
         switch (messageCode) {
             case "CARDS":
                 setPlayerDeck(message);
@@ -131,23 +132,31 @@ public class Client {
                 break;
             case "FORBIDDEN":
                 this.forbidden = true;
+                break;
             case "START":
                 initializeOtherPlayers(message);
                 break;
             case "TOP":
+                String value = message.split("/")[1];
+                this.topCard = getCard(value);
+                break;
+            case "PUT":
                 setTopCard(message);
+                break;
             case "ACTIVE":
                 this.activeButton = true;
+                break;
             case "WAIT":
                 this.waiting = true;
+                break;
             case "":
                 break;
             default:
                 System.out.println(message);
         }
     }
-    
-    private void setTopCard(String message){
+
+    private void setTopCard(String message) {
         String value = message.split("/")[1];
         this.topCard = getCard(value);
     }
@@ -158,7 +167,7 @@ public class Client {
      * Send a message to the server.
      */
     public void sendMessage(String message) {
-        System.out.println("message: "+message);
+        System.out.println("message: " + message);
         if (connect) {
             try {
                 output.writeUTF(message);
@@ -322,7 +331,5 @@ public class Client {
     public void setWaiting(boolean waiting) {
         this.waiting = waiting;
     }
-    
-    
-    
+
 }
