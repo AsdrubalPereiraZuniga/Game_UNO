@@ -40,8 +40,8 @@ public class Flow implements Runnable {
     private static String responseStart = "START/";
     private static String responsePUT = "PUT/";
     private static String responseInitialCards = "CARDS/";
-    private static String responseActiveButtom = "ACTIVE";
-        private static String responseWAIT = "WAIT";
+    private static String responseActiveButtom = "ACTIVE/";
+        private static String responseWAIT = "WAIT/";
 
     private static ArrayList<String> invertCards
             = new ArrayList<>(Arrays.asList("B12", "G12", "R12", "Y12"));
@@ -110,7 +110,8 @@ public class Flow implements Runnable {
                 sendMenssageToClient(numberOfCardsPerPlayer(), "Error al envia mensaje: ");
 
                 if (playersReady()) {
-                    putPlayersOnHold(this.playerPosition);
+                    System.out.println("sppopo" + this.playerPosition);
+                    putPlayersOnHold();
                 }
                 break;
             case "PUT":
@@ -136,13 +137,13 @@ public class Flow implements Runnable {
         }
     }
 
-    private synchronized void putPlayersOnHold(int playerPosition) { //falta poner cuando termine al turno a este en wait y ntificar al que tenga el turno
+    private synchronized void putPlayersOnHold() { //falta poner cuando termine al turno a este en wait y ntificar al que tenga el turno
         System.out.println("colocando en espera..");
         int index;
         System.out.println("tam array playeers:" + Server.players.size());
 
         for (index = 0; index < Server.players.size(); index++) {
-            if (index != playerPosition) {
+            if (index != this.playerPosition) {
                 //obtener el flujo del jugador y ponerlo wait
                 Flow playerFlow = Server.players.get(index).getFlow();
                 System.out.println("Playo en wait:" + Server.players.get(index).getUsername());
@@ -172,7 +173,7 @@ public class Flow implements Runnable {
         //check cancelation of tunr
         checkLimitsOfVectorPlayers();// falta con la de skip
 
-        putPlayersOnHold(this.playerPosition);
+      //  putPlayersOnHold();
 
     }
 
