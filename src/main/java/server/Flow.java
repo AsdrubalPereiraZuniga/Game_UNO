@@ -69,8 +69,6 @@ public class Flow implements Runnable {
 
         System.out.println("player added");
 
-        printPlayerCards();
-
         enableReadyButtom();
 
         broadcast(responseTOP + Server.cardsQueue.peek().toString());//
@@ -78,6 +76,34 @@ public class Flow implements Runnable {
         sendInitialCards();
 
         startListening();
+    }
+
+    private synchronized ArrayList<Card> distributeCards() {
+        ArrayList<Card> playerCards = new ArrayList<>();
+
+        if (Server.cardsStack.size() >= 7 && !Server.cardsStack.isEmpty()) {
+            for (int i = 0; i < 7; i++) {
+                Card card = Server.cardsStack.pop();
+                playerCards.add(card);
+            }
+        }
+        return playerCards;
+    }
+
+    private void enableReadyButtom() {
+        if (Server.players.size() >= 2) {
+            broadcast(responseActiveButtom);
+        }
+    }
+
+    private void sendInitialCards() {
+        String responseInitialCards = "CARDS/";
+
+        for (Card card : this.player.getCards()) {
+            responseInitialCards += card.toString() + "/";
+        }
+        sendMenssageToClient(responseInitialCards,
+                "No se pudo enviar las cartas inciales, error: ");
     }
 
     private void startListening() {
@@ -105,9 +131,10 @@ public class Flow implements Runnable {
                         "Error al envia mensaje: ");
 
                 putPlayersOnHold();
-                
-                //al iniciar mandar broadcast del player con el turno actual
 
+                //al iniciar mandar broadcast del player con el turno actual**Falta manejo de cliente**
+                broadcast(responseTURN
+                        + Server.players.get(currentPlayerIndex).getUsername());
                 break;
             case "PUT":
                 putCardInQueue(request);
@@ -117,19 +144,36 @@ public class Flow implements Runnable {
         }
     }
 
-    public void sendMenssageToClient(String message, String error) {
+    private boolean disconectPlayer() {
         try {
-            this.writeFlow.writeUTF(message);
-            this.writeFlow.flush();
+            returnCardToTheStack();
+            Server.players.removeElement(this.player);
+            broadcast("El jugador " + this.name + "se ha desconectado");
+            this.socket.close();
+            System.out.println("El jugador " + this.name + "se ha desconectado");
         } catch (IOException ex) {
-            System.out.println(error + ex);
+            System.out.println("Erro cerrando la conexion :" + ex);
+        }
+        return true;
+    }
+
+    private void checkPlayersReady() {
+        if (doFunctionPlayersReady && Server.players.size() >= 2 && playersReady()) {
+            broadcast(playersReadyMessage);
+            doFunctionPlayersReady = false;
         }
     }
 
-    public void enableReadyButtom() {
-        if (Server.players.size() >= 2) {
-            broadcast(responseActiveButtom);
+    private String numberOfCardsPerPlayer() {
+        String responseStart = "START/";
+
+        for (Player playerAux : Server.players) {
+            if (!playerAux.getUsername().equals(this.name)) {
+                responseStart += playerAux.getUsername() + ";";
+                responseStart += playerAux.getCards().size() + "/";
+            }
         }
+        return responseStart;
     }
 
     private void putPlayersOnHold() {
@@ -151,6 +195,38 @@ public class Flow implements Runnable {
         }
     }
 
+    private synchronized void putCardInQueue(String request) {
+        String responsePUT = "PUT/";
+        String[] cards = request.split("/");
+
+        int index = 1; //1 pork 0 es la peticion
+        while (index < cards.length) {
+            Server.cardsQueue.add(createObjectCard(cards[index]));
+            index++;
+        }
+
+        responsePUT += createObjectCard(cards[index - 1]).toString();
+
+        //broadcast para que todos vean la carta que se ppuso
+        //Creo que no le va a notificar a todos porque los demas estan en wait,
+        //quiza mejor lo muevo a que haga el broadcast cuando se despierta todos los hilos
+        //broadcast(responsePUT);
+        changeTurn(createObjectCard(cards[index - 1]), responsePUT);
+    }
+
+    private Card createObjectCard(String card) {
+        String letterCard = card.substring(0, 1);
+        String number = card.substring(1);
+
+        if ("C".equals(letterCard)) {
+            return new WildCard(letterCard, number);
+        } else if (Integer.parseInt(number) <= 9) {
+            return new NumberCard(letterCard, number);
+        } else {
+            return new ActionCard(letterCard, number);
+        }
+    }
+
     private synchronized void changeTurn(Card topCard, String responsePUT) {
 
         synchronized (turnLock) {
@@ -168,8 +244,8 @@ public class Flow implements Runnable {
             turnLock.notifyAll();
         }
         broadcast(responsePUT);
-        broadcast(responseTURN + Server.players.get(currentPlayerIndex).getUsername()); //*no se ha probado* le envio al cliente el jugador que tiene el turno
-
+        broadcast(responseTURN
+                + Server.players.get(currentPlayerIndex).getUsername()); //**no se ha probado** le envio al cliente el jugador que tiene el turno.**Falta manejo de cliente**
     }
 
     private synchronized void handlePlayerTurns(Card topCard) {
@@ -196,7 +272,6 @@ public class Flow implements Runnable {
     }
 
     private void checkInvertOrderOfPlayers(Card topCard) {
-
         for (String invertCard : invertCards) {
             if (invertCard.equals(topCard.toString())) {
                 invertOrder = !invertOrder;
@@ -213,71 +288,12 @@ public class Flow implements Runnable {
         System.out.println("cueeeeeeeeeeeee:" + currentPlayerIndex);
     }
 
-    private void checkLimitsOfVectorPlayers() { //esto le falta que si esata con el ultimo y es un skip se brinque al 0 para que pase a 1
-
+    private void checkLimitsOfVectorPlayers() { //*esto le falta que si esata con el ultimo y es un skip se brinque al 0 para que pase a 1*
         if (currentPlayerIndex > Server.players.size() - 1) {
             currentPlayerIndex = 0;
         } else if (currentPlayerIndex < 0) {
             currentPlayerIndex = Server.players.size() - 1;
         }
-    }
-
-    private synchronized void putCardInQueue(String request) {
-        String responsePUT = "PUT/";
-        String[] cards = request.split("/");
-
-        int index = 1; //1 pork 0 es la peticion
-        while (index < cards.length) {
-            Server.cardsQueue.add(createObjectCard(cards[index]));
-            index++;
-        }
-
-        responsePUT += createObjectCard(cards[index - 1]).toString();
-        //broadcast para que todos vean la carta que se ppuso
-        //Creo que no le va a notificar a todos porque los demas estan en wait,
-        //quiza mejor lo muevo a que haga el broadcast cuando se despierta todos los hilos
-        //broadcast(responsePUT);
-
-        //O despues de colocar una carta cambiar de turno dependiendo de la carta puesta
-        //handlePlayerTurns(createObjectCard(cards[index - 1]));
-        changeTurn(createObjectCard(cards[index - 1]), responsePUT);
-
-    }
-
-    private void checkPlayersReady() {
-
-        if (doFunctionPlayersReady && Server.players.size() >= 2 && playersReady()) {
-            broadcast(playersReadyMessage);
-            doFunctionPlayersReady = false;
-        }
-    }
-
-    private boolean disconectPlayer() {
-
-        try {
-            returnCardToTheStack();
-            Server.players.removeElement(this.player);
-            broadcast("El jugador " + this.name + "se ha desconectado");
-            this.socket.close();
-            System.out.println("El jugador " + this.name + "se ha desconectado");
-        } catch (IOException ex) {
-            System.out.println("Erro cerrando la conexion :" + ex);
-        }
-
-        return true;
-
-    }
-
-    private String numberOfCardsPerPlayer() {
-        String responseStart = "START/";
-
-        for (Player playerAux : Server.players) {
-            if (!playerAux.getUsername().equals(this.name)) {
-                responseStart += playerAux.getUsername() + ";";
-                responseStart += playerAux.getCards().size() + "/";
-            }
-        }
-        return responseStart;
     }
 
     private static boolean playersReady() {
@@ -289,56 +305,18 @@ public class Flow implements Runnable {
         return true;
     }
 
-    private void sendInitialCards() {
-        String responseInitialCards = "CARDS/";
-
-        for (Card card : this.player.getCards()) {
-            responseInitialCards += card.toString() + "/";
-        }
-        sendMenssageToClient(responseInitialCards, "No se pudo enviar las cartas inciales, error: ");
-
-    }
-
-    private Card createObjectCard(String card) {
-
-        String letterCard = card.substring(0, 1);
-        String number = card.substring(1);
-
-        if ("C".equals(letterCard)) {
-            return new WildCard(letterCard, number);
-        } else if (Integer.parseInt(number) <= 9) {
-            return new NumberCard(letterCard, number);
-        } else {
-            return new ActionCard(letterCard, number);
-        }
-    }
-
-    public void returnCardToTheStack() {
+    private void returnCardToTheStack() {
         for (Card card : this.player.getCards()) {
             Server.cardsStack.add(card);
         }
     }
 
-    public synchronized ArrayList<Card> distributeCards() {
-
-        ArrayList<Card> playerCards = new ArrayList<>();
-
-        if (Server.cardsStack.size() >= 7 && !Server.cardsStack.isEmpty()) {
-            for (int i = 0; i < 7; i++) {
-                Card card = Server.cardsStack.pop();
-                playerCards.add(card);
-            }
-        }
-
-        return playerCards;
-    }
-
-    private void printPlayerCards() { //luego quito esto
-        for (Player playerAux : Server.players) {
-            System.out.println("Cartas de un player");
-            for (Card card : playerAux.getCards()) {
-                System.out.println(card.toString());
-            }
+    public void sendMenssageToClient(String message, String error) {
+        try {
+            this.writeFlow.writeUTF(message);
+            this.writeFlow.flush();
+        } catch (IOException ex) {
+            System.out.println(error + ex);
         }
     }
 
@@ -359,5 +337,4 @@ public class Flow implements Runnable {
             }
         }
     }
-
 }
