@@ -15,6 +15,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Stack;
 import players.Player;
@@ -33,12 +34,19 @@ public class Flow implements Runnable {
     private DataOutputStream writeFlow;
     private String name;
     private Player player;
+    private boolean invertOrder = true;
     private int playerPosition = 0;
     private static String playersReadyMessage = "READY/";
     private static String responseStart = "START/";
     private static String responsePUT = "PUT/";
     private static String responseInitialCards = "CARDS/";
     private static String responseActiveButtom = "ACTIVE";
+        private static String responseWAIT = "WAIT";
+
+    private static ArrayList<String> invertCards
+            = new ArrayList<>(Arrays.asList("B12", "G12", "R12", "Y12"));
+    private static ArrayList<String> skipCards
+            = new ArrayList<>(Arrays.asList("B12", "G12", "R12", "Y12"));
 
     public static boolean doFunctionPlayersReady = true;
 
@@ -70,8 +78,7 @@ public class Flow implements Runnable {
 
         enableReadyButtom();
 
-        //envio las varas
-        // broadcast("TOP/"+Server.cardsQueue.peek().toString());//
+        broadcast("TOP/"+Server.cardsQueue.peek().toString());//
         sendInitialCards();
 
         startListening();
@@ -81,7 +88,6 @@ public class Flow implements Runnable {
     private void startListening() {
         while (true) {
             try {
-//                checkPlayersReady();
                 String request = this.readFlow.readUTF();
                 System.out.println("lola:" + request);
                 handleMessage(request);
@@ -103,9 +109,8 @@ public class Flow implements Runnable {
                 checkPlayersReady();
                 sendMenssageToClient(numberOfCardsPerPlayer(), "Error al envia mensaje: ");
 
-                //pongo aqui todos los jugadores con wait menos el primero
                 if (playersReady()) {
-                    putPlayersOnHold();
+                    putPlayersOnHold(this.playerPosition);
                 }
                 break;
             case "PUT":
@@ -131,10 +136,11 @@ public class Flow implements Runnable {
         }
     }
 
-    private synchronized void putPlayersOnHold() {
+    private synchronized void putPlayersOnHold(int playerPosition) { //falta poner cuando termine al turno a este en wait y ntificar al que tenga el turno
         System.out.println("colocando en espera..");
         int index;
         System.out.println("tam array playeers:" + Server.players.size());
+
         for (index = 0; index < Server.players.size(); index++) {
             if (index != playerPosition) {
                 //obtener el flujo del jugador y ponerlo wait
@@ -143,6 +149,7 @@ public class Flow implements Runnable {
                 System.out.println("kkkk:" + playerFlow);
                 synchronized (playerFlow) {
                     try {
+                        sendMenssageToClient(responseWAIT, "Error al poner al player en espera.");
                         playerFlow.wait();
                     } catch (Exception e) {
                         System.out.println("Error al colocar en espera: " + e);
@@ -154,10 +161,52 @@ public class Flow implements Runnable {
 
     private synchronized void handlePlayerTurns(Card topCard) {
 
-        
-        
-        
-        
+        int aux = 1;
+
+        checkSkipCards(topCard, aux);
+
+        checkInvertOrderOfPlayers(topCard);
+
+        handlePosition(aux);
+
+        //check cancelation of tunr
+        checkLimitsOfVectorPlayers();// falta con la de skip
+
+        putPlayersOnHold(this.playerPosition);
+
+    }
+
+    private void checkSkipCards(Card topCard, int aux) {
+        for (String skipCard : skipCards) {
+            if (skipCard.equals(topCard.toString())) {
+                aux = aux + 1;
+            }
+        }
+    }
+
+    private void checkInvertOrderOfPlayers(Card topCard) {
+
+        for (String invertCard : invertCards) {
+            if (invertCard.equals(topCard.toString())) {
+                this.invertOrder = !this.invertOrder;
+            }
+        }
+    }
+
+    private void handlePosition(int aux) {
+        if (this.invertOrder) {
+            this.playerPosition -= aux;
+        } else {
+            this.playerPosition += aux;
+        }
+    }
+
+    private void checkLimitsOfVectorPlayers() { //esto le falta que si esata con el ultimo y es un skip se brinque al 0
+        if (this.playerPosition > Server.players.size()) {
+            this.playerPosition = 0;
+        } else if (this.playerPosition < 0) {
+            this.playerPosition = Server.players.size();
+        }
     }
 
     private synchronized void putCardInQueue(String request) {
@@ -177,7 +226,7 @@ public class Flow implements Runnable {
         broadcast(responsePUT);
 
         //O despues de colocar una carta cambiar de turno dependiendo de la carta puesta
-        handlePlayerTurns(createObjectCard(cards[index-1]));
+        handlePlayerTurns(createObjectCard(cards[index - 1]));
 
     }
 
