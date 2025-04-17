@@ -37,6 +37,8 @@ public class Flow implements Runnable {
     private static String responseActiveButtom = "ACTIVE/";
     private static String responseWAIT = "WAIT/";
     private static String responseTURN = "TURN/";
+    private static String responseACTUAL = "ACTUAL/";
+
     private static String responseTOP = "TOP/";
 
     private static int currentPlayerIndex = 0;
@@ -132,8 +134,8 @@ public class Flow implements Runnable {
 
                 putPlayersOnHold();
 
-                //al iniciar mandar broadcast del player con el turno actual**Falta manejo de cliente**
-                broadcast(responseTURN
+//                al iniciar mandar broadcast del player con el turno actual**Falta manejo de cliente**
+                broadcast(responseACTUAL
                         + Server.players.get(currentPlayerIndex).getUsername());
                 break;
             case "PUT":
@@ -244,7 +246,7 @@ public class Flow implements Runnable {
             turnLock.notifyAll();
         }
         broadcast(responsePUT);
-        broadcast(responseTURN
+        broadcast(responseACTUAL
                 + Server.players.get(currentPlayerIndex).getUsername()); //**no se ha probado** le envio al cliente el jugador que tiene el turno.**Falta manejo de cliente**
     }
 
