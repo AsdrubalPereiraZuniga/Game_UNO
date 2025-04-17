@@ -35,7 +35,7 @@ public class Flow implements Runnable {
     private String name;
     private Player player;
     private boolean invertOrder = true;
-    private int playerPosition = 0;
+    
     private static String playersReadyMessage = "READY/";
     private static String responseStart = "START/";
     private static String responsePUT = "PUT/";
@@ -50,6 +50,9 @@ public class Flow implements Runnable {
             = new ArrayList<>(Arrays.asList("B12", "G12", "R12", "Y12"));
 
     public static boolean doFunctionPlayersReady = true;
+
+    private static final Object turnLock = new Object();
+    private static int currentPlayerIndex = 0;
 
     public Flow(Socket socket, String name) {
         this.socket = socket;
@@ -111,7 +114,7 @@ public class Flow implements Runnable {
                 sendMenssageToClient(numberOfCardsPerPlayer(), "Error al envia mensaje: ");
 
                 if (playersReady()) {
-                    System.out.println("sppopo" + this.playerPosition);
+                    System.out.println("sppopo" + this.currentPlayerIndex);
                     putPlayersOnHold();
                 }
                 break;
@@ -138,26 +141,32 @@ public class Flow implements Runnable {
         }
     }
 
-    private synchronized void putPlayersOnHold() { //falta poner cuando termine al turno a este en wait y ntificar al que tenga el turno
-        System.out.println("colocando en espera..");
-        int index;
-        System.out.println("tam array playeers:" + Server.players.size());
-
-        for (index = 0; index < Server.players.size(); index++) {
-            if (index != this.playerPosition) {
-                //obtener el flujo del jugador y ponerlo wait
-                Flow playerFlow = Server.players.get(index).getFlow();
-                System.out.println("Playo en wait:" + Server.players.get(index).getUsername());
-                System.out.println("kkkk:" + playerFlow);
-                synchronized (playerFlow) {
-                    try {
-                        sendMenssageToClient(responseWAIT, "Error al poner al player en espera.");
-                        playerFlow.wait();
-                    } catch (Exception e) {
-                        System.out.println("Error al colocar en espera: " + e);
-                    }
+    private void putPlayersOnHold() {
+        synchronized (turnLock) {
+            for (int i = 0; i < Server.players.size(); i++) {
+                if (i != currentPlayerIndex) {
+                    Flow playerFlow = Server.players.get(i).getFlow();
+                    playerFlow.sendMenssageToClient(responseWAIT, "Error al poner en espera");
+                } else {
+                    
+                    Flow currentFlow = Server.players.get(currentPlayerIndex).getFlow();
+                    currentFlow.sendMenssageToClient("YOUR_TURN/", "Error al notificar turno");
                 }
             }
+        }
+    }
+
+    private synchronized void changeTurn(Card playedCard) {
+        synchronized (turnLock) {
+            Server.players.get(currentPlayerIndex).getFlow()
+                    .sendMenssageToClient(responseWAIT, "Error al poner en espera");
+           
+            handlePlayerTurns(playedCard);
+
+            Flow nextPlayerFlow = Server.players.get(currentPlayerIndex).getFlow();
+            nextPlayerFlow.sendMenssageToClient("TURN/", "Error al notificar turno");
+
+            turnLock.notifyAll();
         }
     }
 
@@ -196,17 +205,17 @@ public class Flow implements Runnable {
 
     private void handlePosition(int aux) {
         if (this.invertOrder) {
-            this.playerPosition -= aux;
+            this.currentPlayerIndex -= aux;
         } else {
-            this.playerPosition += aux;
+            this.currentPlayerIndex += aux;
         }
     }
 
     private void checkLimitsOfVectorPlayers() { //esto le falta que si esata con el ultimo y es un skip se brinque al 0
-        if (this.playerPosition > Server.players.size()) {
-            this.playerPosition = 0;
-        } else if (this.playerPosition < 0) {
-            this.playerPosition = Server.players.size();
+        if (this.currentPlayerIndex > Server.players.size()) {
+            this.currentPlayerIndex = 0;
+        } else if (this.currentPlayerIndex < 0) {
+            this.currentPlayerIndex = Server.players.size();
         }
     }
 
@@ -227,7 +236,8 @@ public class Flow implements Runnable {
         broadcast(responsePUT);
 
         //O despues de colocar una carta cambiar de turno dependiendo de la carta puesta
-        handlePlayerTurns(createObjectCard(cards[index - 1]));
+//        handlePlayerTurns(createObjectCard(cards[index - 1]));
+        changeTurn(createObjectCard(cards[index - 1]));
 
     }
 
