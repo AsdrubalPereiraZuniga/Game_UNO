@@ -141,6 +141,11 @@ public class Flow implements Runnable {
             case "PUT":
                 putCardInQueue(request);
                 break;
+            case "GET_TURN":
+                sendMenssageToClient(responseACTUAL
+                    + Server.players.get(currentPlayerIndex).getUsername(),
+                    "Error al enviar turno actual");
+                break;
             default:
                 System.out.println("No se reccibio nah");
         }

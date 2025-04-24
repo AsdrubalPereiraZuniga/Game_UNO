@@ -27,7 +27,7 @@ import javafx.beans.property.SimpleObjectProperty;
  * frontend.
  */
 public class Client {
-
+    
     private boolean connect;
     private boolean ready;
     private int port;
@@ -158,7 +158,14 @@ public class Client {
             case "TURN":
                 this.waiting = false;
                 setWaitingMode(this.waiting);
-            case "":
+            case "ACTUAL":
+                String[] parts = message.split("/");
+                if (parts.length > 1) {
+                    String currentPlayer = parts[1];
+                    TurnHandler.updateTurn(currentPlayer);
+                } else {
+                    System.err.println("Formato de mensaje ACTUAL inválido: " + message);
+                }
                 break;
             default:
                 System.out.println(message);
@@ -363,5 +370,5 @@ public class Client {
     public void setWaiting(boolean waiting) {
         this.waiting = waiting;
     }
-
+    
 }

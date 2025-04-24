@@ -14,7 +14,11 @@
       <AnchorPane fx:id="players" layoutX="23.0" layoutY="14.0" prefHeight="200.0" prefWidth="716.0">
          <children>
             <HBox fx:id="hbxOtherPlayers" layoutX="14.0" layoutY="14.0" prefHeight="173.0" prefWidth="688.0" />
-         </children></AnchorPane>
+         </children>
+      </AnchorPane>
+      
+      <Label fx:id="lblCurrentTurn" layoutX="1050.0" layoutY="30.0" prefHeight="30.0" prefWidth="200.0" text="Turno de: -" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+
       <AnchorPane fx:id="player" layoutX="219.0" layoutY="506.0" prefHeight="200.0" prefWidth="851.0">
          <children>
             <Label fx:id="lblPlayerName" layoutX="14.0" layoutY="14.0" text="Label" />
@@ -23,9 +27,12 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
             </GridPane>
-         </children></AnchorPane>
+         </children>
+      </AnchorPane>
+
       <Button fx:id="btnOne" layoutX="23.0" layoutY="633.0" mnemonicParsing="false" onAction="#callOne" prefHeight="73.0" prefWidth="181.0" text="UNO" />
       <Button fx:id="btnConfirm" layoutX="1085.0" layoutY="633.0" mnemonicParsing="false" onAction="#confirm" prefHeight="73.0" prefWidth="181.0" text="Confirmar" />
+
       <AnchorPane layoutX="914.0" layoutY="306.0" prefHeight="200.0" prefWidth="362.0">
          <children>
             <GridPane fx:id="grdPlayableCards" layoutX="27.0" layoutY="21.0" prefHeight="159.0" prefWidth="309.0">

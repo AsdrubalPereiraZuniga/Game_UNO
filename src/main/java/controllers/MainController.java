@@ -4,6 +4,7 @@ import cards.Card;
 import client.Client;
 import client.HandleCards;
 import client.OtherPlayers;
+import client.TurnHandler;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -70,6 +71,8 @@ public class MainController implements Initializable {
     private GridPane grdPlayableCards;
 
     private Card lastCard;
+    @FXML
+    private Label lblCurrentTurn;
 
     /**
      * Initialize the controller class.
@@ -85,7 +88,8 @@ public class MainController implements Initializable {
         setOtherPlayers();
         instance.lastCard = null;
         setTopCard(instance.client.getTopCard());
-
+        TurnHandler.setLabel(lblCurrentTurn);
+        instance.client.sendMessage("GET_TURN/");
     }
 
     private void setOtherPlayers() {
