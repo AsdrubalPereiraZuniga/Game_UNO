@@ -90,6 +90,8 @@ public class MainController implements Initializable {
     @FXML
     private Button btnYellow;
     
+    private static final Duration ANIMATION_DURATION = Duration.millis(200);
+    
     
     /**
      * Initialize the controller class.
@@ -108,7 +110,11 @@ public class MainController implements Initializable {
         TurnHandler.setLabel(lblCurrentTurn);
         ViewCardsHandler.setGridPlayerCards(grdPlayableCards);
         ViewCardsHandler.setAnchorPane(usedCardsView);
-        instanceController.client.sendMessage("GET_TURN/");        
+        instanceController.client.sendMessage("GET_TURN/"); 
+        setupHoverEffects(btnRed);
+        setupHoverEffects(btnGreen);
+        setupHoverEffects(btnBlue);
+        setupHoverEffects(btnYellow);
         setDeckImage();
     }
     
@@ -131,7 +137,8 @@ public class MainController implements Initializable {
     }
     
     public void refreshHand() {
-        HandleCards.getInstace().setClient(instanceController.client);
+        HandleCards.getInstace().setCards(this.grdCards, 
+                instanceController.client, this.grdPlayableCards);
     }
 
     private void setOtherPlayers() {
@@ -178,8 +185,7 @@ public class MainController implements Initializable {
      * @param event event.
      */
     @FXML
-    private void confirm(ActionEvent event) {               
-        
+    private void confirm(ActionEvent event) {                 
         Platform.runLater(() -> {
             MainController.getInstanceController().refreshHand();
         });
@@ -327,5 +333,35 @@ public class MainController implements Initializable {
 
         colorSelector.setVisible(false);
         proceedWithCard();
-    }   
+    }  
+    
+        private void setupHoverEffects(Button btn) {
+        DropShadow shadow = new DropShadow();
+        shadow.setColor(Color.rgb(0, 0, 0, 0.3));
+        shadow.setRadius(10);
+        shadow.setSpread(0.2);
+        double normalSize = btn.getWidth();
+
+        btn.setOnMouseEntered(e -> {
+            ScaleTransition st = new ScaleTransition(ANIMATION_DURATION,
+                    btn);
+            st.setToX(1.2);
+            st.setToY(1.2);
+            st.play();
+
+            btn.setEffect(shadow);
+            btn.setStyle("-fx-border-color: #000000; -fx-border-width: 2;");
+            btn.toFront();
+        });
+
+        btn.setOnMouseExited(e -> {
+            ScaleTransition st = new ScaleTransition(ANIMATION_DURATION,
+                    btn);
+            st.setToX(1.0);
+            st.setToY(1.0);
+            st.play();
+
+            btn.setEffect(null);
+        });
+    }
 }

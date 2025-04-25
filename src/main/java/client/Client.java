@@ -246,6 +246,7 @@ public class Client {
     private void setPlayerDeck(String message) {
         String[] deck = message.split("/");
         System.out.println("DECK: " + deck.length);
+        this.cards.clear();
         boolean isNewCard = (deck.length == 2); // Solo una carta nueva, se usó DRAW/
         for (int i = 1; i < deck.length; i++) {
             this.cards.add(getCard(deck[i]));
