@@ -136,15 +136,15 @@ public class Flow implements Runnable {
 
 //                al iniciar mandar broadcast del player con el turno actual**Falta manejo de cliente**
                 broadcast(responseACTUAL
-                        + Server.players.get(currentPlayerIndex).getUsername());
+                        + Server.players.get(currentPlayerIndex).getUsername() + "/" + Server.players.get(currentPlayerIndex).getCards().size() + "/");
                 break;
             case "PUT":
                 putCardInQueue(request);
                 break;
             case "GET_TURN":
-                sendMenssageToClient(responseACTUAL
-                    + Server.players.get(currentPlayerIndex).getUsername(),
-                    "Error al enviar turno actual");
+                 broadcast(responseACTUAL
+                        + Server.players.get(currentPlayerIndex).getUsername() + "/" + Server.players.get(currentPlayerIndex).getCards().size() + "/");
+                    
                 break;
             case "DRAW":
                 giveCardToPlayer();
@@ -279,7 +279,7 @@ public class Flow implements Runnable {
             
             handlePlayerTurns(topCard);            
             System.out.println("Current player: " + currentPlayerIndex);
-            skillsCards(topCard.toString(), currentPlayerIndex);
+           
             
             Flow nextPlayerFlow = Server.players.get(currentPlayerIndex).getFlow();
 
@@ -291,9 +291,11 @@ public class Flow implements Runnable {
        
         //broadcast(responsePUT );
         
+        skillsCards(topCard.toString(), currentPlayerIndex);
+        System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         //**no se ha probado** le envio al cliente el jugador que tiene el turno.**Falta manejo de cliente**
         broadcast(responseACTUAL
-                + Server.players.get(currentPlayerIndex).getUsername()); 
+                + Server.players.get(currentPlayerIndex).getUsername() + "/" + Server.players.get(currentPlayerIndex).getCards().size() + "/"); 
     }
     
     public void skillsCards(String card, int index){
