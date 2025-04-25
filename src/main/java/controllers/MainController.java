@@ -32,6 +32,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
+import server.Server;
 
 /**
  * Main screen controller class.
@@ -142,6 +143,7 @@ public class MainController implements Initializable {
         if (canPlay(HandleCards.getInstace().getPlayCards())) {
             setTopCard(card);
             instance.client.sendMessage(createMessage());
+            
             HandleCards.getInstace().getPlayCards().clear();
         } else {
             for (Card playCard : HandleCards.getInstace().getPlayCards()) {
@@ -165,7 +167,7 @@ public class MainController implements Initializable {
 
         message = "PUT/" + getCardsValue();
 
-        System.out.println("message: " + message);
+        System.out.println("messageMainController: " + message);
         return message;
     }
 

@@ -73,7 +73,7 @@ public class Flow implements Runnable {
 
         enableReadyButtom();
 
-        broadcast(responseTOP + Server.cardsQueue.peek().toString());//
+        broadcast(responseTOP + Server.cardsQueue.peek().toString());
 
         sendInitialCards();
 
@@ -209,10 +209,11 @@ public class Flow implements Runnable {
 
         responsePUT += createObjectCard(cards[index - 1]).toString();
 
-        //broadcast para que todos vean la carta que se ppuso
+        //broadcast para que todos vean la carta que se puso
         //Creo que no le va a notificar a todos porque los demas estan en wait,
         //quiza mejor lo muevo a que haga el broadcast cuando se despierta todos los hilos
-        //broadcast(responsePUT);
+        System.out.println("Envio desde flow: " + responsePUT);
+        broadcast(responsePUT);
         changeTurn(createObjectCard(cards[index - 1]), responsePUT);
     }
 
@@ -231,7 +232,7 @@ public class Flow implements Runnable {
 
     private synchronized void changeTurn(Card topCard, String responsePUT) {
 
-        synchronized (turnLock) {
+        synchronized (turnLock) { // cambia el turno del jugador
             Server.players.get(currentPlayerIndex).getFlow()
                     .sendMenssageToClient(responseWAIT,
                             "Error al poner en espera");
@@ -245,9 +246,19 @@ public class Flow implements Runnable {
 
             turnLock.notifyAll();
         }
-        broadcast(responsePUT);
+        
+        // topCard, carta que acaba de poner
+        // if topCard es +4, entonces pedirle al servidor las primeras 4 cartas 
+        // server.stack pila de cartas .pop.
+        // y agregarselas al jugador
+        // Server.players.get(currentPlayerIndex).getCards().add(server.stack.pop);
+        // hacerlo 4 veces
+        
+        //broadcast(responsePUT );
+        
+        //**no se ha probado** le envio al cliente el jugador que tiene el turno.**Falta manejo de cliente**
         broadcast(responseACTUAL
-                + Server.players.get(currentPlayerIndex).getUsername()); //**no se ha probado** le envio al cliente el jugador que tiene el turno.**Falta manejo de cliente**
+                + Server.players.get(currentPlayerIndex).getUsername()); 
     }
 
     private synchronized void handlePlayerTurns(Card topCard) {
@@ -280,6 +291,7 @@ public class Flow implements Runnable {
             }
         }
     }
+    /// hacer una funcion si es la carta de +4, entonces, al jugador actual se le da ese +4
 
     private void handlePosition(int aux) {
         if (invertOrder) {

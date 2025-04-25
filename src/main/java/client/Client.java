@@ -124,8 +124,13 @@ public class Client {
      *
      * Handle the message of the server.
      */
+    
+    /***
+     * 
+     * cuando entra el mensaje ACTUAL, mostrar el nombre del turno del jugador en la pantalla
+     */
     private void processServerMessage(String message) {
-        System.out.println("message: " + message);
+        System.out.println("message2222: " + message);
         String messageCode = message.split("/")[0];
         System.out.println("wait: " + this.waiting);
         switch (messageCode) {
@@ -164,10 +169,18 @@ public class Client {
                 System.out.println(message);
         }
     }
-
-    private void setTopCard(String message) {
-        String value = message.split("/")[1];
+    /***
+     * 
+     * tomar la carta que se envia desde el broadcast y mostrarla para todos los clientes
+     * 
+     * asi se maneja el cambio de carta en la pantalla cuando un cliente sube una carta
+     * 
+     * usar le metodo del controlador de la interfaz para colocar la carta.
+     */
+    private void setTopCard(String message) {        
+        String value = message.split("/")[1];        
         this.topCard = getCard(value);
+        // tomar ese this.topCard y colocarla en la interfaz
     }
 
     /**
@@ -176,7 +189,7 @@ public class Client {
      * Send a message to the server.
      */
     public void sendMessage(String message) {
-        System.out.println("message: " + message);
+        System.out.println("Client message: " + message);
         if (connect) {
             try {
                 output.writeUTF(message);
