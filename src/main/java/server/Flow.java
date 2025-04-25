@@ -146,10 +146,22 @@ public class Flow implements Runnable {
                     + Server.players.get(currentPlayerIndex).getUsername(),
                     "Error al enviar turno actual");
                 break;
+            case "DRAW":
+                giveCardToPlayer();
+                break;
             default:
                 System.out.println("No se reccibio nah");
         }
     }
+    
+    private void giveCardToPlayer() {
+        if (!Server.cardsStack.isEmpty()) {
+            Card drawnCard = Server.cardsStack.pop();
+            this.player.getCards().add(drawnCard);
+            sendMenssageToClient("CARDS/" + drawnCard.toString() + "/", "No se pudo enviar carta robada");
+        }
+    }
+
 
     private boolean disconectPlayer() {
         try {

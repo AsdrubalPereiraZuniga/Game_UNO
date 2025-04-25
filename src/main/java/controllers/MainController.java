@@ -1,6 +1,7 @@
 package controllers;
 
 import cards.Card;
+import cards.WildCard;
 import client.Client;
 import client.HandleCards;
 import client.OtherPlayers;
@@ -73,7 +74,21 @@ public class MainController implements Initializable {
     private Card lastCard;
     @FXML
     private Label lblCurrentTurn;
-
+    @FXML
+    private ImageView deckImage;
+    @FXML
+    private HBox colorSelector;
+    private String selectedColor = "";
+    @FXML
+    private Button btnRed;
+    @FXML
+    private Button btnGreen;
+    @FXML
+    private Button btnBlue;
+    @FXML
+    private Button btnYellow;
+    
+    
     /**
      * Initialize the controller class.
      *
@@ -90,6 +105,30 @@ public class MainController implements Initializable {
         setTopCard(instance.client.getTopCard());
         TurnHandler.setLabel(lblCurrentTurn);
         instance.client.sendMessage("GET_TURN/");
+        
+        setDeckImage();
+    }
+    
+    private void setDeckImage(){
+        try {
+            deckImage.setImage(new Image("/images/behind/K1.png"));
+            deckImage.setOnMouseClicked(e -> drawCardIfNeeded());
+        } catch (Exception e) {
+            System.out.println("No se pudo cargar la imagen del mazo.");
+        }
+    }
+    
+    private void drawCardIfNeeded() {
+        System.out.println("COMIO CARTA");
+        if (!instance.client.isWaiting()) {
+            if (HandleCards.getInstace().getPlayCards().isEmpty()) {
+                instance.client.sendMessage("DRAW/");
+            }
+        }
+    }
+    
+    public void refreshHand() {
+        HandleCards.getInstace().setClient(instance.client);
     }
 
     private void setOtherPlayers() {
@@ -137,11 +176,24 @@ public class MainController implements Initializable {
      */
     @FXML
     private void confirm(ActionEvent event) {
-        if (HandleCards.getInstace().getPlayCards().isEmpty()) {
+        if (HandleCards.getInstace().getPlayCards().isEmpty()) return;
+
+        Card card = HandleCards.getInstace().getPlayCards().get(0);
+
+        if (card instanceof WildCard && card.getColor().equals("C")) {
+            showColorSelector();
             return;
         }
-        int last = HandleCards.getInstace().getPlayCards().size() - 1;
-        Card card = HandleCards.getInstace().getPlayCards().get(last);
+
+        proceedWithCard();
+    }
+
+    private void showColorSelector() {
+        colorSelector.setVisible(true);
+    }
+    
+    private void proceedWithCard() {
+        Card card = HandleCards.getInstace().getPlayCards().get(0);
 
         if (canPlay(HandleCards.getInstace().getPlayCards())) {
             setTopCard(card);
@@ -155,6 +207,7 @@ public class MainController implements Initializable {
             HandleCards.getInstace().setClient(instance.client);
         }
     }
+
 
     public void setTopCard(Card card) {
         this.usedCardsView.getChildren().clear();
@@ -193,17 +246,19 @@ public class MainController implements Initializable {
     }
 
     private boolean handleOnePlayedCard(Card card) {
-        if (instance.lastCard.getColor().
-                equals(card.getColor())) {
+        if (card instanceof WildCard) {
             return true;
         }
-        if (instance.lastCard.getValue().
-                equals(card.getValue())) {
+
+        if (instance.lastCard.getColor().equals(card.getColor())) {
             return true;
         }
-        //verificar si la puede colocar sobre una de cambio de color o los +4
+        if (instance.lastCard.getValue().equals(card.getValue())) {
+            return true;
+        }
         return false;
     }
+
 
     private boolean handleManyPlayedCards(Card card) {
         if (instance.lastCard.getColor().equals(card.getColor())) {
@@ -239,4 +294,23 @@ public class MainController implements Initializable {
         }
         return cardContainer;
     }
+
+    @FXML
+    private void selectColor(ActionEvent e) {
+        Button source = (Button) e.getSource();
+        String color = "";
+
+        if (source == btnRed) color = "R";
+        else if (source == btnGreen) color = "G";
+        else if (source == btnBlue) color = "B";
+        else if (source == btnYellow) color = "Y";
+
+        Card wildCard = HandleCards.getInstace().getPlayCards().get(0);
+        wildCard.setColor(color);
+
+        colorSelector.setVisible(false);
+        proceedWithCard();
+    }
+
+    
 }

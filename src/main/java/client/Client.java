@@ -211,10 +211,18 @@ public class Client {
 
     private void setPlayerDeck(String message) {
         String[] deck = message.split("/");
+        boolean isNewCard = (deck.length == 2); // Solo una carta nueva, se usó DRAW/
         for (int i = 1; i < deck.length; i++) {
             this.cards.add(getCard(deck[i]));
         }
+
+        if (isNewCard) {
+            Platform.runLater(() -> {
+                MainController.getInstance().refreshHand(); // ⬅️ nuevo método
+            });
+        }
     }
+
 
     private Card getCard(String card) {
         String code = card.substring(0, 1);
