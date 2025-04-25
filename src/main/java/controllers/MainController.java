@@ -137,7 +137,8 @@ public class MainController implements Initializable {
     }
     
     public void refreshHand() {
-        HandleCards.getInstace().setClient(instanceController.client);
+        HandleCards.getInstace().setCards(this.grdCards, 
+                instanceController.client, this.grdPlayableCards);
     }
 
     private void setOtherPlayers() {
@@ -184,8 +185,7 @@ public class MainController implements Initializable {
      * @param event event.
      */
     @FXML
-    private void confirm(ActionEvent event) {               
-        
+    private void confirm(ActionEvent event) {                 
         Platform.runLater(() -> {
             MainController.getInstanceController().refreshHand();
         });
@@ -346,12 +346,11 @@ public class MainController implements Initializable {
             ScaleTransition st = new ScaleTransition(ANIMATION_DURATION,
                     btn);
             st.setToX(1.2);
-            st.setToY(1.1);
+            st.setToY(1.2);
             st.play();
 
             btn.setEffect(shadow);
-            btn.setStyle("-fx-background-color: #f8f8f8; "
-                    + "-fx-border-color: #000000; -fx-border-width: 2;");
+            btn.setStyle("-fx-border-color: #000000; -fx-border-width: 2;");
             btn.toFront();
         });
 
@@ -363,8 +362,6 @@ public class MainController implements Initializable {
             st.play();
 
             btn.setEffect(null);
-            btn.setStyle("-fx-background-color: white; "
-                    + "-fx-border-color: #333;");
         });
     }
 }
