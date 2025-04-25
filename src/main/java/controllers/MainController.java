@@ -1,9 +1,12 @@
 package controllers;
 
 import cards.Card;
+import cards.WildCard;
 import client.Client;
 import client.HandleCards;
 import client.OtherPlayers;
+import client.TurnHandler;
+import client.ViewCardsHandler;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -32,6 +35,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
+import server.Server;
 
 /**
  * Main screen controller class.
@@ -43,7 +47,7 @@ import javafx.util.Duration;
  */
 public class MainController implements Initializable {
 
-    private static MainController instance;
+    private static MainController instanceController;
 
     private Client client;
     @FXML
@@ -70,7 +74,23 @@ public class MainController implements Initializable {
     private GridPane grdPlayableCards;
 
     private Card lastCard;
-
+    @FXML
+    private Label lblCurrentTurn;
+    @FXML
+    private ImageView deckImage;
+    @FXML
+    private HBox colorSelector;
+    private String selectedColor = "";
+    @FXML
+    private Button btnRed;
+    @FXML
+    private Button btnGreen;
+    @FXML
+    private Button btnBlue;
+    @FXML
+    private Button btnYellow;
+    
+    
     /**
      * Initialize the controller class.
      *
@@ -79,20 +99,46 @@ public class MainController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        this.lblPlayerName.setText(instance.client.getPlayerName());
-        HandleCards.getInstace().setCards(this.grdCards, instance.client,
+        this.lblPlayerName.setText(instanceController.client.getPlayerName());
+        HandleCards.getInstace().setCards(this.grdCards, instanceController.client,
                 this.grdPlayableCards);
         setOtherPlayers();
-        instance.lastCard = null;
-        setTopCard(instance.client.getTopCard());
-
+        instanceController.lastCard = null;
+        setTopCard(instanceController.client.getTopCard());        
+        TurnHandler.setLabel(lblCurrentTurn);
+        ViewCardsHandler.setGridPlayerCards(grdPlayableCards);
+        ViewCardsHandler.setAnchorPane(usedCardsView);
+        instanceController.client.sendMessage("GET_TURN/");        
+        setDeckImage();
+    }
+    
+    private void setDeckImage(){
+        try {
+            deckImage.setImage(new Image("/images/behind/K1.png"));
+            deckImage.setOnMouseClicked(e -> drawCardIfNeeded());
+        } catch (Exception e) {
+            System.out.println("No se pudo cargar la imagen del mazo.");
+        }
+    }
+    
+    private void drawCardIfNeeded() {
+        System.out.println("COMIO CARTA");
+        if (!instanceController.client.isWaiting()) {
+            if (HandleCards.getInstace().getPlayCards().isEmpty()) {
+                instanceController.client.sendMessage("DRAW/");
+            }
+        }
+    }
+    
+    public void refreshHand() {
+        HandleCards.getInstace().setClient(instanceController.client);
     }
 
     private void setOtherPlayers() {
-        System.out.println("Nombre del men:" + instance.client.getPlayerName());
-        for (OtherPlayers otherPlayer : instance.client.getOtherPlayers()) {
+        System.out.println("Nombre del men:" + instanceController.client.getPlayerName());
+        for (OtherPlayers otherPlayer : instanceController.client.getOtherPlayers()) {
             System.out.println("LOLAAAAAAAAAAAAAAAAAAA:" + otherPlayer.toString());
-            if (!otherPlayer.getName().equals(instance.client.getPlayerName())) {
+            if (!otherPlayer.getName().equals(instanceController.client.getPlayerName())) {
                 this.hbxOtherPlayers.getChildren().add(new Label(
                         otherPlayer.getName() + ": "
                         + otherPlayer.getAmountOfCards()));
@@ -100,12 +146,12 @@ public class MainController implements Initializable {
         }
     }
 
-    public static MainController getInstance() {
-        if (MainController.instance == null) {
-            MainController.instance = new MainController();
-            return MainController.instance;
+    public static MainController getInstanceController() {
+        if (MainController.instanceController == null) {
+            MainController.instanceController = new MainController();
+            return MainController.instanceController;
         }
-        return MainController.instance;
+        return MainController.instanceController;
     }
 
     /**
@@ -114,7 +160,7 @@ public class MainController implements Initializable {
      * @param client client.
      */
     public void setClient(Client client) {
-        MainController.instance.client = client;
+        MainController.instanceController.client = client;
     }
 
     /**
@@ -132,31 +178,56 @@ public class MainController implements Initializable {
      * @param event event.
      */
     @FXML
-    private void confirm(ActionEvent event) {
-        if (HandleCards.getInstace().getPlayCards().isEmpty()) {
+    private void confirm(ActionEvent event) {               
+        
+        Platform.runLater(() -> {
+            MainController.getInstanceController().refreshHand();
+        });
+        if (HandleCards.getInstace().getPlayCards().isEmpty()) return;
+
+        Card card = HandleCards.getInstace().getPlayCards().get(0);
+        
+        if (card instanceof WildCard && card.getColor().equals("C")) {
+            System.out.println("CARTA DEL CONFIRM: " + card.toString());            
+            showColorSelector();
             return;
         }
-        int last = HandleCards.getInstace().getPlayCards().size() - 1;
-        Card card = HandleCards.getInstace().getPlayCards().get(last);
 
-        if (canPlay(HandleCards.getInstace().getPlayCards())) {
-            setTopCard(card);
-            instance.client.sendMessage(createMessage());
-            HandleCards.getInstace().getPlayCards().clear();
-        } else {
-            for (Card playCard : HandleCards.getInstace().getPlayCards()) {
-                instance.client.getCards().add(playCard);
-            }
-            HandleCards.getInstace().getPlayCards().clear();
-            HandleCards.getInstace().setClient(instance.client);
-        }
+        proceedWithCard();
     }
 
-    public void setTopCard(Card card) {
+    private void showColorSelector() {
+        colorSelector.setVisible(true);
+    }
+    
+    public void proceedWithCard() {
+        Card card = HandleCards.getInstace().getPlayCards().get(0);        
+        instanceController.lastCard = instanceController.client.getTopCard();
+        System.out.println("LASTCARD" + instanceController.toString());        
+        
+        if (canPlay(HandleCards.getInstace().getPlayCards())) {                                
+            //setTopCard(card);            
+            ViewCardsHandler.updateUsedViewCard(getNewCard(card));            
+            instanceController.client.sendMessage(createMessage());
+            instanceController.lastCard = instanceController.client.getTopCard();            
+            
+            HandleCards.getInstace().getPlayCards().clear();
+        } else {            
+            for (Card playCard : HandleCards.getInstace().getPlayCards()) {
+                instanceController.client.getCards().add(playCard);
+            }
+            HandleCards.getInstace().getPlayCards().clear();
+            HandleCards.getInstace().setClient(instanceController.client);
+        }        
+    }
+
+    
+
+    public void setTopCard(Card card) {        
         this.usedCardsView.getChildren().clear();
-        this.usedCardsView.getChildren().add(getNewCard(card));
+        this.usedCardsView.getChildren().add(getNewCard(card));               
         this.grdPlayableCards.getChildren().clear();
-        instance.lastCard = card;
+        instanceController.lastCard = instanceController.client.getTopCard();
     }
 
     private String createMessage() {
@@ -165,7 +236,7 @@ public class MainController implements Initializable {
 
         message = "PUT/" + getCardsValue();
 
-        System.out.println("message: " + message);
+        System.out.println("messageMainController: " + message);
         return message;
     }
 
@@ -178,34 +249,39 @@ public class MainController implements Initializable {
     }
 
     private boolean canPlay(ArrayList<Card> cards) {
-        if (instance.lastCard == null) {
+        if (instanceController.lastCard == null) {
             return true;
         }
         if (cards.size() == 1) {
             return handleOnePlayedCard(cards.get(0));
         } else {
+            System.out.println("Many card");
             return handleManyPlayedCards(cards.get(0));
         }
     }
 
     private boolean handleOnePlayedCard(Card card) {
-        if (instance.lastCard.getColor().
-                equals(card.getColor())) {
+        if (card instanceof WildCard) {
             return true;
         }
-        if (instance.lastCard.getValue().
-                equals(card.getValue())) {
+
+        if (instanceController.lastCard.getColor().equals(card.getColor())) {
             return true;
         }
-        //verificar si la puede colocar sobre una de cambio de color o los +4
+        if (instanceController.lastCard.getValue().equals(card.getValue())) {
+            return true;
+        }
         return false;
     }
 
+
     private boolean handleManyPlayedCards(Card card) {
-        if (instance.lastCard.getColor().equals(card.getColor())) {
+        
+        if (instanceController.lastCard.getColor().equals(card.getColor())) {
             return true;
         }
-        if (instance.lastCard.getValue().equals(card.getValue())) {
+        
+        if (instanceController.lastCard.getValue().equals(card.getValue())) {
             return true;
         }
         return false;
@@ -235,4 +311,21 @@ public class MainController implements Initializable {
         }
         return cardContainer;
     }
+
+    @FXML
+    private void selectColor(ActionEvent e) {
+        Button source = (Button) e.getSource();
+        String color = "";
+
+        if (source == btnRed) color = "R";
+        else if (source == btnGreen) color = "G";
+        else if (source == btnBlue) color = "B";
+        else if (source == btnYellow) color = "Y";
+
+        Card wildCard = HandleCards.getInstace().getPlayCards().get(0);
+        wildCard.setColor(color);
+
+        colorSelector.setVisible(false);
+        proceedWithCard();
+    }   
 }

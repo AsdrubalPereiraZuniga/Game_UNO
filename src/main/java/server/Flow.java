@@ -73,7 +73,7 @@ public class Flow implements Runnable {
 
         enableReadyButtom();
 
-        broadcast(responseTOP + Server.cardsQueue.peek().toString());//
+        broadcast(responseTOP + Server.cardsQueue.peek().toString());
 
         sendInitialCards();
 
@@ -141,10 +141,38 @@ public class Flow implements Runnable {
             case "PUT":
                 putCardInQueue(request);
                 break;
+            case "GET_TURN":
+                sendMenssageToClient(responseACTUAL
+                    + Server.players.get(currentPlayerIndex).getUsername(),
+                    "Error al enviar turno actual");
+                break;
+            case "DRAW":
+                giveCardToPlayer();
+                break;
+            case "NEWCARDS":
+                giveNewCardsToPlayer();
+                break;
             default:
                 System.out.println("No se reccibio nah");
         }
     }
+    
+    private void giveCardToPlayer() {
+        if (!Server.cardsStack.isEmpty()) {
+            Card drawnCard = Server.cardsStack.pop();
+            this.player.getCards().add(drawnCard);
+            sendMenssageToClient("CARDS/" + drawnCard.toString() + "/", "No se pudo enviar carta robada");
+        }
+    }
+    
+    private void giveNewCardsToPlayer(){
+        if (!Server.cardsStack.isEmpty()) {
+            Card drawnCard = Server.cardsStack.pop();
+            this.player.getCards().add(drawnCard);
+            sendMenssageToClient("NEWCARDS/" + drawnCard.toString() + "/", "No se pudo enviar la nueva carta");
+        }
+    }
+
 
     private boolean disconectPlayer() {
         try {
@@ -209,10 +237,10 @@ public class Flow implements Runnable {
 
         responsePUT += createObjectCard(cards[index - 1]).toString();
 
-        //broadcast para que todos vean la carta que se ppuso
+        //broadcast para que todos vean la carta que se puso
         //Creo que no le va a notificar a todos porque los demas estan en wait,
-        //quiza mejor lo muevo a que haga el broadcast cuando se despierta todos los hilos
-        //broadcast(responsePUT);
+        //quiza mejor lo muevo a que haga el broadcast cuando se despierta todos los hilos        
+        broadcast(responsePUT);
         changeTurn(createObjectCard(cards[index - 1]), responsePUT);
     }
 
@@ -231,23 +259,97 @@ public class Flow implements Runnable {
 
     private synchronized void changeTurn(Card topCard, String responsePUT) {
 
-        synchronized (turnLock) {
+        synchronized (turnLock) { // cambia el turno del jugador
             Server.players.get(currentPlayerIndex).getFlow()
                     .sendMenssageToClient(responseWAIT,
                             "Error al poner en espera");
-
-            handlePlayerTurns(topCard);
-
+            System.out.println("Current player comming: " + currentPlayerIndex);
+            System.out.println("Current player comming size: " + 
+                    Server.players.get(currentPlayerIndex).getCards().size());
+            
+            for(int i=0; i<Server.players.get(currentPlayerIndex).getCards().size(); i++){
+                if(Server.players.get(currentPlayerIndex).getCards()
+                        .get(i).toString().contains(topCard.toString()) ){
+                    Server.players.get(currentPlayerIndex).getCards().remove(i);
+                    break;
+                }
+            }            
+            System.out.println("Current player comming size eliminada: " + 
+                    Server.players.get(currentPlayerIndex).getCards().size());
+            
+            handlePlayerTurns(topCard);            
+            System.out.println("Current player: " + currentPlayerIndex);
+            skillsCards(topCard.toString(), currentPlayerIndex);
+            
             Flow nextPlayerFlow = Server.players.get(currentPlayerIndex).getFlow();
 
             nextPlayerFlow.sendMenssageToClient(responseTURN,
                     "Error al notificar turno");
 
             turnLock.notifyAll();
-        }
-        broadcast(responsePUT);
+        }                      
+       
+        //broadcast(responsePUT );
+        
+        //**no se ha probado** le envio al cliente el jugador que tiene el turno.**Falta manejo de cliente**
         broadcast(responseACTUAL
-                + Server.players.get(currentPlayerIndex).getUsername()); //**no se ha probado** le envio al cliente el jugador que tiene el turno.**Falta manejo de cliente**
+                + Server.players.get(currentPlayerIndex).getUsername()); 
+    }
+    
+    public void skillsCards(String card, int index){
+        Card _card;
+        System.out.println("CARD_FLOW: " + card);
+        System.out.println("INDEX: " + index);
+        System.out.println("CARTAS comming: " + Server.players.get(index).getCards().size());
+        switch (card) {
+            case "C1":
+                System.out.println("Is +4");
+                for(int i=0; i<4; i++){
+                    _card = Server.cardsStack.pop();
+                    Server.players.get(index).getCards().add(_card);
+                    sendMenssageToClient("NEWCARDS/"+Server.players.get(index).getUsername()+"/" + _card.toString()+"/",
+                            "No se pudo enviar el refresh");
+                }
+                break;
+            case "B10":
+                System.out.println("Is +2 B");
+                for(int i=0; i<2; i++){
+                    _card = Server.cardsStack.pop();
+                    Server.players.get(index).getCards().add(_card);                    
+                    sendMenssageToClient("NEWCARDS/"+Server.players.get(index).getUsername()+"/" + _card.toString()+"/",
+                            "No se pudo enviar el refresh");
+                }
+                break;
+            case "G10":
+                System.out.println("Is +2G");
+                for(int i=0; i<2; i++){
+                    _card = Server.cardsStack.pop();
+                    Server.players.get(index).getCards().add(_card);                    
+                    sendMenssageToClient("NEWCARDS/"+Server.players.get(index).getUsername()+"/" + _card.toString()+"/",
+                            "No se pudo enviar el refresh");
+                }
+                break;
+            case "R10":
+                System.out.println("Is +2R");                
+                for(int i=0; i<2; i++){
+                    _card = Server.cardsStack.pop();
+                    Server.players.get(index).getCards().add(_card);                    
+                    sendMenssageToClient("NEWCARDS/"+Server.players.get(index).getUsername()+"/" + _card.toString()+"/",
+                            "No se pudo enviar el refresh");
+                }
+                break;
+            case "Y10":
+                System.out.println("Is +2Y");
+                for(int i=0; i<2; i++){
+                    _card = Server.cardsStack.pop();
+                    Server.players.get(index).getCards().add(_card);                    
+                    sendMenssageToClient("NEWCARDS/"+Server.players.get(index).getUsername()+"/" + _card.toString()+"/",
+                            "No se pudo enviar el refresh");
+                }
+                break;
+            default:                
+        }
+        System.out.println("CARTAS: " + Server.players.get(index).getCards().size());
     }
 
     private synchronized void handlePlayerTurns(Card topCard) {
@@ -280,6 +382,7 @@ public class Flow implements Runnable {
             }
         }
     }
+    /// hacer una funcion si es la carta de +4, entonces, al jugador actual se le da ese +4    
 
     private void handlePosition(int aux) {
         if (invertOrder) {
