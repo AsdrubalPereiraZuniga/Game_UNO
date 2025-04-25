@@ -173,6 +173,5 @@ public class Server {
         }
 
         Collections.shuffle(cardsStack);
-    }
-
+    }        
 }

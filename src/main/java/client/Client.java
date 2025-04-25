@@ -16,6 +16,12 @@ import java.util.Arrays;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
+import server.Server;
 
 /**
  * @author Ismael Marchena Méndez.
@@ -27,7 +33,7 @@ import javafx.beans.property.SimpleObjectProperty;
  * frontend.
  */
 public class Client {
-
+    
     private boolean connect;
     private boolean ready;
     private int port;
@@ -44,7 +50,9 @@ public class Client {
     private Card topCard;
     private boolean waiting;
     private boolean myTurn = false;
-    private final Object turnLock = new Object();
+    private final Object turnLock = new Object();    
+    
+    private MainController mainController;
 
     /**
      * @param playerName the name of the player.
@@ -64,7 +72,7 @@ public class Client {
         this.otherPlayers = new ArrayList<>();
         this.activeButton = false;
         this.topCard = null;
-        this.waiting = false;
+        this.waiting = false;        
 
         initializeConnection();
         startListening();
@@ -106,7 +114,7 @@ public class Client {
         listenerThread = new Thread(() -> {
             while (connect && !socket.isClosed()) {
                 try {
-                    String message = input.readUTF();
+                    String message = input.readUTF();                    
                     processServerMessage(message);
                 } catch (IOException e) {
                     System.out.println("Connection lost: " + e.getMessage());
@@ -134,6 +142,9 @@ public class Client {
         String messageCode = message.split("/")[0];
         System.out.println("wait: " + this.waiting);
         switch (messageCode) {
+            case "NEWCARDS":
+                refreshCards(message);
+                break;
             case "CARDS":
                 setPlayerDeck(message);
                 break;
@@ -146,8 +157,8 @@ public class Client {
             case "START":
                 initializeOtherPlayers(message);
                 break;
-            case "TOP":
-                String value = message.split("/")[1];
+            case "TOP":                
+                String value = message.split("/")[1];        
                 this.topCard = getCard(value);
                 break;
             case "PUT":
@@ -163,33 +174,43 @@ public class Client {
             case "TURN":
                 this.waiting = false;
                 setWaitingMode(this.waiting);
-            case "":
+            case "ACTUAL":
+                String[] parts = message.split("/");
+                if (parts.length > 1) {
+                    String currentPlayer = parts[1];
+                    //TurnHandler.updateTurn(currentPlayer);
+                    TurnHandler.updateTurn(currentPlayer + ": " + String.valueOf(this.cards.size()));
+                } else {
+                    System.err.println("Formato de mensaje ACTUAL inválido: " + message);
+                }
                 break;
             default:
                 System.out.println(message);
         }
     }
-    /***
-     * 
-     * tomar la carta que se envia desde el broadcast y mostrarla para todos los clientes
-     * 
-     * asi se maneja el cambio de carta en la pantalla cuando un cliente sube una carta
-     * 
-     * usar le metodo del controlador de la interfaz para colocar la carta.
-     */
+    
+    public void refreshCards(String message){
+        String[] deck = message.split("/");
+        System.out.println("DECK: " + deck.length);
+               
+        this.cards.add(getCard(deck[2]));        
+        
+        TurnHandler.updateTurn(deck[1] + ": " + String.valueOf(this.cards.size()));
+    }    
+    
     private void setTopCard(String message) {        
         String value = message.split("/")[1];        
         this.topCard = getCard(value);
-        // tomar ese this.topCard y colocarla en la interfaz
+        ViewCardsHandler.updateUsedViewCard(getNewCard(topCard));
     }
 
     /**
      * @param message for the server.
      *
      * Send a message to the server.
-     */
+     */ 
     public void sendMessage(String message) {
-        System.out.println("Client message: " + message);
+        
         if (connect) {
             try {
                 output.writeUTF(message);
@@ -217,10 +238,19 @@ public class Client {
 
     private void setPlayerDeck(String message) {
         String[] deck = message.split("/");
+        System.out.println("DECK: " + deck.length);
+        boolean isNewCard = (deck.length == 2); // Solo una carta nueva, se usó DRAW/
         for (int i = 1; i < deck.length; i++) {
             this.cards.add(getCard(deck[i]));
         }
+
+        if (isNewCard) {
+            Platform.runLater(() -> {
+                MainController.getInstanceController().refreshHand(); // ⬅️ nuevo método
+            });
+        }
     }
+
 
     private Card getCard(String card) {
         String code = card.substring(0, 1);
@@ -273,6 +303,31 @@ public class Client {
                 }
             }
         }
+    }
+    
+    private VBox getNewCard(Card card) {
+        VBox cardContainer = new VBox();
+        double NORMAL_WIDTH = HandleCards.getInstace().getNORMAL_WIDTH();
+        double CARD_HEIGHT = HandleCards.getInstace().getCARD_HEIGTH();
+        cardContainer.setPrefSize(NORMAL_WIDTH, CARD_HEIGHT);
+        cardContainer.setStyle("-fx-background-color: white; -fx-border-color: "
+                + "#333; -fx-border-radius: 5;");
+        cardContainer.setAlignment(Pos.CENTER);
+
+        try {
+            ImageView cardImage = new ImageView(new Image(
+                    card.getImagePath()));
+            cardImage.setPreserveRatio(true);
+            cardImage.setFitWidth(NORMAL_WIDTH - 10);
+            cardContainer.getChildren().add(cardImage);
+        } catch (Exception e) {
+            // Fallback a Label si no hay imagen
+            String cardText = card.getColor() + card.getValue();
+            Label label = new Label(cardText);
+            label.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+            cardContainer.getChildren().add(label);
+        }
+        return cardContainer;
     }
 
     /**
@@ -376,5 +431,9 @@ public class Client {
     public void setWaiting(boolean waiting) {
         this.waiting = waiting;
     }
-
+    
+    public void setMainController(MainController controller){
+        this.mainController = controller;
+    }
+    
 }

@@ -5,6 +5,7 @@ controllers\LoginController.class
 server\Flow.class
 cards\NumberCard.class
 cards\ActionCard.class
+client\TurnHandler.class
 cards\Card.class
 controllers\MainController.class
 client\OtherPlayers.class
@@ -12,4 +13,5 @@ players\Player.class
 module-info.class
 controllers\WaitingController.class
 server\Server.class
+client\ViewCardsHandler.class
 client\Client.class
