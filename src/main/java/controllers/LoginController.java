@@ -91,38 +91,32 @@ public class LoginController implements Initializable {
 
 
     private void animateBounce(ImageView icon) {
-        // Salto 1
         TranslateTransition jump1 = new TranslateTransition(Duration.seconds(0.25), icon);
         jump1.setByY(-10);
         ScaleTransition stretch1 = new ScaleTransition(Duration.seconds(0.25), icon);
         stretch1.setToY(1.25);
         stretch1.setToX(0.85);
 
-        // Regreso 1
         TranslateTransition down1 = new TranslateTransition(Duration.seconds(0.25), icon);
         down1.setByY(10);
         ScaleTransition reset1 = new ScaleTransition(Duration.seconds(0.25), icon);
         reset1.setToY(1.0);
         reset1.setToX(1.0);
 
-        // Salto 2
         TranslateTransition jump2 = new TranslateTransition(Duration.seconds(0.25), icon);
         jump2.setByY(-10);
         ScaleTransition stretch2 = new ScaleTransition(Duration.seconds(0.25), icon);
         stretch2.setToY(1.25);
         stretch2.setToX(0.85);
 
-        // Regreso 2
         TranslateTransition down2 = new TranslateTransition(Duration.seconds(0.25), icon);
         down2.setByY(10);
         ScaleTransition reset2 = new ScaleTransition(Duration.seconds(0.25), icon);
         reset2.setToY(1.0);
         reset2.setToX(1.0);
 
-        // Pausa final
         PauseTransition pause = new PauseTransition(Duration.seconds(2));
 
-        // Secuencia total
         SequentialTransition bounce = new SequentialTransition(
             new ParallelTransition(jump1, stretch1),
             new ParallelTransition(down1, reset1),
