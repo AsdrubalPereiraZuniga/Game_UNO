@@ -51,6 +51,7 @@ public class Client {
     private boolean waiting;
     private boolean myTurn = false;
     private final Object turnLock = new Object();
+    private boolean firstTime = true;
 
     private MainController mainController;
 
@@ -198,8 +199,6 @@ public class Client {
         String[] deck = message.split("/");
         System.out.println("DECK: " + deck.length);
 
-        System.out.println("getCard(deck[2]):" + getCard(deck[2]));
-
         this.cards.add(getCard(deck[2]));
 
         TurnHandler.updateTurn(deck[1] + ": " + String.valueOf(this.cards.size()));
@@ -208,7 +207,6 @@ public class Client {
     private void setTopCard(String message) {
         String value = message.split("/")[1];
         this.topCard = getCard(value);
-        System.out.println("lkkkkkkkkkkkkkkkkkkkk: " + this.topCard);
         ViewCardsHandler.updateUsedViewCard(getNewCard(topCard));
     }
 
@@ -253,11 +251,13 @@ public class Client {
             this.cards.add(getCard(deck[i]));
         }
 
-        if (isNewCard) {
+        if (!firstTime) {
             Platform.runLater(() -> {
                 MainController.getInstanceController().refreshHand(); // ⬅️ nuevo método
             });
         }
+        firstTime = false;
+
     }
 
     private Card getCard(String card) {
