@@ -136,7 +136,7 @@ public class MainController implements Initializable {
     }
 
     public void refreshHand() {
-         HandleCards.getInstace().setClient(instanceController.client);
+        HandleCards.getInstace().setClient(instanceController.client);
     }
 
     private void setOtherPlayers() {
@@ -331,12 +331,11 @@ public class MainController implements Initializable {
         }
 
         Card wildCard = HandleCards.getInstace().getPlayCards().get(0);
-        instanceController.client.sendMessage("COLORSELECTED/"+color+"0/");
 
         colorSelector.setVisible(false);
         proceedWithCard();
+        instanceController.client.sendMessage("COLORSELECTED/" + color + "0/");
     }
-
 
     private void setupHoverEffects(Button btn) {
         DropShadow shadow = new DropShadow();
@@ -344,14 +343,14 @@ public class MainController implements Initializable {
         shadow.setRadius(10);
         shadow.setSpread(0.2);
         double normalSize = btn.getWidth();
-        
+
         btn.setOnMouseEntered(e -> {
-            btn.setStyle(btn.getStyle()+" -fx-scale-x: 1.5; -fx-scale-y: 1.5;");
+            btn.setStyle(btn.getStyle() + " -fx-scale-x: 1.5; -fx-scale-y: 1.5;");
             btn.setEffect(shadow);
         });
 
         btn.setOnMouseExited(e -> {
-            btn.setStyle(btn.getStyle()+ " -fx-scale-x: 1.0; -fx-scale-y: 1.0;");
+            btn.setStyle(btn.getStyle() + " -fx-scale-x: 1.0; -fx-scale-y: 1.0;");
             btn.setEffect(null);
         });
     }

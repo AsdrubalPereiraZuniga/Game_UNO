@@ -191,7 +191,7 @@ public class HandleCards {
             grid.add(cardContainer, i, 0);
         }
     }
-
+    
     private void removeCard(int cardIndex) {
         //add
         instance.playableCards.add(instance.client.getCards().get(cardIndex));
@@ -209,8 +209,7 @@ public class HandleCards {
         if (cardIndex >= instance.playableCards.size()) {
             return false;
         }
-        String cardValue = instance.playableCards.get(cardIndex).getColor()
-                + instance.playableCards.get(cardIndex).getValue();
+        String cardValue = instance.playableCards.get(cardIndex).toString();
         if (instance.playableCards.get(cardIndex) != null
                 && cardValue.equals(value)) {
             instance.client.getCards().add(instance.playableCards.
