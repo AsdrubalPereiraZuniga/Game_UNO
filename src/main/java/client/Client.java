@@ -200,13 +200,6 @@ public class Client {
             System.err.println("Formato de mensaje ACTUAL inválido: " + message);
         }
     }
-
-    /**
-     * Refresh the player's deck.
-     * 
-     * @param message the message from the server.
-     */
-    public void refreshCards(String message) {
     
     /**
      * Updates the player's hand when receiving new cards.
@@ -218,15 +211,7 @@ public class Client {
         this.cards.add(getCard(deck[2]));
 
         TurnHandler.updateTurn(deck[1] + ": " + String.valueOf(this.cards.size()));
-    }
-
-    /**
-     * Handle the change of the top card.
-     * @param message the message from the server.
-     */
-    private void setTopCard(String message) {
-        String value = message.split("/")[1];
-    }    
+    } 
     
     /**
      * Updates the top card placed on the table.
@@ -271,11 +256,6 @@ public class Client {
     }
 
     /**
-     * Update the player deck.
-     * 
-     * @param message the message from the server.
-     */
-    /**
      * Updates the player's hand with cards received from the server.
      *
      * @param message the server message containing the full player deck
@@ -294,14 +274,6 @@ public class Client {
         }
         firstTime = false;
 
-    }
-
-    /**
-     * Return a type by its type, wild, action and number.
-     * 
-     * @param card the value of the card. ex: R0, G8, Y2, C0, B10.
-     * @return the object of the card.
-     */
     }
 
     /**
@@ -326,13 +298,6 @@ public class Client {
     }
 
     /**
-     * Initialize the other players.
-     * 
-     * @param message the message from the server.
-     */
-    
-    
-    /**
      * Initializes the list of other players in the game.
      *
      * @param message the server message containing other players' information
@@ -352,11 +317,6 @@ public class Client {
     }
 
     /**
-     * Change the thread state of the player.
-     * 
-     * @param waiting the state of the player.
-     */
-    /**
      * Sets the waiting mode for the player (true if waiting for turn).
      *
      * @param waiting whether the player must wait for their turn
@@ -371,9 +331,6 @@ public class Client {
         }
     }
 
-    /**
-     * Wait to be notify.
-     */
     /**
      * Blocks the execution until it is the player's turn.
      */
@@ -390,13 +347,6 @@ public class Client {
         }
     }
 
-    /**
-     * Create a new card conteiner.
-     * 
-     * @param card the card to be insert in the container.
-     * @return the card in the container.
-     */
-    
     /**
      * Creates a visual representation of a card as a VBox container.
      *

@@ -47,9 +47,6 @@ public class WaitingController implements Initializable {
     private Button btnReady;
     @FXML
     private Label lblWatingForPlayers;
-    private Timeline animationTimeline;
-    private volatile boolean stopChecking = false;
-    private Thread readyCheckThread;
     @FXML
     private AnchorPane bgWait;
 

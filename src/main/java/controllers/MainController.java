@@ -89,10 +89,7 @@ public class MainController implements Initializable {
     private Label lblCurrentTurn;
     @FXML
     private Label lblPlayerName;
-
-    private Button btnYellow;
     
-    private static final Duration ANIMATION_DURATION = Duration.millis(200);
     
     private BackgroundMain backgroundAnimation;
     
@@ -123,11 +120,6 @@ public class MainController implements Initializable {
         setDeckImage();
     }
     
-    /**
-     * Sets the default image for the deck and its hover/click effects.
-     */
-    private void setDeckImage() {
-
     /**
      * Set the deck Image
      */

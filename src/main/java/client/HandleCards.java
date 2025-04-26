@@ -39,7 +39,6 @@ public class HandleCards {
     private Client client;
     private GridPane grdCards;
     private GridPane grdPlayableCards;
-    private ArrayList<Card> playableCards;
 
     /**
      * Configures the default properties of the cards GridPane.
