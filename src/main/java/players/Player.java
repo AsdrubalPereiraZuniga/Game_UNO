@@ -6,7 +6,7 @@ package players;
 
 import cards.Card;
 import java.util.ArrayList;
-import java.util.concurrent.Flow;
+import server.Flow;
 
 /**
  * Represents a player in the game, including their username, cards,
