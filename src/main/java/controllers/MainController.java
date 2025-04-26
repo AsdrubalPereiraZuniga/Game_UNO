@@ -236,8 +236,7 @@ public class MainController implements Initializable {
         instanceController.lastCard = instanceController.client.getTopCard();
         System.out.println("LASTCARD" + instanceController.toString());        
         
-        if (canPlay(HandleCards.getInstace().getPlayCards())) {                                
-            //setTopCard(card);            
+        if (canPlay(HandleCards.getInstace().getPlayCards())) {                                        
             ViewCardsHandler.updateUsedViewCard(getNewCard(card));            
             instanceController.client.sendMessage(createMessage());
             instanceController.lastCard = instanceController.client.getTopCard();            
@@ -251,8 +250,6 @@ public class MainController implements Initializable {
             HandleCards.getInstace().setClient(instanceController.client);
         }        
     }
-
-    
 
     public void setTopCard(Card card) {        
         this.usedCardsView.getChildren().clear();

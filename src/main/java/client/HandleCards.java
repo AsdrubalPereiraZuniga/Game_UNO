@@ -82,7 +82,7 @@ public class HandleCards {
     }
 
     private VBox createCardContainer(String cardText, int cardIndex,
-            ArrayList<Card> cards) {
+        ArrayList<Card> cards) {
         VBox cardContainer = new VBox();
         cardContainer.setPrefSize(NORMAL_WIDTH, CARD_HEIGHT);
         
@@ -121,7 +121,7 @@ public class HandleCards {
             st.play();
 
             cardContainer.setEffect(glow);
-            cardContainer.setStyle("-fx-background-color: transparent;");
+            //cardContainer.setStyle("-fx-background-color: transparent;");
             cardContainer.toFront();
         });
 
@@ -133,7 +133,7 @@ public class HandleCards {
             st.play();
             cardContainer.setEffect(null);
 
-            cardContainer.setStyle("-fx-background-color: transparent;");
+            //cardContainer.setStyle("-fx-background-color: transparent;");
         });
     }
 

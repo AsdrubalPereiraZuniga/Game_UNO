@@ -30,6 +30,7 @@ public class ViewCardsHandler {
         if(container != null){
             Platform.runLater(() ->{
                 anchorPane.getChildren().clear();
+                container.setStyle("-fx-background-color: transparent;");
                 anchorPane.getChildren().add(container);  
                 gridPlayer.getChildren().clear();
             });
