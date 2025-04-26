@@ -16,8 +16,11 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import players.Player;
+import static server.Server.cardsStack;
 
 /**
  *
@@ -169,10 +172,13 @@ public class Flow implements Runnable {
     }
 
     private void restockStack() {
+        System.out.println("tamanio del queue" + Server.cardsQueue.size());
 
         for (int i = 0; i < Server.cardsQueue.size() - 1; i++) {
+            System.out.println("aaa" + i);
             Server.cardsStack.add(Server.cardsQueue.poll());
         }
+        Collections.shuffle(Server.cardsStack);
 
     }
 

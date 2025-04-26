@@ -89,10 +89,9 @@ public class MainController implements Initializable {
     private Button btnBlue;
     @FXML
     private Button btnYellow;
-    
+
     private static final Duration ANIMATION_DURATION = Duration.millis(200);
-    
-    
+
     /**
      * Initialize the controller class.
      *
@@ -106,19 +105,19 @@ public class MainController implements Initializable {
                 this.grdPlayableCards);
         setOtherPlayers();
         instanceController.lastCard = null;
-        setTopCard(instanceController.client.getTopCard());        
+        setTopCard(instanceController.client.getTopCard());
         TurnHandler.setLabel(lblCurrentTurn);
         ViewCardsHandler.setGridPlayerCards(grdPlayableCards);
         ViewCardsHandler.setAnchorPane(usedCardsView);
-        instanceController.client.sendMessage("GET_TURN/"); 
+        instanceController.client.sendMessage("GET_TURN/");
         setupHoverEffects(btnRed);
         setupHoverEffects(btnGreen);
         setupHoverEffects(btnBlue);
         setupHoverEffects(btnYellow);
         setDeckImage();
     }
-    
-    private void setDeckImage(){
+
+    private void setDeckImage() {
         try {
             deckImage.setImage(new Image("/images/behind/K1.png"));
             deckImage.setOnMouseClicked(e -> drawCardIfNeeded());
@@ -126,7 +125,7 @@ public class MainController implements Initializable {
             System.out.println("No se pudo cargar la imagen del mazo.");
         }
     }
-    
+
     private void drawCardIfNeeded() {
         System.out.println("COMIO CARTA");
         if (!instanceController.client.isWaiting()) {
@@ -135,10 +134,9 @@ public class MainController implements Initializable {
             }
         }
     }
-    
+
     public void refreshHand() {
-        HandleCards.getInstace().setCards(this.grdCards, 
-                instanceController.client, this.grdPlayableCards);
+         HandleCards.getInstace().setClient(instanceController.client);
     }
 
     private void setOtherPlayers() {
@@ -185,16 +183,18 @@ public class MainController implements Initializable {
      * @param event event.
      */
     @FXML
-    private void confirm(ActionEvent event) {                 
+    private void confirm(ActionEvent event) {
         Platform.runLater(() -> {
             MainController.getInstanceController().refreshHand();
         });
-        if (HandleCards.getInstace().getPlayCards().isEmpty()) return;
+        if (HandleCards.getInstace().getPlayCards().isEmpty()) {
+            return;
+        }
 
         Card card = HandleCards.getInstace().getPlayCards().get(0);
-        
+
         if (card instanceof WildCard && card.getColor().equals("C")) {
-            System.out.println("CARTA DEL CONFIRM: " + card.toString());            
+            System.out.println("CARTA DEL CONFIRM: " + card.toString());
             showColorSelector();
             return;
         }
@@ -205,33 +205,31 @@ public class MainController implements Initializable {
     private void showColorSelector() {
         colorSelector.setVisible(true);
     }
-    
+
     public void proceedWithCard() {
-        Card card = HandleCards.getInstace().getPlayCards().get(0);        
+        Card card = HandleCards.getInstace().getPlayCards().get(0);
         instanceController.lastCard = instanceController.client.getTopCard();
-        System.out.println("LASTCARD" + instanceController.toString());        
-        
-        if (canPlay(HandleCards.getInstace().getPlayCards())) {                                
+        System.out.println("LASTCARD" + instanceController.toString());
+
+        if (canPlay(HandleCards.getInstace().getPlayCards())) {
             //setTopCard(card);            
-            ViewCardsHandler.updateUsedViewCard(getNewCard(card));            
+            ViewCardsHandler.updateUsedViewCard(getNewCard(card));
             instanceController.client.sendMessage(createMessage());
-            instanceController.lastCard = instanceController.client.getTopCard();            
-            
+            instanceController.lastCard = instanceController.client.getTopCard();
+
             HandleCards.getInstace().getPlayCards().clear();
-        } else {            
+        } else {
             for (Card playCard : HandleCards.getInstace().getPlayCards()) {
                 instanceController.client.getCards().add(playCard);
             }
             HandleCards.getInstace().getPlayCards().clear();
             HandleCards.getInstace().setClient(instanceController.client);
-        }        
+        }
     }
 
-    
-
-    public void setTopCard(Card card) {        
+    public void setTopCard(Card card) {
         this.usedCardsView.getChildren().clear();
-        this.usedCardsView.getChildren().add(getNewCard(card));               
+        this.usedCardsView.getChildren().add(getNewCard(card));
         this.grdPlayableCards.getChildren().clear();
         instanceController.lastCard = instanceController.client.getTopCard();
     }
@@ -280,13 +278,12 @@ public class MainController implements Initializable {
         return false;
     }
 
-
     private boolean handleManyPlayedCards(Card card) {
-        
+
         if (instanceController.lastCard.getColor().equals(card.getColor())) {
             return true;
         }
-        
+
         if (instanceController.lastCard.getValue().equals(card.getValue())) {
             return true;
         }
@@ -323,45 +320,62 @@ public class MainController implements Initializable {
         Button source = (Button) e.getSource();
         String color = "";
 
-        if (source == btnRed) color = "R";
-        else if (source == btnGreen) color = "G";
-        else if (source == btnBlue) color = "B";
-        else if (source == btnYellow) color = "Y";
+        if (source == btnRed) {
+            color = "R";
+        } else if (source == btnGreen) {
+            color = "G";
+        } else if (source == btnBlue) {
+            color = "B";
+        } else if (source == btnYellow) {
+            color = "Y";
+        }
 
         Card wildCard = HandleCards.getInstace().getPlayCards().get(0);
         wildCard.setColor(color);
 
         colorSelector.setVisible(false);
         proceedWithCard();
-    }  
-    
-        private void setupHoverEffects(Button btn) {
+    }
+
+    private void setupHoverEffects(Button btn) {
         DropShadow shadow = new DropShadow();
+        System.out.println("btn: "+btn.getText()+" id: "+btn.getId());
         shadow.setColor(Color.rgb(0, 0, 0, 0.3));
         shadow.setRadius(10);
         shadow.setSpread(0.2);
         double normalSize = btn.getWidth();
+        
 
         btn.setOnMouseEntered(e -> {
-            ScaleTransition st = new ScaleTransition(ANIMATION_DURATION,
-                    btn);
-            st.setToX(1.2);
-            st.setToY(1.2);
-            st.play();
-
+            btn.setStyle("-fx-scale-x: 1.2; -fx-scale-y: 1.2; -fx-border-color: #000000; -fx-border-width: 2;");
             btn.setEffect(shadow);
-            btn.setStyle("-fx-border-color: #000000; -fx-border-width: 2;");
-            btn.toFront();
         });
 
         btn.setOnMouseExited(e -> {
-            ScaleTransition st = new ScaleTransition(ANIMATION_DURATION,
-                    btn);
-            st.setToX(1.0);
-            st.setToY(1.0);
-            st.play();
-
+            btn.setStyle("-fx-scale-x: 1.0; -fx-scale-y: 1.0; -fx-border-color: transparent;");
             btn.setEffect(null);
         });
+
+//        btn.setOnMouseEntered(e -> {
+//            ScaleTransition st = new ScaleTransition(ANIMATION_DURATION,
+//                    btn);
+//            st.setToX(1.2);
+//            st.setToY(1.2);
+//            st.play();
+//
+//            btn.setEffect(shadow);
+//            btn.setStyle("-fx-border-color: #000000; -fx-border-width: 2;");
+//            btn.toFront();
+//        });
+//
+//        btn.setOnMouseExited(e -> {
+//            ScaleTransition st = new ScaleTransition(ANIMATION_DURATION,
+//                    btn);
+//            st.setToX(1.0);
+//            st.setToY(1.0);
+//            st.play();
+//
+//            btn.setEffect(null);
+//        });
     }
 }
