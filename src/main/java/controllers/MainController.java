@@ -337,45 +337,22 @@ public class MainController implements Initializable {
         proceedWithCard();
     }
 
+
     private void setupHoverEffects(Button btn) {
         DropShadow shadow = new DropShadow();
-        System.out.println("btn: "+btn.getText()+" id: "+btn.getId());
         shadow.setColor(Color.rgb(0, 0, 0, 0.3));
         shadow.setRadius(10);
         shadow.setSpread(0.2);
         double normalSize = btn.getWidth();
         
-
         btn.setOnMouseEntered(e -> {
-            btn.setStyle("-fx-scale-x: 1.2; -fx-scale-y: 1.2; -fx-border-color: #000000; -fx-border-width: 2;");
+            btn.setStyle(btn.getStyle()+" -fx-scale-x: 1.5; -fx-scale-y: 1.5;");
             btn.setEffect(shadow);
         });
 
         btn.setOnMouseExited(e -> {
-            btn.setStyle("-fx-scale-x: 1.0; -fx-scale-y: 1.0; -fx-border-color: transparent;");
+            btn.setStyle(btn.getStyle()+ " -fx-scale-x: 1.0; -fx-scale-y: 1.0;");
             btn.setEffect(null);
         });
-
-//        btn.setOnMouseEntered(e -> {
-//            ScaleTransition st = new ScaleTransition(ANIMATION_DURATION,
-//                    btn);
-//            st.setToX(1.2);
-//            st.setToY(1.2);
-//            st.play();
-//
-//            btn.setEffect(shadow);
-//            btn.setStyle("-fx-border-color: #000000; -fx-border-width: 2;");
-//            btn.toFront();
-//        });
-//
-//        btn.setOnMouseExited(e -> {
-//            ScaleTransition st = new ScaleTransition(ANIMATION_DURATION,
-//                    btn);
-//            st.setToX(1.0);
-//            st.setToY(1.0);
-//            st.play();
-//
-//            btn.setEffect(null);
-//        });
     }
 }
