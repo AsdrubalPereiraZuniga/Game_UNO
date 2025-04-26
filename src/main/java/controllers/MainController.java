@@ -331,7 +331,7 @@ public class MainController implements Initializable {
         }
 
         Card wildCard = HandleCards.getInstace().getPlayCards().get(0);
-        wildCard.setColor(color);
+        instanceController.client.sendMessage("COLORSELECTED/"+color+"0/");
 
         colorSelector.setVisible(false);
         proceedWithCard();
