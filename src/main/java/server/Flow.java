@@ -155,6 +155,10 @@ public class Flow implements Runnable {
             case "NEWCARDS":
                 giveNewCardsToPlayer();
                 break;
+            case "COLORSELECTED":
+                broadcast("TOP" + request.split("/")[1]);
+                break;
+                    
             default:
                 System.out.println("No se reccibio nah");
         }
@@ -163,7 +167,11 @@ public class Flow implements Runnable {
     private void giveCardToPlayer() {
         if (!Server.cardsStack.isEmpty()) {
             Card drawnCard = Server.cardsStack.pop();
-            this.player.getCards().add(drawnCard);
+//            this.player.getCards().add(drawnCard);
+            Server.players.get(currentPlayerIndex).getCards().add(drawnCard);
+            
+             System.out.println("Current player: " + Server.players.get(currentPlayerIndex) +currentPlayerIndex);
+            
             sendMenssageToClient("CARDS/" + drawnCard.toString() + "/", "No se pudo enviar carta robada");
         } else {
             System.out.println("Si el stack ya no tiene cartas");
@@ -338,6 +346,8 @@ public class Flow implements Runnable {
 //    }
     
     public void skillsCards(String card, int index) {
+        System.out.println("skil cards " + card);
+       
         Card _card;
         System.out.println("CARD_FLOW: " + card);
         System.out.println("INDEX: " + index);
