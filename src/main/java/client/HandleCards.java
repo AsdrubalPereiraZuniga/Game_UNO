@@ -6,6 +6,7 @@ import javafx.animation.ScaleTransition;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Glow;
 import javafx.scene.image.Image;
@@ -39,6 +40,7 @@ public class HandleCards {
     private Client client;
     private GridPane grdCards;
     private GridPane grdPlayableCards;
+    private ScrollPane scrollPane;
 
     /**
      * Configures the default properties of the cards GridPane.
@@ -56,11 +58,12 @@ public class HandleCards {
      * @param client the Client instance
      * @param gridPC the playable cards GridPane
      */
-    public void initialize(GridPane grid, Client client, GridPane gridPC) {
+    public void initialize(GridPane grid, Client client, GridPane gridPC, ScrollPane scroll) {
         instance.grdCards = grid;
         instance.client = client;
         instance.grdPlayableCards = gridPC;
         instance.playableCards = new ArrayList<>();
+        instance.scrollPane = scroll;
         configureGridPane();
     }
 
@@ -71,8 +74,8 @@ public class HandleCards {
      * @param client the Client instance
      * @param gridPC the playable cards GridPane
      */
-    public void setCards(GridPane grid, Client client, GridPane gridPC) {
-        initialize(grid, client, gridPC);
+    public void setCards(GridPane grid, Client client, GridPane gridPC, ScrollPane scroll) {
+        initialize(grid, client, gridPC, scroll);
         instance.grdCards.getChildren().clear();
         instance.grdCards.getColumnConstraints().clear();
 
@@ -81,26 +84,22 @@ public class HandleCards {
             return;
         }
 
-        for (int i = 0; i < cardCount; i++) {
-            ColumnConstraints cc = new ColumnConstraints();
-            cc.setPrefWidth(120);
-
-            cc.setMinWidth(80);
-
-            cc.setMaxWidth(Region.USE_COMPUTED_SIZE);
-
-            cc.setHgrow(Priority.NEVER);
-
-            instance.grdCards.setAlignment(Pos.CENTER);
-            instance.grdCards.getColumnConstraints().add(cc);
-        }
+        int numRows = (int) Math.ceil((double) cardCount / 7);
+        
+        instance.grdCards.setPrefHeight(numRows * (CARD_HEIGHT + 10)); 
 
         for (int i = 0; i < cardCount; i++) {
+            int row = i / 7;
+            int col = i % 7;
+            
             VBox cardContainer = createCardContainer(
                     instance.client.getCards().get(i).toString(),
                     i, instance.client.getCards());
-            instance.grdCards.add(cardContainer, i, 0);
+            instance.grdCards.add(cardContainer, col, row);
         }
+        
+        instance.scrollPane.setContent(instance.grdCards);
+        instance.scrollPane.setFitToWidth(true);
     }
 
     /**
@@ -187,27 +186,36 @@ public class HandleCards {
             return;
         }
         
+        if (grid == instance.grdCards) {
+            int numRows = (int) Math.ceil((double) cardCount / 7);
+            
+            grid.setPrefHeight(numRows * (CARD_HEIGHT + 10)); 
 
-        for (int i = 0; i < cardCount; i++) {
-            ColumnConstraints cc = new ColumnConstraints();
+            for (int i = 0; i < cardCount; i++) {
+                int row = i / 7;
+                int col = i %7;
+                
+                VBox cardContainer = createCardContainer(
+                        cards.get(i).toString(), i, cards);
+                grid.add(cardContainer, col, row);
+            }
+        } else {
 
-            cc.setPrefWidth(120);
+            for (int i = 0; i < cardCount; i++) {
+                ColumnConstraints cc = new ColumnConstraints();
+                cc.setPrefWidth(120);
+                cc.setMinWidth(80);
+                cc.setMaxWidth(Region.USE_COMPUTED_SIZE);
+                cc.setHgrow(Priority.NEVER);
+                grid.setAlignment(Pos.CENTER);
+                grid.getColumnConstraints().add(cc);
+            }
 
-            cc.setMinWidth(80);
-
-            cc.setMaxWidth(Region.USE_COMPUTED_SIZE);
-
-            cc.setHgrow(Priority.NEVER);
-
-            grid.setAlignment(Pos.CENTER);
-            grid.getColumnConstraints().add(cc);
-        }
-
-        for (int i = 0; i < cardCount; i++) {
-            VBox cardContainer
-                    = createCardContainer(
-                            cards.get(i).toString(), i, cards);
-            grid.add(cardContainer, i, 0);
+            for (int i = 0; i < cardCount; i++) {
+                VBox cardContainer = createCardContainer(
+                        cards.get(i).toString(), i, cards);
+                grid.add(cardContainer, i, 0);
+            }
         }
     }
 

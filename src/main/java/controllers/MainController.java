@@ -29,6 +29,7 @@ import java.io.IOException;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.Glow;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -92,6 +93,8 @@ public class MainController implements Initializable {
     
     
     private BackgroundMain backgroundAnimation;
+    @FXML
+    private ScrollPane scrollCards;
     
     
     /**
@@ -104,8 +107,14 @@ public class MainController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         this.backgroundAnimation = new BackgroundMain(bgView);
         this.lblPlayerName.setText(instanceController.client.getPlayerName());
+        
+        scrollCards.getStylesheets().add(getClass().getResource("/style/css.css").toExternalForm());
+        scrollCards.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollCards.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollCards.setFitToWidth(true);
+        
         HandleCards.getInstace().setCards(this.grdCards, 
-                instanceController.client, this.grdPlayableCards);
+                instanceController.client, this.grdPlayableCards, this.scrollCards);
         setOtherPlayers();
         instanceController.lastCard = null;
         setTopCard(instanceController.client.getTopCard());

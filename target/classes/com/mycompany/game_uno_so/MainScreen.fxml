@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -28,11 +29,11 @@
       <AnchorPane fx:id="player" layoutX="219.0" layoutY="506.0" prefHeight="200.0" prefWidth="851.0">
          <children>
             <Label fx:id="lblPlayerName" layoutX="14.0" layoutY="14.0" text="Label" />
-            <GridPane fx:id="grdCards" gridLinesVisible="true" layoutX="42.0" layoutY="31.0" prefHeight="140.0" prefWidth="780.0">
-              <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
-            </GridPane>
+            <ScrollPane fx:id="scrollCards" layoutX="42.0" layoutY="31.0" prefHeight="140.0" prefWidth="780.0" style="-fx-background: transparent; -fx-background-color: transparent;">
+               <content>
+                  <GridPane fx:id="grdCards" hgap="10" vgap="10" style="-fx-background-color: transparent;" />
+               </content>
+            </ScrollPane>
          </children>
       </AnchorPane>
 

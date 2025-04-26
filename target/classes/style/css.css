@@ -32,3 +32,39 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     -fx-focus-color: #ffffff;
     -fx-faint-focus-color: transparent;
 }
+
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-border-color: white;
+    -fx-border-width: 2px;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 0;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .scroll-bar {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .scroll-bar > .thumb {
+    -fx-background-color: white;
+    -fx-background-radius: 3px;
+}
+
+.scroll-pane > .scroll-bar > .track {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .scroll-bar > .increment-button,
+.scroll-pane > .scroll-bar > .decrement-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.scroll-pane > .corner {
+    -fx-background-color: transparent;
+}
