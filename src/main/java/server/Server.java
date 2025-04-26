@@ -139,9 +139,21 @@ public class Server {
 
         addCardsToStackAndShuffle();
 
-        cardsQueue.add(cardsStack.pop());
+        getTopCardOfStack();
 
         showStack();
+    }
+
+    private static void getTopCardOfStack() {
+
+        Card card = cardsStack.peek();
+
+        while (card.getColor().equals("C") || Integer.parseInt(card.getValue()) >= 10) {
+            System.out.println("Pasoooooooooooooooooooooooooooooooooooooooooo");
+            Collections.shuffle(cardsStack);
+            card = cardsStack.peek();
+        }
+        cardsQueue.add(cardsStack.pop());
 
     }
 
@@ -173,5 +185,5 @@ public class Server {
         }
 
         Collections.shuffle(cardsStack);
-    }        
+    }
 }
