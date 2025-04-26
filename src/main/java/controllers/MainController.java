@@ -29,6 +29,7 @@ import java.io.IOException;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.effect.Glow;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -92,6 +93,8 @@ public class MainController implements Initializable {
     
     private static final Duration ANIMATION_DURATION = Duration.millis(200);
     
+    private BackgroundMain backgroundAnimation;
+    
     
     /**
      * Initialize the controller class.
@@ -101,6 +104,7 @@ public class MainController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        this.backgroundAnimation = new BackgroundMain(bgView);
         this.lblPlayerName.setText(instanceController.client.getPlayerName());
         HandleCards.getInstace().setCards(this.grdCards, instanceController.client,
                 this.grdPlayableCards);
@@ -118,9 +122,30 @@ public class MainController implements Initializable {
         setDeckImage();
     }
     
-    private void setDeckImage(){
+    private void setDeckImage() {
         try {
             deckImage.setImage(new Image("/images/behind/K1.png"));
+
+            deckImage.setOnMouseEntered(e -> {
+                ScaleTransition st = new ScaleTransition(Duration.millis(200), deckImage);
+                st.setToX(1.1);
+                st.setToY(1.1);
+                st.play();
+
+                Glow glow = new Glow();
+                glow.setLevel(0.5);
+                deckImage.setEffect(glow);
+            });
+
+            deckImage.setOnMouseExited(e -> {
+                ScaleTransition st = new ScaleTransition(Duration.millis(200), deckImage);
+                st.setToX(1.0);
+                st.setToY(1.0);
+                st.play();
+
+                deckImage.setEffect(null);
+            });
+
             deckImage.setOnMouseClicked(e -> drawCardIfNeeded());
         } catch (Exception e) {
             System.out.println("No se pudo cargar la imagen del mazo.");
@@ -298,8 +323,7 @@ public class MainController implements Initializable {
         double NORMAL_WIDTH = HandleCards.getInstace().getNORMAL_WIDTH();
         double CARD_HEIGHT = HandleCards.getInstace().getCARD_HEIGTH();
         cardContainer.setPrefSize(NORMAL_WIDTH, CARD_HEIGHT);
-        cardContainer.setStyle("-fx-background-color: white; -fx-border-color: "
-                + "#333; -fx-border-radius: 5;");
+        cardContainer.setStyle("-fx-background-color: transparent;");
         cardContainer.setAlignment(Pos.CENTER);
 
         try {
@@ -312,9 +336,10 @@ public class MainController implements Initializable {
             // Fallback a Label si no hay imagen
             String cardText = card.getColor() + card.getValue();
             Label label = new Label(cardText);
-            label.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+            label.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: white;");
             cardContainer.getChildren().add(label);
         }
+
         return cardContainer;
     }
 

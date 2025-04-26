@@ -3,6 +3,7 @@ com\mycompany\game_uno_so\App.class
 client\HandleCards.class
 controllers\LoginController.class
 server\Flow.class
+controllers\BackgroundMain.class
 cards\NumberCard.class
 cards\ActionCard.class
 client\TurnHandler.class

@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package client;
 
 import cards.Card;
@@ -11,6 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.Glow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
@@ -62,31 +59,24 @@ public class HandleCards {
             return;
         }
 
-        // Configurar columnas
         for (int i = 0; i < cardCount; i++) {
             ColumnConstraints cc = new ColumnConstraints();
-            // Tamaño base deseado para cada carta (ej: 120px)
             cc.setPrefWidth(120);
 
-            // Ancho mínimo para que no se deformen (ej: 80px)
             cc.setMinWidth(80);
 
-            // Permite que las columnas se compriman si no hay espacio
             cc.setMaxWidth(Region.USE_COMPUTED_SIZE);
 
-            // Opcional: Prioridad de crecimiento (para espacio extra)
             cc.setHgrow(Priority.NEVER);
 
             instance.grdCards.setAlignment(Pos.CENTER);
             instance.grdCards.getColumnConstraints().add(cc);
         }
 
-        // Crear cartas
         for (int i = 0; i < cardCount; i++) {
-            VBox cardContainer
-                    = createCardContainer(
-                            instance.client.getCards().get(i).toString(),
-                            i, instance.client.getCards());
+            VBox cardContainer = createCardContainer(
+                    instance.client.getCards().get(i).toString(),
+                    i, instance.client.getCards());
             instance.grdCards.add(cardContainer, i, 0);
         }
     }
@@ -95,8 +85,8 @@ public class HandleCards {
             ArrayList<Card> cards) {
         VBox cardContainer = new VBox();
         cardContainer.setPrefSize(NORMAL_WIDTH, CARD_HEIGHT);
-        cardContainer.setStyle("-fx-background-color: white; -fx-border-color: "
-                + "#333; -fx-border-radius: 5;");
+        
+        cardContainer.setStyle("-fx-background-color: transparent;");
         cardContainer.setAlignment(Pos.CENTER);
 
         try {
@@ -106,16 +96,13 @@ public class HandleCards {
             cardImage.setFitWidth(NORMAL_WIDTH - 10);
             cardContainer.getChildren().add(cardImage);
         } catch (Exception e) {
-            // Si no hay imagen
             Label label = new Label(cardText);
-            label.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+            label.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: white;");
             cardContainer.getChildren().add(label);
         }
 
-        // Configurar efectos hover
         setupHoverEffects(cardContainer);
 
-        // Configurar evento click
         cardContainer.setOnMouseClicked(e -> handleCardClick(cardIndex,
                 cardText));
 
@@ -123,22 +110,18 @@ public class HandleCards {
     }
 
     private void setupHoverEffects(VBox cardContainer) {
-        DropShadow shadow = new DropShadow();
-        shadow.setColor(Color.rgb(0, 0, 0, 0.3));
-        shadow.setRadius(10);
-        shadow.setSpread(0.2);
-        double normalSize = cardContainer.getWidth();
-
+        Glow glow = new Glow();
+        glow.setLevel(0.5);
+        
         cardContainer.setOnMouseEntered(e -> {
             ScaleTransition st = new ScaleTransition(ANIMATION_DURATION,
                     cardContainer);
             st.setToX(1.2);
-            st.setToY(1.1);
+            st.setToY(1.2);
             st.play();
 
-            cardContainer.setEffect(shadow);
-            cardContainer.setStyle("-fx-background-color: #f8f8f8; "
-                    + "-fx-border-color: #ff0000; -fx-border-width: 2;");
+            cardContainer.setEffect(glow);
+            cardContainer.setStyle("-fx-background-color: transparent;");
             cardContainer.toFront();
         });
 
@@ -148,10 +131,9 @@ public class HandleCards {
             st.setToX(1.0);
             st.setToY(1.0);
             st.play();
-
             cardContainer.setEffect(null);
-            cardContainer.setStyle("-fx-background-color: white; "
-                    + "-fx-border-color: #333;");
+
+            cardContainer.setStyle("-fx-background-color: transparent;");
         });
     }
 
@@ -164,19 +146,15 @@ public class HandleCards {
             return;
         }
 
-        // Configurar columnas
         for (int i = 0; i < cardCount; i++) {
             ColumnConstraints cc = new ColumnConstraints();
-            // Tamaño base deseado para cada carta (ej: 120px)
+
             cc.setPrefWidth(120);
 
-            // Ancho mínimo para que no se deformen (ej: 80px)
             cc.setMinWidth(80);
 
-            // Permite que las columnas se compriman si no hay espacio
             cc.setMaxWidth(Region.USE_COMPUTED_SIZE);
 
-            // Opcional: Prioridad de crecimiento (para espacio extra)
             cc.setHgrow(Priority.NEVER);
 
             grid.setAlignment(Pos.CENTER);
@@ -278,5 +256,4 @@ public class HandleCards {
         refreshCards(instance.grdCards, instance.client.getCards());
         refreshCards(instance.grdPlayableCards, instance.playableCards);
     }
-
 }

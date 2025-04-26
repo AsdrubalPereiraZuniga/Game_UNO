@@ -2,13 +2,14 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<AnchorPane fx:id="bgView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
+<AnchorPane fx:id="bgView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" stylesheets="@../../../style/css.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
    <children>
       <AnchorPane fx:id="usedCardsView" layoutX="640.0" layoutY="235.0" prefHeight="250.0" prefWidth="200.0" />
       <AnchorPane fx:id="deckView" layoutX="433.0" layoutY="235.0" prefHeight="250.0" prefWidth="200.0">
@@ -42,8 +43,22 @@
          <Button fx:id="btnYellow" onAction="#selectColor" style="-fx-background-color: yellow; -fx-background-radius: 100%; -fx-min-width: 40px; -fx-min-height: 40px;" />
       </HBox>
 
-      <Button fx:id="btnOne" layoutX="23.0" layoutY="633.0" mnemonicParsing="false" onAction="#callOne" prefHeight="73.0" prefWidth="181.0" text="UNO" />
-      <Button fx:id="btnConfirm" layoutX="1085.0" layoutY="633.0" mnemonicParsing="false" onAction="#confirm" prefHeight="73.0" prefWidth="181.0" text="Confirmar" />
+      <Button fx:id="btnOne" layoutX="14.0" layoutY="618.0" mnemonicParsing="false" onAction="#callOne" prefHeight="88.0" prefWidth="112.0">
+         <graphic>
+            <ImageView fitHeight="80.0" fitWidth="140.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../images/more/btnUno.png" />
+               </image>
+            </ImageView>
+         </graphic></Button>
+      <Button fx:id="btnConfirm" layoutX="1120.0" layoutY="618.0" mnemonicParsing="false" onAction="#confirm" prefHeight="88.0" prefWidth="108.0">
+         <graphic>
+            <ImageView fitHeight="80.0" fitWidth="140.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../images/more/btnPut.png" />
+               </image>
+            </ImageView>
+         </graphic></Button>
 
       <AnchorPane layoutX="914.0" layoutY="306.0" prefHeight="200.0" prefWidth="362.0">
          <children>

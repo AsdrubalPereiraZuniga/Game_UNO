@@ -56,7 +56,7 @@ public class LoginController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        this.host = "25.0.110.89";
+        this.host = "localhost";
         this.port = 8000;
         
         backAnimation();
@@ -88,7 +88,6 @@ public class LoginController implements Initializable {
             }
         }
     }
-
 
     private void animateBounce(ImageView icon) {
         TranslateTransition jump1 = new TranslateTransition(Duration.seconds(0.25), icon);
