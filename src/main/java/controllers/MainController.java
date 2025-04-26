@@ -39,18 +39,20 @@ import javafx.util.Duration;
 import server.Server;
 
 /**
- * Main screen controller class.
- *
  * @author Ismael Marchena Méndez.
  * @author Jorge Rojas Mena.
  * @author Asdrubal Pererira Zuñiga.
  * @author Cesar Fabian Arguedas León.
+ * 
+ * Main screen controller class, handle all the user events while playing.
  */
 public class MainController implements Initializable {
-
+    private String selectedColor = "";
+    private Card lastCard;
+    private Client client;
+    private static final Duration ANIMATION_DURATION = Duration.millis(200);
     private static MainController instanceController;
 
-    private Client client;
     @FXML
     private AnchorPane bgView;
     @FXML
@@ -62,33 +64,32 @@ public class MainController implements Initializable {
     @FXML
     private AnchorPane usedCardsView;
     @FXML
+    private Button btnBlue;
+    @FXML
     private Button btnConfirm;
-    @FXML
-    private Button btnOne;
-    @FXML
-    private Label lblPlayerName;
-    @FXML
-    private GridPane grdCards;
-    @FXML
-    private HBox hbxOtherPlayers;
-    @FXML
-    private GridPane grdPlayableCards;
-
-    private Card lastCard;
-    @FXML
-    private Label lblCurrentTurn;
-    @FXML
-    private ImageView deckImage;
-    @FXML
-    private HBox colorSelector;
-    private String selectedColor = "";
-    @FXML
-    private Button btnRed;
     @FXML
     private Button btnGreen;
     @FXML
-    private Button btnBlue;
+    private Button btnOne;
     @FXML
+    private Button btnRed;
+    @FXML
+    private Button btnYellow;
+    @FXML
+    private GridPane grdCards;
+    @FXML
+    private GridPane grdPlayableCards;
+    @FXML
+    private HBox colorSelector;
+    @FXML
+    private HBox hbxOtherPlayers;
+    @FXML
+    private ImageView deckImage;
+    @FXML
+    private Label lblCurrentTurn;
+    @FXML
+    private Label lblPlayerName;
+
     private Button btnYellow;
     
     private static final Duration ANIMATION_DURATION = Duration.millis(200);
@@ -106,15 +107,15 @@ public class MainController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         this.backgroundAnimation = new BackgroundMain(bgView);
         this.lblPlayerName.setText(instanceController.client.getPlayerName());
-        HandleCards.getInstace().setCards(this.grdCards, instanceController.client,
-                this.grdPlayableCards);
+        HandleCards.getInstace().setCards(this.grdCards, 
+                instanceController.client, this.grdPlayableCards);
         setOtherPlayers();
         instanceController.lastCard = null;
-        setTopCard(instanceController.client.getTopCard());        
+        setTopCard(instanceController.client.getTopCard());
         TurnHandler.setLabel(lblCurrentTurn);
         ViewCardsHandler.setGridPlayerCards(grdPlayableCards);
         ViewCardsHandler.setAnchorPane(usedCardsView);
-        instanceController.client.sendMessage("GET_TURN/"); 
+        instanceController.client.sendMessage("GET_TURN/");
         setupHoverEffects(btnRed);
         setupHoverEffects(btnGreen);
         setupHoverEffects(btnBlue);
@@ -124,6 +125,11 @@ public class MainController implements Initializable {
     
     /**
      * Sets the default image for the deck and its hover/click effects.
+     */
+    private void setDeckImage() {
+
+    /**
+     * Set the deck Image
      */
     private void setDeckImage() {
         try {
@@ -154,21 +160,20 @@ public class MainController implements Initializable {
             System.out.println("No se pudo cargar la imagen del mazo.");
         }
     }
-    
+
     /**
-     * Draws a card from the deck if needed (only when no playable cards).
+     * Draw cards.
      */
     private void drawCardIfNeeded() {
-        System.out.println("COMIO CARTA");
         if (!instanceController.client.isWaiting()) {
             if (HandleCards.getInstace().getPlayCards().isEmpty()) {
                 instanceController.client.sendMessage("DRAW/");
             }
         }
     }
-    
+
     /**
-     * Refreshes the player's hand after updates.
+     * Refresh the deck.
      */
     public void refreshHand() {
         HandleCards.getInstace().setClient(instanceController.client);
@@ -177,11 +182,14 @@ public class MainController implements Initializable {
     /**
      * Sets the view displaying other players.
      */
+    /**
+     * Set the other players.
+     */
     private void setOtherPlayers() {
-        System.out.println("Nombre del men:" + instanceController.client.getPlayerName());
-        for (OtherPlayers otherPlayer : instanceController.client.getOtherPlayers()) {
-            System.out.println("LOLAAAAAAAAAAAAAAAAAAA:" + otherPlayer.toString());
-            if (!otherPlayer.getName().equals(instanceController.client.getPlayerName())) {
+        for (OtherPlayers otherPlayer :
+                instanceController.client.getOtherPlayers()) {
+            if (!otherPlayer.getName().equals(instanceController.
+                    client.getPlayerName())) {
                 this.hbxOtherPlayers.getChildren().add(new Label(
                         otherPlayer.getName() + ": "
                         + otherPlayer.getAmountOfCards()));
@@ -190,9 +198,9 @@ public class MainController implements Initializable {
     }
 
     /**
-     * Returns the singleton instance of MainController.
-     *
-     * @return the MainController instance
+     * Return the main controller instance.
+     * 
+     * @return the main controller instance.
      */
     public static MainController getInstanceController() {
         if (MainController.instanceController == null) {
@@ -221,22 +229,23 @@ public class MainController implements Initializable {
     }
 
     /**
+     * Confirm the cards that the player will be play.
      * Handles the confirm button event when playing a card.
      *
      * @param event the button click event
      */
     @FXML
-    private void confirm(ActionEvent event) {               
-        
+    private void confirm(ActionEvent event) {
         Platform.runLater(() -> {
             MainController.getInstanceController().refreshHand();
         });
-        if (HandleCards.getInstace().getPlayCards().isEmpty()) return;
+        if (HandleCards.getInstace().getPlayCards().isEmpty()) {
+            return;
+        }
 
         Card card = HandleCards.getInstace().getPlayCards().get(0);
-        
+
         if (card instanceof WildCard && card.getColor().equals("C")) {
-            System.out.println("CARTA DEL CONFIRM: " + card.toString());            
             showColorSelector();
             return;
         }
@@ -247,32 +256,36 @@ public class MainController implements Initializable {
     /**
      * Displays the color selection panel when a Wild Card is played.
      */
+    /**
+     * Show the selector of colors.
+     */
     private void showColorSelector() {
         colorSelector.setVisible(true);
     }
-    
+
     /**
-     * Proceeds with playing the selected card(s).
+     * Handle the card played.
      */
     public void proceedWithCard() {
-        Card card = HandleCards.getInstace().getPlayCards().get(0);        
-        instanceController.lastCard = instanceController.client.getTopCard();
-        System.out.println("LASTCARD" + instanceController.toString());        
+        Card card = HandleCards.getInstace().getPlayCards().get(0);
+        instanceController.lastCard = instanceController.client.getTopCard();    
         
         if (canPlay(HandleCards.getInstace().getPlayCards())) {                                        
             ViewCardsHandler.updateUsedViewCard(getNewCard(card));            
             instanceController.client.sendMessage(createMessage());
-            instanceController.lastCard = instanceController.client.getTopCard();            
-            
+            instanceController.lastCard = 
+                    instanceController.client.getTopCard();
+
             HandleCards.getInstace().getPlayCards().clear();
-        } else {            
+        } else {
             for (Card playCard : HandleCards.getInstace().getPlayCards()) {
                 instanceController.client.getCards().add(playCard);
             }
             HandleCards.getInstace().getPlayCards().clear();
             HandleCards.getInstace().setClient(instanceController.client);
-        }        
+        }
     }
+
 
     /**
      * Updates the visual representation of the top card on the discard pile.
@@ -281,10 +294,11 @@ public class MainController implements Initializable {
      */
     public void setTopCard(Card card) {        
         this.usedCardsView.getChildren().clear();
-        this.usedCardsView.getChildren().add(getNewCard(card));               
+        this.usedCardsView.getChildren().add(getNewCard(card));
         this.grdPlayableCards.getChildren().clear();
         instanceController.lastCard = instanceController.client.getTopCard();
     }
+
 
     /**
      * Creates the message to send to the server when a card is played.
@@ -296,10 +310,9 @@ public class MainController implements Initializable {
         String code;
 
         message = "PUT/" + getCardsValue();
-
-        System.out.println("messageMainController: " + message);
         return message;
     }
+
 
     /**
      * Generates the string representation of the played cards.
@@ -314,6 +327,7 @@ public class MainController implements Initializable {
         return cardsValue;
     }
 
+
     /**
      * Determines if the current cards can be legally played.
      *
@@ -327,10 +341,11 @@ public class MainController implements Initializable {
         if (cards.size() == 1) {
             return handleOnePlayedCard(cards.get(0));
         } else {
-            System.out.println("Many card");
             return handleManyPlayedCards(cards.get(0));
         }
     }
+
+
     
     /**
      * Validates if a single card can be played based on color or value.
@@ -352,6 +367,7 @@ public class MainController implements Initializable {
         return false;
     }
 
+
     /**
      * Validates if a sequence of cards can be played.
      *
@@ -359,17 +375,18 @@ public class MainController implements Initializable {
      * @return true if playable, false otherwise
      */
     private boolean handleManyPlayedCards(Card card) {
-        
+
         if (instanceController.lastCard.getColor().equals(card.getColor())) {
             return true;
         }
-        
+
         if (instanceController.lastCard.getValue().equals(card.getValue())) {
             return true;
         }
         return false;
     }
 
+ 
     /**
      * Creates a visual VBox representation of a card.
      *
@@ -401,6 +418,7 @@ public class MainController implements Initializable {
         return cardContainer;
     }
 
+
     /**
      * Handles the color selection for a Wild Card and proceeds with the move.
      *
@@ -411,17 +429,24 @@ public class MainController implements Initializable {
         Button source = (Button) e.getSource();
         String color = "";
 
-        if (source == btnRed) color = "R";
-        else if (source == btnGreen) color = "G";
-        else if (source == btnBlue) color = "B";
-        else if (source == btnYellow) color = "Y";
+        if (source == btnRed) {
+            color = "R";
+        } else if (source == btnGreen) {
+            color = "G";
+        } else if (source == btnBlue) {
+            color = "B";
+        } else if (source == btnYellow) {
+            color = "Y";
+        }
 
         Card wildCard = HandleCards.getInstace().getPlayCards().get(0);
-        wildCard.setColor(color);
 
         colorSelector.setVisible(false);
         proceedWithCard();
-    }  
+        instanceController.client.sendMessage("COLORSELECTED/" + color + "0/");
+    }
+
+
     
     /**
      * Sets up hover effects for the color selection buttons.
@@ -436,28 +461,13 @@ public class MainController implements Initializable {
         double normalSize = btn.getWidth();
 
         btn.setOnMouseEntered(e -> {
-            ScaleTransition st = new ScaleTransition(ANIMATION_DURATION,
-                    btn);
-            st.setToX(1.2);
-            st.setToY(1.1);
-            st.play();
-
+            btn.setStyle(btn.getStyle() + " -fx-scale-x: 1.5; -fx-scale-y: 1.5;");
             btn.setEffect(shadow);
-            btn.setStyle("-fx-background-color: #f8f8f8; "
-                    + "-fx-border-color: #000000; -fx-border-width: 2;");
-            btn.toFront();
         });
 
         btn.setOnMouseExited(e -> {
-            ScaleTransition st = new ScaleTransition(ANIMATION_DURATION,
-                    btn);
-            st.setToX(1.0);
-            st.setToY(1.0);
-            st.play();
-
+            btn.setStyle(btn.getStyle() + " -fx-scale-x: 1.0; -fx-scale-y: 1.0;");
             btn.setEffect(null);
-            btn.setStyle("-fx-background-color: white; "
-                    + "-fx-border-color: #333;");
         });
     }
 }

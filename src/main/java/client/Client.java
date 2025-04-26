@@ -33,26 +33,26 @@ import server.Server;
  * frontend.
  */
 public class Client {
-    
+
+    private boolean activeButton;
     private boolean connect;
+    private boolean firstTime = true;
+    private boolean forbidden;
+    private boolean myTurn = false;
     private boolean ready;
+    private boolean waiting;
     private int port;
     private ArrayList<Card> cards;
+    private ArrayList<OtherPlayers> otherPlayers;
+    private Card topCard;
     private DataInputStream input;
     private DataOutputStream output;
-    private Socket socket;
-    private String playerName;
-    private String host;
-    private Thread listenerThread;
-    private ArrayList<OtherPlayers> otherPlayers;
-    private boolean forbidden;
-    private boolean activeButton;
-    private Card topCard;
-    private boolean waiting;
-    private boolean myTurn = false;
-    private final Object turnLock = new Object();    
-    
     private MainController mainController;
+    private final Object turnLock = new Object();
+    private Socket socket;
+    private String host;
+    private String playerName;
+    private Thread listenerThread;
 
     /**
      * @param playerName the name of the player.
@@ -72,7 +72,7 @@ public class Client {
         this.otherPlayers = new ArrayList<>();
         this.activeButton = false;
         this.topCard = null;
-        this.waiting = false;        
+        this.waiting = false;
 
         initializeConnection();
         startListening();
@@ -114,7 +114,7 @@ public class Client {
         listenerThread = new Thread(() -> {
             while (connect && !socket.isClosed()) {
                 try {
-                    String message = input.readUTF();                    
+                    String message = input.readUTF();
                     processServerMessage(message);
                 } catch (IOException e) {
                     System.out.println("Connection lost: " + e.getMessage());
@@ -130,16 +130,23 @@ public class Client {
     /**
      * Processes the message received from the server.
      *
+     * Handle the message of the server.
+     * 
+     * CARDS: refresh the players deck. 
+     * READY: set the player state to ready.
+     * FORBIDDEN: don´t let the player access to an already start game. 
+     * START: starts the game. 
+     * TOP: put the firts card to be played. 
+     * PUT: change the top card played. 
+     * ACTIVE: change the state of the ready button. 
+     * WAIT: set the player to wait mode. 
+     * TURN: notify the player that its his/her turn.
+     * ACTUAL: show the actual player.
      * @param message the message received from the server
      */
     private void processServerMessage(String message) {
-        System.out.println("message2222: " + message);
         String messageCode = message.split("/")[0];
-        System.out.println("wait: " + this.waiting);
         switch (messageCode) {
-            case "NEWCARDS":
-                refreshCards(message);
-                break;
             case "CARDS":
                 setPlayerDeck(message);
                 break;
@@ -152,8 +159,8 @@ public class Client {
             case "START":
                 initializeOtherPlayers(message);
                 break;
-            case "TOP":                
-                String value = message.split("/")[1];        
+            case "TOP":
+                String value = message.split("/")[1];
                 this.topCard = getCard(value);
                 break;
             case "PUT":
@@ -169,20 +176,37 @@ public class Client {
             case "TURN":
                 this.waiting = false;
                 setWaitingMode(this.waiting);
+                break;
             case "ACTUAL":
-                String[] parts = message.split("/");
-                if (parts.length > 1) {
-                    String currentPlayer = parts[1];
-                    //TurnHandler.updateTurn(currentPlayer);
-                    TurnHandler.updateTurn(currentPlayer + ": " + String.valueOf(this.cards.size()));
-                } else {
-                    System.err.println("Formato de mensaje ACTUAL inválido: " + message);
-                }
+                setActualPlayer(message);
                 break;
             default:
                 System.out.println(message);
         }
     }
+
+    /**
+     * Handle the actual player chande.
+     * 
+     * @param message the message from the server.
+     */
+    private void setActualPlayer(String message) {
+        String[] parts = message.split("/");
+        if (parts.length > 1) {
+            String currentPlayer = parts[1];
+            String cardsSize = parts[2];
+            TurnHandler.updateTurn(currentPlayer + ": " + cardsSize);
+        } else {
+            System.err.println("Formato de mensaje ACTUAL inválido: " + message);
+        }
+    }
+
+    /**
+     * Refresh the player's deck.
+     * 
+     * @param message the message from the server.
+     */
+    public void refreshCards(String message) {
     
     /**
      * Updates the player's hand when receiving new cards.
@@ -191,11 +215,17 @@ public class Client {
      */
     public void refreshCards(String message){
         String[] deck = message.split("/");
-        System.out.println("DECK: " + deck.length);
-               
-        this.cards.add(getCard(deck[2]));        
-        
+        this.cards.add(getCard(deck[2]));
+
         TurnHandler.updateTurn(deck[1] + ": " + String.valueOf(this.cards.size()));
+    }
+
+    /**
+     * Handle the change of the top card.
+     * @param message the message from the server.
+     */
+    private void setTopCard(String message) {
+        String value = message.split("/")[1];
     }    
     
     /**
@@ -208,14 +238,13 @@ public class Client {
         this.topCard = getCard(value);
         ViewCardsHandler.updateUsedViewCard(getNewCard(topCard));
     }
-
+    
     /**
-     * @param message for the server.
-     *
      * Send a message to the server.
-     */ 
+     * 
+     * @param message the message from the server.
+     */
     public void sendMessage(String message) {
-        
         if (connect) {
             try {
                 output.writeUTF(message);
@@ -242,24 +271,37 @@ public class Client {
     }
 
     /**
+     * Update the player deck.
+     * 
+     * @param message the message from the server.
+     */
+    /**
      * Updates the player's hand with cards received from the server.
      *
      * @param message the server message containing the full player deck
      */
     private void setPlayerDeck(String message) {
         String[] deck = message.split("/");
-        System.out.println("DECK: " + deck.length);
         this.cards.clear();
-        boolean isNewCard = (deck.length == 2); // Solo una carta nueva, se usó DRAW/
         for (int i = 1; i < deck.length; i++) {
             this.cards.add(getCard(deck[i]));
         }
 
-        if (isNewCard) {
+        if (!firstTime) {
             Platform.runLater(() -> {
-                MainController.getInstanceController().refreshHand(); // ⬅️ nuevo método
+                MainController.getInstanceController().refreshHand();
             });
         }
+        firstTime = false;
+
+    }
+
+    /**
+     * Return a type by its type, wild, action and number.
+     * 
+     * @param card the value of the card. ex: R0, G8, Y2, C0, B10.
+     * @return the object of the card.
+     */
     }
 
     /**
@@ -282,6 +324,12 @@ public class Client {
         }
         return null;
     }
+
+    /**
+     * Initialize the other players.
+     * 
+     * @param message the message from the server.
+     */
     
     
     /**
@@ -296,7 +344,6 @@ public class Client {
         int amountOfCards;
         String[] data;
         for (int i = 1; i < players.length; i++) {
-            System.out.println("i: " + i);
             data = players[i].split(";");
             name = data[0];
             amountOfCards = Integer.parseInt(data[1]);
@@ -304,6 +351,11 @@ public class Client {
         }
     }
 
+    /**
+     * Change the thread state of the player.
+     * 
+     * @param waiting the state of the player.
+     */
     /**
      * Sets the waiting mode for the player (true if waiting for turn).
      *
@@ -314,10 +366,14 @@ public class Client {
             myTurn = !waiting;
             if (!waiting) {
                 turnLock.notifyAll();
+                turnLock.notifyAll();
             }
         }
     }
 
+    /**
+     * Wait to be notify.
+     */
     /**
      * Blocks the execution until it is the player's turn.
      */
@@ -333,6 +389,13 @@ public class Client {
             }
         }
     }
+
+    /**
+     * Create a new card conteiner.
+     * 
+     * @param card the card to be insert in the container.
+     * @return the card in the container.
+     */
     
     /**
      * Creates a visual representation of a card as a VBox container.
@@ -356,7 +419,6 @@ public class Client {
             cardImage.setFitWidth(NORMAL_WIDTH - 10);
             cardContainer.getChildren().add(cardImage);
         } catch (Exception e) {
-            // Fallback a Label si no hay imagen
             String cardText = card.getColor() + card.getValue();
             Label label = new Label(cardText);
             label.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
@@ -366,109 +428,174 @@ public class Client {
     }
 
     /**
-     * @return the player name.
-     *
      * Return the player name.
+     * 
+     * @return the player name.
      */
     public String getPlayerName() {
         return playerName;
     }
 
     /**
-     * @param playerName the player name.
-     *
      * Sets the player name.
+     * 
+     * @param playerName the player name.
      */
     public void setPlayerName(String playerName) {
         this.playerName = playerName;
     }
 
     /**
-     * @return the connection of the player with the server.
-     *
      * Handle the state of the connection of the player with the server.
+     * 
+     * @return the connection of the player with the server.
      */
     public boolean isConnect() {
         return connect;
     }
 
     /**
-     * @param connect the new value of the connection.
-     *
      * Change the state of the connection.
+     * 
+     * @param connect the new value of the connection.
      */
     public void setConnect(boolean connect) {
         this.connect = connect;
     }
 
     /**
-     * @return if the player is ready to start.
-     *
      * Handle if the player is ready to start.
+     * 
+     * @return if the player is ready to start.
      */
     public boolean isReady() {
         return ready;
     }
 
     /**
-     * @param ready new value of reeady.
-     *
      * Change the state ready of the player.
+     * 
+     * @param ready new value of reeady
      */
     public void setReady(boolean ready) {
         this.ready = ready;
     }
-
+    
+    /**
+     * Returns the player deck.
+     * 
+     * @return the player deck.
+     */
     public ArrayList<Card> getCards() {
         return cards;
     }
 
+    /**
+     * Change the playeer deck.
+     * 
+     * @param cards new deck.
+     */
     public void setCards(ArrayList<Card> cards) {
         this.cards = cards;
     }
 
+    /**
+     * Return the other players data.
+     * 
+     * @return the other players data.
+     */
     public ArrayList<OtherPlayers> getOtherPlayers() {
         return otherPlayers;
     }
 
+    /**
+     * Change the other players arraylist.
+     * 
+     * @param otherPlayers new other player arraylist.
+     */
     public void setOtherPlayers(ArrayList<OtherPlayers> otherPlayers) {
         this.otherPlayers = otherPlayers;
     }
 
+    /**
+     * Return the state of forbidden.
+     * 
+     * @return the state of forbidden.
+     */
     public boolean isForbidden() {
         return forbidden;
     }
 
+    /**
+     * Change the state of forbidden.
+     * 
+     * @param forbidden new state of forbidden.
+     */
     public void setForbidden(boolean forbidden) {
         this.forbidden = forbidden;
     }
 
+    /**
+     * Return the state of the active button.
+     * 
+     * @return the state of the active button.
+     */
     public boolean isActiveButton() {
         return activeButton;
     }
 
+    /**
+     * Change the state of the active button.
+     * 
+     * @param activeButton new state of the active button.
+     */
     public void setActiveButton(boolean activeButton) {
         this.activeButton = activeButton;
     }
 
+    /**
+     * Return the top card.
+     * 
+     * @return the top card.
+     */
     public Card getTopCard() {
         return topCard;
     }
 
+    /**
+     * Change the top card.
+     * 
+     * @param topCard new top card.
+     */
     public void setTopCard(Card topCard) {
         this.topCard = topCard;
     }
 
+    /**
+     * Return the state of waiting.
+     * 
+     * @return the state of waiting.
+     */
     public boolean isWaiting() {
         return waiting;
     }
 
+    /**
+     * Change the state of waiting.
+     * 
+     * @param waiting new state of waiting.
+     */
     public void setWaiting(boolean waiting) {
         this.waiting = waiting;
     }
-    
-    public void setMainController(MainController controller){
+
+    /**
+     * Change the main controller.
+     * 
+     * @param controller main controller.
+     */
+    public void setMainController(MainController controller) {
         this.mainController = controller;
     }
-    
+
 }

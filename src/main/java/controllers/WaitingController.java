@@ -28,12 +28,21 @@ import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 
 /**
+ * @author Ismael Marchena Méndez.
+ * @author Jorge Rojas Mena.
+ * @author Asdrubal Pererira Zuñiga.
+ * @author Cesar Fabian Arguedas León.
+ * 
+ * Waiting controller class, handle the waiting interface.
  * Controller class for the waiting screen.
  * Manages player readiness, animations, and transitions to the main game screen.
  */
 public class WaitingController implements Initializable {
 
+    private volatile boolean stopChecking = false;
     private static Client client;
+    private Thread readyCheckThread;
+    private Timeline animationTimeline;
     @FXML
     private Button btnReady;
     @FXML
@@ -165,7 +174,7 @@ public class WaitingController implements Initializable {
     }
 
     /**
-     * Handle the evento of ready.
+     * Handle the event of ready.
      *
      * @param event event.
      */
@@ -205,6 +214,9 @@ public class WaitingController implements Initializable {
     }
 
     /**
+     * Handle the status of the message.
+     */
+    /**
      * Handles the transition depending on whether the game is ready to start
      * or the player was forbidden to join.
      */
@@ -227,6 +239,10 @@ public class WaitingController implements Initializable {
             }
         });
     }
+    
+    /**
+     * Stop the verification.
+     */
 
     /**
      * Stops the player ready checking thread.

@@ -32,12 +32,13 @@ import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 
 /**
- * Login controller class.
- * 
  * @author Ismael Marchena Méndez.
  * @author Jorge Rojas Mena.
  * @author Asdrubal Pererira Zuñiga.
  * @author Cesar Fabian Arguedas León.
+ * 
+ * Login controller class, handle the login of the player and start the 
+ * connection to the server.
  */
 public class LoginController implements Initializable {
 

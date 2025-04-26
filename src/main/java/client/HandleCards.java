@@ -19,18 +19,25 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 /**
+ * @author Ismael Marchena Méndez.
+ * @author Jorge Rojas Mena.
+ * @author Asdrubal Pererira Zuñiga.
+ * @author Cesar Fabian Arguedas León.
+ *
+ * Handle the cards and give them some animations.
  * This class handles the display, interaction, and management of player cards
  * in the game UI, including hand cards and playable cards.
  */
 public class HandleCards {
+    private static final double CARD_HEIGHT = 120;
+    private static final double HOVER_WIDTH = 80;
 
     private static final double NORMAL_WIDTH = 80;
-    private static final double HOVER_WIDTH = 80;
-    private static final double CARD_HEIGHT = 120;
     private static final Duration ANIMATION_DURATION = Duration.millis(200);
     private static HandleCards instance;
-    private GridPane grdCards;
+    private ArrayList<Card> playableCards;
     private Client client;
+    private GridPane grdCards;
     private GridPane grdPlayableCards;
     private ArrayList<Card> playableCards;
 
@@ -180,6 +187,7 @@ public class HandleCards {
         if (cardCount == 0) {
             return;
         }
+        
 
         for (int i = 0; i < cardCount; i++) {
             ColumnConstraints cc = new ColumnConstraints();
@@ -204,21 +212,26 @@ public class HandleCards {
         }
     }
 
+
     /**
      * Moves a card from the hand to the playable cards list after clicking.
      *
      * @param cardIndex the index of the card to remove
      */
     private void removeCard(int cardIndex) {
-        //add
         instance.playableCards.add(instance.client.getCards().get(cardIndex));
-        //remove
         instance.client.getCards().remove(cardIndex);
-        //refresh
         refreshCards(instance.grdCards, instance.client.getCards());
         refreshCards(instance.grdPlayableCards, instance.playableCards);
     }
 
+    /**
+     * Remove clear the playable cards.
+     * 
+     * @param cardIndex card index.
+     * @param value value of the card. ex, R0, Y0, C0, B0, G0.
+     * @return if can continue or not.
+     */
     /**
      * Tries to remove a card from the playable cards list.
      *
@@ -233,8 +246,7 @@ public class HandleCards {
         if (cardIndex >= instance.playableCards.size()) {
             return false;
         }
-        String cardValue = instance.playableCards.get(cardIndex).getColor()
-                + instance.playableCards.get(cardIndex).getValue();
+        String cardValue = instance.playableCards.get(cardIndex).toString();
         if (instance.playableCards.get(cardIndex) != null
                 && cardValue.equals(value)) {
             instance.client.getCards().add(instance.playableCards.
@@ -247,6 +259,12 @@ public class HandleCards {
         return false;
     }
 
+    /**
+     * Handle the click of the card.
+     * 
+     * @param cardIndex card index.
+     * @param cardText value of the card. ex, R0, Y0, C0, B0, G0.
+     */
     /**
      * Handles the logic executed when a card is clicked.
      *
@@ -272,6 +290,12 @@ public class HandleCards {
     }
 
     /**
+     * Verified if a card can be played with others.
+     * 
+     * @param cardIndex card index.
+     * @return if can continue or not.
+     */
+    /**
      * Verifies if the selected card can be played based on the value
      * compared to the playable cards.
      *
@@ -289,6 +313,11 @@ public class HandleCards {
         return canPlay;
     }
 
+    /**
+     * Return the instance of the handle cards.
+     * 
+     * @return the instace of the handle cards.
+     */
     
     /**
      * Returns the singleton instance of HandleCards.
@@ -304,6 +333,11 @@ public class HandleCards {
     }
 
     /**
+     * Return the playable cards.
+     * 
+     * @return the playable cards.
+     */
+    /**
      * Returns the list of currently playable cards.
      *
      * @return the list of playable cards
@@ -312,6 +346,11 @@ public class HandleCards {
         return instance.playableCards;
     }
 
+    /**
+     * Return the constant NORMAL_WITH.
+     * 
+     * @return the constant NORMAL_WITH.
+     */
     /**
      * Returns the normal width of a card.
      *
@@ -322,6 +361,10 @@ public class HandleCards {
     }
 
     /**
+     * Return the constant CARD_HEIGTH.
+     * @return the constant CARD_HEIGTH.
+     */
+    /**
      * Returns the normal height of a card.
      *
      * @return the normal card height
@@ -329,6 +372,12 @@ public class HandleCards {
     public double getCARD_HEIGTH() {
         return CARD_HEIGHT;
     }
+
+    /**
+     * Set the client.
+     * 
+     * @param client client.
+     */
     
     /**
      * Sets the client instance and refreshes the cards shown on screen.
