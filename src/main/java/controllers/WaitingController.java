@@ -16,23 +16,23 @@ import javafx.scene.control.Label;
 import javafx.util.Duration;
 
 /**
- * Login controller class.
- *
  * @author Ismael Marchena Méndez.
  * @author Jorge Rojas Mena.
  * @author Asdrubal Pererira Zuñiga.
  * @author Cesar Fabian Arguedas León.
+ * 
+ * Waiting controller class, handle the waiting interface.
  */
 public class WaitingController implements Initializable {
 
+    private volatile boolean stopChecking = false;
     private static Client client;
+    private Thread readyCheckThread;
+    private Timeline animationTimeline;
     @FXML
     private Button btnReady;
     @FXML
     private Label lblWatingForPlayers;
-    private Timeline animationTimeline;
-    private volatile boolean stopChecking = false;
-    private Thread readyCheckThread;
 
     /**
      * Initialize.
@@ -55,7 +55,7 @@ public class WaitingController implements Initializable {
     }
 
     /**
-     * Handle the evento of ready.
+     * Handle the event of ready.
      *
      * @param event event.
      */
@@ -94,6 +94,9 @@ public class WaitingController implements Initializable {
         readyCheckThread.start();
     }
 
+    /**
+     * Handle the status of the message.
+     */
     private void handleStatusOfTheMessage() {
         Platform.runLater(() -> {
             if (client.isForbidden()) {
@@ -114,8 +117,10 @@ public class WaitingController implements Initializable {
             }
         });
     }
-
-// Método para detener la verificación cuando sea necesario
+    
+    /**
+     * Stop the verification.
+     */
     public void stopPlayerReadyCheck() {
         stopChecking = true;
         if (readyCheckThread != null) {

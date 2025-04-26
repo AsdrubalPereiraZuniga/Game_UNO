@@ -22,28 +22,39 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 /**
+ * @author Ismael Marchena Méndez.
+ * @author Jorge Rojas Mena.
+ * @author Asdrubal Pererira Zuñiga.
+ * @author Cesar Fabian Arguedas León.
  *
- * @author igmml
+ * Handle the cards and give them some animations.
  */
 public class HandleCards {
-
-    // Constantes de diseño
-    private static final double NORMAL_WIDTH = 80;
-    private static final double HOVER_WIDTH = 80;
     private static final double CARD_HEIGHT = 120;
+    private static final double HOVER_WIDTH = 80;
+    private static final double NORMAL_WIDTH = 80;
     private static final Duration ANIMATION_DURATION = Duration.millis(200);
     private static HandleCards instance;
-    private GridPane grdCards;
-    private Client client;
-    private GridPane grdPlayableCards;
     private ArrayList<Card> playableCards;
+    private Client client;
+    private GridPane grdCards;
+    private GridPane grdPlayableCards;
 
+    /**
+     * Configured the grid pane.
+     */
     private void configureGridPane() {
         instance.grdCards.setHgap(10);
         instance.grdCards.setVgap(10);
         instance.grdCards.setAlignment(Pos.CENTER);
     }
 
+    /**
+     * Initialize the variables.
+     * @param grid the graphic players deck.
+     * @param client client.
+     * @param gridPC played cards.
+     */
     public void initialize(GridPane grid, Client client, GridPane gridPC) {
         instance.grdCards = grid;
         instance.client = client;
@@ -52,6 +63,13 @@ public class HandleCards {
         configureGridPane();
     }
 
+    /**
+     * Set the cards in the graphic player deck.
+     * 
+     * @param grid the graphic player deck.
+     * @param client client.
+     * @param gridPC played cards.
+     */
     public void setCards(GridPane grid, Client client, GridPane gridPC) {
         initialize(grid, client, gridPC);
         instance.grdCards.getChildren().clear();
@@ -62,26 +80,17 @@ public class HandleCards {
             return;
         }
 
-        // Configurar columnas
         for (int i = 0; i < cardCount; i++) {
             ColumnConstraints cc = new ColumnConstraints();
-            // Tamaño base deseado para cada carta (ej: 120px)
             cc.setPrefWidth(120);
-
-            // Ancho mínimo para que no se deformen (ej: 80px)
             cc.setMinWidth(80);
-
-            // Permite que las columnas se compriman si no hay espacio
             cc.setMaxWidth(Region.USE_COMPUTED_SIZE);
-
-            // Opcional: Prioridad de crecimiento (para espacio extra)
             cc.setHgrow(Priority.NEVER);
 
             instance.grdCards.setAlignment(Pos.CENTER);
             instance.grdCards.getColumnConstraints().add(cc);
         }
 
-        // Crear cartas
         for (int i = 0; i < cardCount; i++) {
             VBox cardContainer
                     = createCardContainer(
@@ -91,6 +100,14 @@ public class HandleCards {
         }
     }
 
+    /**
+     * Create the card container and insert the card in it.
+     * 
+     * @param cardText value of the card. ex, R0, Y0, C0, B0, G0.
+     * @param cardIndex the card index.
+     * @param cards the player deck.
+     * @return 
+     */
     private VBox createCardContainer(String cardText, int cardIndex,
             ArrayList<Card> cards) {
         VBox cardContainer = new VBox();
@@ -106,22 +123,23 @@ public class HandleCards {
             cardImage.setFitWidth(NORMAL_WIDTH - 10);
             cardContainer.getChildren().add(cardImage);
         } catch (Exception e) {
-            // Si no hay imagen
             Label label = new Label(cardText);
             label.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
             cardContainer.getChildren().add(label);
         }
 
-        // Configurar efectos hover
         setupHoverEffects(cardContainer);
-
-        // Configurar evento click
         cardContainer.setOnMouseClicked(e -> handleCardClick(cardIndex,
                 cardText));
 
         return cardContainer;
     }
 
+    /**
+     * Set the hover effect to the card container.
+     * 
+     * @param cardContainer card conteiner.
+     */
     private void setupHoverEffects(VBox cardContainer) {
         DropShadow shadow = new DropShadow();
         shadow.setColor(Color.rgb(0, 0, 0, 0.3));
@@ -155,6 +173,12 @@ public class HandleCards {
         });
     }
 
+    /**
+     * Refresh the player cards.
+     * 
+     * @param grid grid.
+     * @param cards player deck.
+     */
     private void refreshCards(GridPane grid, ArrayList<Card> cards) {
         grid.getChildren().clear();
         grid.getColumnConstraints().clear();
@@ -163,27 +187,18 @@ public class HandleCards {
         if (cardCount == 0) {
             return;
         }
-
-        // Configurar columnas
+        
         for (int i = 0; i < cardCount; i++) {
             ColumnConstraints cc = new ColumnConstraints();
-            // Tamaño base deseado para cada carta (ej: 120px)
             cc.setPrefWidth(120);
-
-            // Ancho mínimo para que no se deformen (ej: 80px)
             cc.setMinWidth(80);
-
-            // Permite que las columnas se compriman si no hay espacio
             cc.setMaxWidth(Region.USE_COMPUTED_SIZE);
-
-            // Opcional: Prioridad de crecimiento (para espacio extra)
             cc.setHgrow(Priority.NEVER);
 
             grid.setAlignment(Pos.CENTER);
             grid.getColumnConstraints().add(cc);
         }
 
-        // Crear cartas
         for (int i = 0; i < cardCount; i++) {
             VBox cardContainer
                     = createCardContainer(
@@ -192,16 +207,26 @@ public class HandleCards {
         }
     }
 
+    /**
+     * Remove the card from the player deck and refresh the played cards view
+     * and the graphic player deck.
+     * 
+     * @param cardIndex card index.
+     */
     private void removeCard(int cardIndex) {
-        //add
         instance.playableCards.add(instance.client.getCards().get(cardIndex));
-        //remove
         instance.client.getCards().remove(cardIndex);
-        //refresh
         refreshCards(instance.grdCards, instance.client.getCards());
         refreshCards(instance.grdPlayableCards, instance.playableCards);
     }
 
+    /**
+     * Remove clear the playable cards.
+     * 
+     * @param cardIndex card index.
+     * @param value value of the card. ex, R0, Y0, C0, B0, G0.
+     * @return if can continue or not.
+     */
     private boolean removeFromPlayableCards(int cardIndex, String value) {
         if (instance.playableCards.isEmpty()) {
             return false;
@@ -209,8 +234,7 @@ public class HandleCards {
         if (cardIndex >= instance.playableCards.size()) {
             return false;
         }
-        String cardValue = instance.playableCards.get(cardIndex).getColor()
-                + instance.playableCards.get(cardIndex).getValue();
+        String cardValue = instance.playableCards.get(cardIndex).toString();
         if (instance.playableCards.get(cardIndex) != null
                 && cardValue.equals(value)) {
             instance.client.getCards().add(instance.playableCards.
@@ -223,6 +247,12 @@ public class HandleCards {
         return false;
     }
 
+    /**
+     * Handle the click of the card.
+     * 
+     * @param cardIndex card index.
+     * @param cardText value of the card. ex, R0, Y0, C0, B0, G0.
+     */
     private void handleCardClick(int cardIndex, String cardText) {
         if (instance.client.isWaiting()) {
             return;
@@ -241,6 +271,12 @@ public class HandleCards {
         }
     }
 
+    /**
+     * Verified if a card can be played with others.
+     * 
+     * @param cardIndex card index.
+     * @return if can continue or not.
+     */
     private boolean verifiedCanPlayWithOtherCards(int cardIndex) {
         boolean canPlay = false;
         for (Card playableCard : instance.playableCards) {
@@ -252,6 +288,11 @@ public class HandleCards {
         return canPlay;
     }
 
+    /**
+     * Return the instance of the handle cards.
+     * 
+     * @return the instace of the handle cards.
+     */
     public static HandleCards getInstace() {
         if (HandleCards.instance == null) {
             HandleCards.instance = new HandleCards();
@@ -260,18 +301,37 @@ public class HandleCards {
         return HandleCards.instance;
     }
 
+    /**
+     * Return the playable cards.
+     * 
+     * @return the playable cards.
+     */
     public ArrayList<Card> getPlayCards() {
         return instance.playableCards;
     }
 
+    /**
+     * Return the constant NORMAL_WITH.
+     * 
+     * @return the constant NORMAL_WITH.
+     */
     public double getNORMAL_WIDTH() {
         return NORMAL_WIDTH;
     }
 
+    /**
+     * Return the constant CARD_HEIGTH.
+     * @return the constant CARD_HEIGTH.
+     */
     public double getCARD_HEIGTH() {
         return CARD_HEIGHT;
     }
 
+    /**
+     * Set the client.
+     * 
+     * @param client client.
+     */
     public void setClient(Client client) {
         instance.client = client;
 
