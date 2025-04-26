@@ -292,7 +292,12 @@ public class MainController implements Initializable {
      */
     public void setTopCard(Card card) {        
         this.usedCardsView.getChildren().clear();
-        this.usedCardsView.getChildren().add(getNewCard(card));
+
+        this.usedCardsView.setStyle("-fx-background-color: transparent;");
+
+        VBox cardBox = getNewCard(card);
+        this.usedCardsView.getChildren().add(cardBox);
+
         this.grdPlayableCards.getChildren().clear();
         instanceController.lastCard = instanceController.client.getTopCard();
     }
@@ -397,11 +402,16 @@ public class MainController implements Initializable {
         double CARD_HEIGHT = HandleCards.getInstace().getCARD_HEIGTH();
         cardContainer.setPrefSize(NORMAL_WIDTH, CARD_HEIGHT);
         cardContainer.setStyle("-fx-background-color: transparent;");
-        cardContainer.setAlignment(Pos.CENTER);
+        cardContainer.setAlignment(Pos.CENTER); // Centrado vertical
+
+        // Centrar el contenedor en el AnchorPane
+        AnchorPane.setTopAnchor(cardContainer, (usedCardsView.getPrefHeight() - CARD_HEIGHT) / 2);
+        AnchorPane.setLeftAnchor(cardContainer, (usedCardsView.getPrefWidth() - NORMAL_WIDTH) / 2);
+        AnchorPane.setRightAnchor(cardContainer, (usedCardsView.getPrefWidth() - NORMAL_WIDTH) / 2);
+        AnchorPane.setBottomAnchor(cardContainer, (usedCardsView.getPrefHeight() - CARD_HEIGHT) / 2);
 
         try {
-            ImageView cardImage = new ImageView(new Image(
-                    card.getImagePath()));
+            ImageView cardImage = new ImageView(new Image(card.getImagePath()));
             cardImage.setPreserveRatio(true);
             cardImage.setFitWidth(NORMAL_WIDTH - 10);
             cardContainer.getChildren().add(cardImage);

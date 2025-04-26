@@ -12,10 +12,10 @@
 
 <AnchorPane fx:id="bgView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" stylesheets="@../../../style/css.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
    <children>
-      <AnchorPane fx:id="usedCardsView" layoutX="640.0" layoutY="235.0" prefHeight="250.0" prefWidth="200.0" />
-      <AnchorPane fx:id="deckView" layoutX="433.0" layoutY="235.0" prefHeight="250.0" prefWidth="200.0">
+      <AnchorPane fx:id="usedCardsView" layoutX="668.0" layoutY="235.0" prefHeight="250.0" prefWidth="200.0" styleClass="anchor-pane-bordered" stylesheets="@../../../style/css.css" />
+      <AnchorPane fx:id="deckView" layoutX="451.0" layoutY="235.0" prefHeight="250.0" prefWidth="200.0" styleClass="anchor-pane-bordered" stylesheets="@../../../style/css.css">
          <children>
-            <ImageView fx:id="deckImage" fitHeight="120.0" fitWidth="80.0" layoutX="60.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="deckImage" fitHeight="120.0" fitWidth="80.0" layoutX="60.0" layoutY="65.0" pickOnBounds="true" preserveRatio="true" />
          </children>
       </AnchorPane>
       <AnchorPane fx:id="players" layoutX="23.0" layoutY="14.0" prefHeight="200.0" prefWidth="716.0">
@@ -31,7 +31,7 @@
             <Label fx:id="lblPlayerName" layoutX="14.0" layoutY="14.0" text="Label" />
             <ScrollPane fx:id="scrollCards" layoutX="42.0" layoutY="31.0" prefHeight="140.0" prefWidth="780.0" style="-fx-background: transparent; -fx-background-color: transparent;">
                <content>
-                  <GridPane fx:id="grdCards" hgap="10" vgap="10" style="-fx-background-color: transparent;" />
+                  <GridPane fx:id="grdCards" hgap="10" style="-fx-background-color: transparent;" vgap="10" />
                </content>
             </ScrollPane>
          </children>
@@ -61,7 +61,7 @@
             </ImageView>
          </graphic></Button>
 
-      <AnchorPane layoutX="914.0" layoutY="306.0" prefHeight="200.0" prefWidth="362.0">
+      <AnchorPane layoutX="889.0" layoutY="285.0" prefHeight="200.0" prefWidth="362.0" styleClass="anchor-pane-bordered" stylesheets="@../../../style/css.css">
          <children>
             <GridPane fx:id="grdPlayableCards" layoutX="27.0" layoutY="21.0" prefHeight="159.0" prefWidth="309.0">
               <rowConstraints>
@@ -70,5 +70,25 @@
             </GridPane>
          </children>
       </AnchorPane>
+      <ImageView fitHeight="40.0" fitWidth="170.0" layoutX="451.0" layoutY="194.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../images/more/imgDeckCard.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="40.0" fitWidth="170.0" layoutX="668.0" layoutY="195.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../images/more/imgCurrentCard.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="40.0" fitWidth="170.0" layoutX="889.0" layoutY="221.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../images/more/imgCarPut1.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="40.0" fitWidth="170.0" layoutX="889.0" layoutY="245.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../images/more/imgCarPut2.png" />
+         </image>
+      </ImageView>
    </children>
 </AnchorPane>

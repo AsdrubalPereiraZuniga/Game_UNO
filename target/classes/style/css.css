@@ -33,6 +33,14 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     -fx-faint-focus-color: transparent;
 }
 
+.anchor-pane-bordered {
+    -fx-border-color: white;
+    -fx-border-width: 2px;
+    -fx-border-radius: 6;
+    -fx-background-color: transparent;
+    -fx-padding: 5;
+}
+
 .scroll-pane {
     -fx-background-color: transparent;
     -fx-border-color: white;

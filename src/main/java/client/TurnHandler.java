@@ -43,7 +43,7 @@ public class TurnHandler {
                     if (soundFile != null) {
                         Media media = new Media(soundFile.toString());
                         mediaPlayer = new MediaPlayer(media);
-                        mediaPlayer.play();
+                        //mediaPlayer.play();
                     } else {
                         System.err.println("No se pudo encontrar el archivo de sonido");
                     }
