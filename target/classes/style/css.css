@@ -1,0 +1,34 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Apr 25, 2025, 6:07:25 PM
+    Author     : Fabiux
+*/
+
+.button {
+    -fx-background-color: transparent;
+}
+
+.button:pressed {
+    -fx-scale-x: 0.9;
+    -fx-scale-y: 0.9;
+    -fx-transition-duration: 0.2s;
+}
+
+.text-field {
+    -fx-background-color: transparent;
+    -fx-border-color: white;
+    -fx-border-width: 2px;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-prompt-text-fill: rgba(255, 255, 255, 0.5);
+    -fx-background-insets: 0;
+    -fx-padding: 6 10;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-focus-color: #ffffff;
+    -fx-faint-focus-color: transparent;
+}
