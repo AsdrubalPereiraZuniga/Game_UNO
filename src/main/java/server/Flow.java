@@ -127,6 +127,7 @@ public class Flow implements Runnable {
 
     private void handleMessage(String request) {
         String code = request.split("/")[0];
+        
         System.out.println("codee: " + code);
         switch (code) {
             case "READY":
@@ -156,7 +157,8 @@ public class Flow implements Runnable {
                 giveNewCardsToPlayer();
                 break;
             case "COLORSELECTED":
-                broadcast("TOP" + request.split("/")[1]);
+                System.out.println("colooooooooooooooooooo:" + request.split("/")[1]);
+                broadcast("PUT/" + request.split("/")[1]);
                 break;
                     
             default:
@@ -322,6 +324,8 @@ public class Flow implements Runnable {
 
         //Envia las cartas del jugador luego de que comió
         String responseInitialCards = "CARDS/";
+        
+            System.out.println("hhhhhhhhhhhhhhhhhhh:" + Server.players.get(currentPlayerIndex));
 
         for (Card card : Server.players.get(currentPlayerIndex).getCards()) {
             responseInitialCards += card.toString() + "/";

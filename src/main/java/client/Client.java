@@ -208,6 +208,7 @@ public class Client {
     private void setTopCard(String message) {
         String value = message.split("/")[1];
         this.topCard = getCard(value);
+        System.out.println("lkkkkkkkkkkkkkkkkkkkk: " + this.topCard);
         ViewCardsHandler.updateUsedViewCard(getNewCard(topCard));
     }
 
