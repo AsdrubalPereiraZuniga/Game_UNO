@@ -135,10 +135,7 @@ public class Flow implements Runnable {
                 checkPlayersReady();
                 sendMenssageToClient(numberOfCardsPerPlayer(),
                         "Error al envia mensaje: ");
-
                 putPlayersOnHold();
-
-//                al iniciar mandar broadcast del player con el turno actual**Falta manejo de cliente**
                 broadcast(responseACTUAL
                         + Server.players.get(currentPlayerIndex).getUsername() + "/" + Server.players.get(currentPlayerIndex).getCards().size() + "/");
                 break;
@@ -148,7 +145,6 @@ public class Flow implements Runnable {
             case "GET_TURN":
                 broadcast(responseACTUAL
                         + Server.players.get(currentPlayerIndex).getUsername() + "/" + Server.players.get(currentPlayerIndex).getCards().size() + "/");
-
                 break;
             case "DRAW":
                 giveCardToPlayer();
@@ -157,7 +153,6 @@ public class Flow implements Runnable {
                 giveNewCardsToPlayer();
                 break;
             case "COLORSELECTED":
-                System.out.println("colooooooooooooooooooo:" + request.split("/")[1]);
                 broadcast("PUT/" + request.split("/")[1]);
                 break;
 
@@ -169,35 +164,27 @@ public class Flow implements Runnable {
     private void giveCardToPlayer() {
         if (!Server.cardsStack.isEmpty()) {
             Card drawnCard = Server.cardsStack.pop();
-//            this.player.getCards().add(drawnCard);
             Server.players.get(currentPlayerIndex).getCards().add(drawnCard);
-
-            System.out.println("Current player: " + Server.players.get(currentPlayerIndex) + currentPlayerIndex);
-
             sendMenssageToClient("CARDS/" + getPlayerCards()  + "/", "No se pudo enviar carta robada");
         } else {
-            System.out.println("Si el stack ya no tiene cartas");
             restockStack();
         }
     }
     
-    private String getPlayerCards()
-    {
+    private String getPlayerCards(){
         String playerCards = "";
         for (Card card : Server.players.get(currentPlayerIndex).getCards()) {
             playerCards += card.toString() + "/";
         }
         return playerCards;
     }
+    
     private void restockStack() {
-        System.out.println("tamanio del queue" + Server.cardsQueue.size());
-
         for (int i = 0; i < Server.cardsQueue.size() - 1; i++) {
             System.out.println("aaa" + i);
             Server.cardsStack.add(Server.cardsQueue.poll());
         }
         Collections.shuffle(Server.cardsStack);
-
     }
 
     private void giveNewCardsToPlayer() {
@@ -293,9 +280,7 @@ public class Flow implements Runnable {
 
     private synchronized void changeTurn(Card topCard, String responsePUT) {
 
-        System.out.println("anteeeeeeeeeeeeees" + Server.players.get(currentPlayerIndex));
-
-        synchronized (turnLock) { // cambia el turno del jugador
+        synchronized (turnLock) { 
             Server.players.get(currentPlayerIndex).getFlow()
                     .sendMenssageToClient(responseWAIT,
                             "Error al poner en espera");;
@@ -308,12 +293,8 @@ public class Flow implements Runnable {
                 }
             }
 
-            System.out.println("Current player comming size eliminada: "
-                    + Server.players.get(currentPlayerIndex).getCards().size());
 
             handlePlayerTurns(topCard);
-
-            System.out.println("Current player: " + Server.players.get(currentPlayerIndex) + currentPlayerIndex);
 
             Flow nextPlayerFlow = Server.players.get(currentPlayerIndex).getFlow();
 
@@ -331,15 +312,15 @@ public class Flow implements Runnable {
         Flow nextPlayerFlow = Server.players.get(currentPlayerIndex).getFlow();
 
         for (Card card : Server.players.get(currentPlayerIndex).getCards()) {
-            responseInitialCards = card.toString() + "/";
+            responseInitialCards += card.toString() + "/";
         }
-        System.out.println("popopo:" + responseInitialCards);
 
         nextPlayerFlow.sendMenssageToClient(responseInitialCards,
                 "No se pudo enviar las cartas inciales, error: ");
 
 //        sendMenssageToClient(numberOfCardsPerPlayer(),
 //                "Error al envia mensaje: ");
+
         broadcast(responseACTUAL
                 + Server.players.get(currentPlayerIndex).getUsername() + "/" + Server.players.get(currentPlayerIndex).getCards().size() + "/");
     }
@@ -355,12 +336,9 @@ public class Flow implements Runnable {
 //                "No se pudo enviar las cartas inciales, error: ");
 //    }
     public void skillsCards(String card, int index) {
-        System.out.println("skil cards " + card);
 
         Card _card;
         System.out.println("CARD_FLOW: " + card);
-        System.out.println("INDEX: " + index);
-        System.out.println("CARTAS comming: " + Server.players.get(index).getCards().size());
         switch (card) {
             case "C1":
                 System.out.println("Is +4");
@@ -450,7 +428,6 @@ public class Flow implements Runnable {
         } else {
             currentPlayerIndex += aux;
         }
-        System.out.println("cueeeeeeeeeeeee:" + currentPlayerIndex);
     }
 
     private void checkLimitsOfVectorPlayers() { //*esto le falta que si esata con el ultimo y es un skip se brinque al 0 para que pase a 1*
