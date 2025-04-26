@@ -33,7 +33,7 @@ import server.Server;
  * frontend.
  */
 public class Client {
-    
+
     private boolean connect;
     private boolean ready;
     private int port;
@@ -50,8 +50,8 @@ public class Client {
     private Card topCard;
     private boolean waiting;
     private boolean myTurn = false;
-    private final Object turnLock = new Object();    
-    
+    private final Object turnLock = new Object();
+
     private MainController mainController;
 
     /**
@@ -72,7 +72,7 @@ public class Client {
         this.otherPlayers = new ArrayList<>();
         this.activeButton = false;
         this.topCard = null;
-        this.waiting = false;        
+        this.waiting = false;
 
         initializeConnection();
         startListening();
@@ -114,7 +114,7 @@ public class Client {
         listenerThread = new Thread(() -> {
             while (connect && !socket.isClosed()) {
                 try {
-                    String message = input.readUTF();                    
+                    String message = input.readUTF();
                     processServerMessage(message);
                 } catch (IOException e) {
                     System.out.println("Connection lost: " + e.getMessage());
@@ -132,10 +132,11 @@ public class Client {
      *
      * Handle the message of the server.
      */
-    
-    /***
-     * 
-     * cuando entra el mensaje ACTUAL, mostrar el nombre del turno del jugador en la pantalla
+    /**
+     * *
+     *
+     * cuando entra el mensaje ACTUAL, mostrar el nombre del turno del jugador
+     * en la pantalla
      */
     private void processServerMessage(String message) {
         System.out.println("message2222: " + message);
@@ -157,8 +158,8 @@ public class Client {
             case "START":
                 initializeOtherPlayers(message);
                 break;
-            case "TOP":                
-                String value = message.split("/")[1];        
+            case "TOP":
+                String value = message.split("/")[1];
                 this.topCard = getCard(value);
                 break;
             case "PUT":
@@ -174,12 +175,16 @@ public class Client {
             case "TURN":
                 this.waiting = false;
                 setWaitingMode(this.waiting);
+                break;
             case "ACTUAL":
+                System.out.println("patodooooosxxxxxxxxxxxxxxxxx");
                 String[] parts = message.split("/");
+                System.out.println("nose: " + message);
                 if (parts.length > 1) {
                     String currentPlayer = parts[1];
+                    String cardsSize = parts[2];
                     //TurnHandler.updateTurn(currentPlayer);
-                    TurnHandler.updateTurn(currentPlayer + ": " + String.valueOf(this.cards.size()));
+                    TurnHandler.updateTurn(currentPlayer + ": " + cardsSize);
                 } else {
                     System.err.println("Formato de mensaje ACTUAL inválido: " + message);
                 }
@@ -188,18 +193,20 @@ public class Client {
                 System.out.println(message);
         }
     }
-    
-    public void refreshCards(String message){
+
+    public void refreshCards(String message) {
         String[] deck = message.split("/");
         System.out.println("DECK: " + deck.length);
-               
-        this.cards.add(getCard(deck[2]));        
-        
+
+        System.out.println("getCard(deck[2]):" + getCard(deck[2]));
+
+        this.cards.add(getCard(deck[2]));
+
         TurnHandler.updateTurn(deck[1] + ": " + String.valueOf(this.cards.size()));
-    }    
-    
-    private void setTopCard(String message) {        
-        String value = message.split("/")[1];        
+    }
+
+    private void setTopCard(String message) {
+        String value = message.split("/")[1];
         this.topCard = getCard(value);
         ViewCardsHandler.updateUsedViewCard(getNewCard(topCard));
     }
@@ -208,9 +215,9 @@ public class Client {
      * @param message for the server.
      *
      * Send a message to the server.
-     */ 
+     */
     public void sendMessage(String message) {
-        
+
         if (connect) {
             try {
                 output.writeUTF(message);
@@ -251,7 +258,6 @@ public class Client {
             });
         }
     }
-
 
     private Card getCard(String card) {
         String code = card.substring(0, 1);
@@ -305,7 +311,7 @@ public class Client {
             }
         }
     }
-    
+
     private VBox getNewCard(Card card) {
         VBox cardContainer = new VBox();
         double NORMAL_WIDTH = HandleCards.getInstace().getNORMAL_WIDTH();
@@ -432,9 +438,9 @@ public class Client {
     public void setWaiting(boolean waiting) {
         this.waiting = waiting;
     }
-    
-    public void setMainController(MainController controller){
+
+    public void setMainController(MainController controller) {
         this.mainController = controller;
     }
-    
+
 }

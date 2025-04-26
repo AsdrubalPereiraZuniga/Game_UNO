@@ -16,8 +16,11 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import players.Player;
+import static server.Server.cardsStack;
 
 /**
  *
@@ -136,15 +139,15 @@ public class Flow implements Runnable {
 
 //                al iniciar mandar broadcast del player con el turno actual**Falta manejo de cliente**
                 broadcast(responseACTUAL
-                        + Server.players.get(currentPlayerIndex).getUsername());
+                        + Server.players.get(currentPlayerIndex).getUsername() + "/" + Server.players.get(currentPlayerIndex).getCards().size() + "/");
                 break;
             case "PUT":
                 putCardInQueue(request);
                 break;
             case "GET_TURN":
-                sendMenssageToClient(responseACTUAL
-                    + Server.players.get(currentPlayerIndex).getUsername(),
-                    "Error al enviar turno actual");
+                broadcast(responseACTUAL
+                        + Server.players.get(currentPlayerIndex).getUsername() + "/" + Server.players.get(currentPlayerIndex).getCards().size() + "/");
+
                 break;
             case "DRAW":
                 giveCardToPlayer();
@@ -156,23 +159,36 @@ public class Flow implements Runnable {
                 System.out.println("No se reccibio nah");
         }
     }
-    
+
     private void giveCardToPlayer() {
         if (!Server.cardsStack.isEmpty()) {
             Card drawnCard = Server.cardsStack.pop();
             this.player.getCards().add(drawnCard);
             sendMenssageToClient("CARDS/" + drawnCard.toString() + "/", "No se pudo enviar carta robada");
+        } else {
+            System.out.println("Si el stack ya no tiene cartas");
+            restockStack();
         }
     }
-    
-    private void giveNewCardsToPlayer(){
+
+    private void restockStack() {
+        System.out.println("tamanio del queue" + Server.cardsQueue.size());
+
+        for (int i = 0; i < Server.cardsQueue.size() - 1; i++) {
+            System.out.println("aaa" + i);
+            Server.cardsStack.add(Server.cardsQueue.poll());
+        }
+        Collections.shuffle(Server.cardsStack);
+
+    }
+
+    private void giveNewCardsToPlayer() {
         if (!Server.cardsStack.isEmpty()) {
             Card drawnCard = Server.cardsStack.pop();
             this.player.getCards().add(drawnCard);
             sendMenssageToClient("NEWCARDS/" + drawnCard.toString() + "/", "No se pudo enviar la nueva carta");
         }
     }
-
 
     private boolean disconectPlayer() {
         try {
@@ -264,39 +280,64 @@ public class Flow implements Runnable {
                     .sendMenssageToClient(responseWAIT,
                             "Error al poner en espera");
             System.out.println("Current player comming: " + currentPlayerIndex);
-            System.out.println("Current player comming size: " + 
-                    Server.players.get(currentPlayerIndex).getCards().size());
-            
-            for(int i=0; i<Server.players.get(currentPlayerIndex).getCards().size(); i++){
-                if(Server.players.get(currentPlayerIndex).getCards()
-                        .get(i).toString().contains(topCard.toString()) ){
+            System.out.println("Current player comming size: "
+                    + Server.players.get(currentPlayerIndex).getCards().size());
+
+            for (int i = 0; i < Server.players.get(currentPlayerIndex).getCards().size(); i++) {
+                System.out.println("xxxxxxxxx:" + Server.players.get(currentPlayerIndex).getCards()
+                        .get(i).toString());
+                   System.out.println("qqqqqqqqqqq:" + topCard.toString());
+                if (Server.players.get(currentPlayerIndex).getCards()
+                        .get(i).toString().contains(topCard.toString())) {
                     Server.players.get(currentPlayerIndex).getCards().remove(i);
                     break;
                 }
-            }            
-            System.out.println("Current player comming size eliminada: " + 
-                    Server.players.get(currentPlayerIndex).getCards().size());
-            
-            handlePlayerTurns(topCard);            
-            System.out.println("Current player: " + currentPlayerIndex);
-            skillsCards(topCard.toString(), currentPlayerIndex);
-            
+            }
+
+
+            System.out.println("Current player comming size eliminada: "
+                    + Server.players.get(currentPlayerIndex).getCards().size());
+
+            handlePlayerTurns(topCard);
+
+            System.out.println("Current player: " + Server.players.get(currentPlayerIndex) +currentPlayerIndex);
+
             Flow nextPlayerFlow = Server.players.get(currentPlayerIndex).getFlow();
 
             nextPlayerFlow.sendMenssageToClient(responseTURN,
                     "Error al notificar turno");
 
             turnLock.notifyAll();
-        }                      
-       
-        //broadcast(responsePUT );
-        
-        //**no se ha probado** le envio al cliente el jugador que tiene el turno.**Falta manejo de cliente**
+        }
+
+        skillsCards(topCard.toString(), currentPlayerIndex);
+
+        //Envia las cartas del jugador luego de que comió
+        String responseInitialCards = "CARDS/";
+
+        for (Card card : Server.players.get(currentPlayerIndex).getCards()) {
+            responseInitialCards += card.toString() + "/";
+        }
+        System.out.println("popopo:" + responseInitialCards);
+        sendMenssageToClient(responseInitialCards,
+                "No se pudo enviar las cartas inciales, error: ");
+
         broadcast(responseACTUAL
-                + Server.players.get(currentPlayerIndex).getUsername()); 
+                + Server.players.get(currentPlayerIndex).getUsername() + "/" + Server.players.get(currentPlayerIndex).getCards().size() + "/");
     }
+
+//    private void sendUpdatedCards() {
+//        String responseInitialCards = "CARDS/";
+//
+//        for (Card card : Server.players.get(currentPlayerIndex).getCards()) {
+//            responseInitialCards += card.toString() + "/";
+//        }
+//        System.out.println("popopo:" + responseInitialCards);
+//        sendMenssageToClient(responseInitialCards,
+//                "No se pudo enviar las cartas inciales, error: ");
+//    }
     
-    public void skillsCards(String card, int index){
+    public void skillsCards(String card, int index) {
         Card _card;
         System.out.println("CARD_FLOW: " + card);
         System.out.println("INDEX: " + index);
@@ -304,50 +345,50 @@ public class Flow implements Runnable {
         switch (card) {
             case "C1":
                 System.out.println("Is +4");
-                for(int i=0; i<4; i++){
+                for (int i = 0; i < 4; i++) {
                     _card = Server.cardsStack.pop();
                     Server.players.get(index).getCards().add(_card);
-                    sendMenssageToClient("NEWCARDS/"+Server.players.get(index).getUsername()+"/" + _card.toString()+"/",
-                            "No se pudo enviar el refresh");
+//                    sendMenssageToClient("NEWCARDS/" + Server.players.get(index).getUsername() + "/" + _card.toString() + "/",
+//                            "No se pudo enviar el refresh");
                 }
                 break;
             case "B10":
                 System.out.println("Is +2 B");
-                for(int i=0; i<2; i++){
+                for (int i = 0; i < 2; i++) {
                     _card = Server.cardsStack.pop();
-                    Server.players.get(index).getCards().add(_card);                    
-                    sendMenssageToClient("NEWCARDS/"+Server.players.get(index).getUsername()+"/" + _card.toString()+"/",
-                            "No se pudo enviar el refresh");
+                    Server.players.get(index).getCards().add(_card);
+//                    sendMenssageToClient("NEWCARDS/" + Server.players.get(index).getUsername() + "/" + _card.toString() + "/",
+//                            "No se pudo enviar el refresh");
                 }
                 break;
             case "G10":
                 System.out.println("Is +2G");
-                for(int i=0; i<2; i++){
+                for (int i = 0; i < 2; i++) {
                     _card = Server.cardsStack.pop();
-                    Server.players.get(index).getCards().add(_card);                    
-                    sendMenssageToClient("NEWCARDS/"+Server.players.get(index).getUsername()+"/" + _card.toString()+"/",
-                            "No se pudo enviar el refresh");
+                    Server.players.get(index).getCards().add(_card);
+//                    sendMenssageToClient("NEWCARDS/" + Server.players.get(index).getUsername() + "/" + _card.toString() + "/",
+//                            "No se pudo enviar el refresh");
                 }
                 break;
             case "R10":
-                System.out.println("Is +2R");                
-                for(int i=0; i<2; i++){
+                System.out.println("Is +2R");
+                for (int i = 0; i < 2; i++) {
                     _card = Server.cardsStack.pop();
-                    Server.players.get(index).getCards().add(_card);                    
-                    sendMenssageToClient("NEWCARDS/"+Server.players.get(index).getUsername()+"/" + _card.toString()+"/",
-                            "No se pudo enviar el refresh");
+                    Server.players.get(index).getCards().add(_card);
+//                    sendMenssageToClient("NEWCARDS/" + Server.players.get(index).getUsername() + "/" + _card.toString() + "/",
+//                            "No se pudo enviar el refresh");
                 }
                 break;
             case "Y10":
                 System.out.println("Is +2Y");
-                for(int i=0; i<2; i++){
+                for (int i = 0; i < 2; i++) {
                     _card = Server.cardsStack.pop();
-                    Server.players.get(index).getCards().add(_card);                    
-                    sendMenssageToClient("NEWCARDS/"+Server.players.get(index).getUsername()+"/" + _card.toString()+"/",
-                            "No se pudo enviar el refresh");
+                    Server.players.get(index).getCards().add(_card);
+//                    sendMenssageToClient("NEWCARDS/" + Server.players.get(index).getUsername() + "/" + _card.toString() + "/",
+//                            "No se pudo enviar el refresh");
                 }
                 break;
-            default:                
+            default:
         }
         System.out.println("CARTAS: " + Server.players.get(index).getCards().size());
     }
