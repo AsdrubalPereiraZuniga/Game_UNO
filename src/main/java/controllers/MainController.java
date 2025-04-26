@@ -122,6 +122,9 @@ public class MainController implements Initializable {
         setDeckImage();
     }
     
+    /**
+     * Sets the default image for the deck and its hover/click effects.
+     */
     private void setDeckImage() {
         try {
             deckImage.setImage(new Image("/images/behind/K1.png"));
@@ -152,6 +155,9 @@ public class MainController implements Initializable {
         }
     }
     
+    /**
+     * Draws a card from the deck if needed (only when no playable cards).
+     */
     private void drawCardIfNeeded() {
         System.out.println("COMIO CARTA");
         if (!instanceController.client.isWaiting()) {
@@ -161,10 +167,16 @@ public class MainController implements Initializable {
         }
     }
     
+    /**
+     * Refreshes the player's hand after updates.
+     */
     public void refreshHand() {
         HandleCards.getInstace().setClient(instanceController.client);
     }
 
+    /**
+     * Sets the view displaying other players.
+     */
     private void setOtherPlayers() {
         System.out.println("Nombre del men:" + instanceController.client.getPlayerName());
         for (OtherPlayers otherPlayer : instanceController.client.getOtherPlayers()) {
@@ -177,6 +189,11 @@ public class MainController implements Initializable {
         }
     }
 
+    /**
+     * Returns the singleton instance of MainController.
+     *
+     * @return the MainController instance
+     */
     public static MainController getInstanceController() {
         if (MainController.instanceController == null) {
             MainController.instanceController = new MainController();
@@ -204,9 +221,9 @@ public class MainController implements Initializable {
     }
 
     /**
-     * Confirm.
+     * Handles the confirm button event when playing a card.
      *
-     * @param event event.
+     * @param event the button click event
      */
     @FXML
     private void confirm(ActionEvent event) {               
@@ -227,10 +244,16 @@ public class MainController implements Initializable {
         proceedWithCard();
     }
 
+    /**
+     * Displays the color selection panel when a Wild Card is played.
+     */
     private void showColorSelector() {
         colorSelector.setVisible(true);
     }
     
+    /**
+     * Proceeds with playing the selected card(s).
+     */
     public void proceedWithCard() {
         Card card = HandleCards.getInstace().getPlayCards().get(0);        
         instanceController.lastCard = instanceController.client.getTopCard();
@@ -251,6 +274,11 @@ public class MainController implements Initializable {
         }        
     }
 
+    /**
+     * Updates the visual representation of the top card on the discard pile.
+     *
+     * @param card the card to display
+     */
     public void setTopCard(Card card) {        
         this.usedCardsView.getChildren().clear();
         this.usedCardsView.getChildren().add(getNewCard(card));               
@@ -258,6 +286,11 @@ public class MainController implements Initializable {
         instanceController.lastCard = instanceController.client.getTopCard();
     }
 
+    /**
+     * Creates the message to send to the server when a card is played.
+     *
+     * @return the message string
+     */
     private String createMessage() {
         String message = "";
         String code;
@@ -268,6 +301,11 @@ public class MainController implements Initializable {
         return message;
     }
 
+    /**
+     * Generates the string representation of the played cards.
+     *
+     * @return the string of card values
+     */
     private String getCardsValue() {
         String cardsValue = "";
         for (Card playableCard : HandleCards.getInstace().getPlayCards()) {
@@ -276,6 +314,12 @@ public class MainController implements Initializable {
         return cardsValue;
     }
 
+    /**
+     * Determines if the current cards can be legally played.
+     *
+     * @param cards the list of cards to check
+     * @return true if playable, false otherwise
+     */
     private boolean canPlay(ArrayList<Card> cards) {
         if (instanceController.lastCard == null) {
             return true;
@@ -287,7 +331,13 @@ public class MainController implements Initializable {
             return handleManyPlayedCards(cards.get(0));
         }
     }
-
+    
+    /**
+     * Validates if a single card can be played based on color or value.
+     *
+     * @param card the card to validate
+     * @return true if playable, false otherwise
+     */
     private boolean handleOnePlayedCard(Card card) {
         if (card instanceof WildCard) {
             return true;
@@ -302,7 +352,12 @@ public class MainController implements Initializable {
         return false;
     }
 
-
+    /**
+     * Validates if a sequence of cards can be played.
+     *
+     * @param card the starting card
+     * @return true if playable, false otherwise
+     */
     private boolean handleManyPlayedCards(Card card) {
         
         if (instanceController.lastCard.getColor().equals(card.getColor())) {
@@ -315,6 +370,12 @@ public class MainController implements Initializable {
         return false;
     }
 
+    /**
+     * Creates a visual VBox representation of a card.
+     *
+     * @param card the card to display
+     * @return the VBox containing the card view
+     */
     private VBox getNewCard(Card card) {
         VBox cardContainer = new VBox();
         double NORMAL_WIDTH = HandleCards.getInstace().getNORMAL_WIDTH();
@@ -340,6 +401,11 @@ public class MainController implements Initializable {
         return cardContainer;
     }
 
+    /**
+     * Handles the color selection for a Wild Card and proceeds with the move.
+     *
+     * @param e the button click event
+     */
     @FXML
     private void selectColor(ActionEvent e) {
         Button source = (Button) e.getSource();
@@ -357,7 +423,12 @@ public class MainController implements Initializable {
         proceedWithCard();
     }  
     
-        private void setupHoverEffects(Button btn) {
+    /**
+     * Sets up hover effects for the color selection buttons.
+     *
+     * @param btn the button to apply effects to
+     */
+    private void setupHoverEffects(Button btn) {
         DropShadow shadow = new DropShadow();
         shadow.setColor(Color.rgb(0, 0, 0, 0.3));
         shadow.setRadius(10);

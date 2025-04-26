@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package server;
 
 import cards.ActionCard;
@@ -20,8 +16,8 @@ import java.util.Enumeration;
 import players.Player;
 
 /**
- *
- * @author jorge
+ * Class that manages the flow of communication with a single client/player.
+ * Handles message processing, card distribution, turn management, and special card effects.
  */
 public class Flow implements Runnable {
 
@@ -49,6 +45,12 @@ public class Flow implements Runnable {
     private static ArrayList<String> skipCards
             = new ArrayList<>(Arrays.asList("B11", "G11", "R11", "Y11"));
 
+    /**
+     * Constructs a Flow instance for a specific player.
+     *
+     * @param socket the client's socket connection
+     * @param name the name of the player
+     */
     public Flow(Socket socket, String name) {
         this.socket = socket;
         this.name = name;
@@ -62,6 +64,9 @@ public class Flow implements Runnable {
         }
     }
 
+    /**
+     * Main method executed by the thread to initialize the player and start listening for messages.
+     */
     @Override
     public void run() {
 
@@ -80,6 +85,11 @@ public class Flow implements Runnable {
         startListening();
     }
 
+    /**
+     * Distributes the initial 7 cards to a player.
+     *
+     * @return the list of distributed cards
+     */
     private synchronized ArrayList<Card> distributeCards() {
         ArrayList<Card> playerCards = new ArrayList<>();
 
@@ -92,12 +102,18 @@ public class Flow implements Runnable {
         return playerCards;
     }
 
+    /**
+     * Enables the Ready button for all players once the minimum number of players is connected.
+     */
     private void enableReadyButtom() {
         if (Server.players.size() >= 2) {
             broadcast(responseActiveButtom);
         }
     }
 
+    /**
+     * Sends the player's initial hand to the client.
+     */
     private void sendInitialCards() {
         String responseInitialCards = "CARDS/";
 
@@ -108,6 +124,9 @@ public class Flow implements Runnable {
                 "No se pudo enviar las cartas inciales, error: ");
     }
 
+    /**
+     * Starts listening for messages from the player.
+     */
     private void startListening() {
         while (true) {
             try {
@@ -122,6 +141,11 @@ public class Flow implements Runnable {
         }
     }
 
+    /**
+     * Processes a received message from the client.
+     *
+     * @param request the received message
+     */
     private void handleMessage(String request) {
         String code = request.split("/")[0];
         System.out.println("codee: " + code);
@@ -134,7 +158,6 @@ public class Flow implements Runnable {
 
                 putPlayersOnHold();
 
-//                al iniciar mandar broadcast del player con el turno actual**Falta manejo de cliente**
                 broadcast(responseACTUAL
                         + Server.players.get(currentPlayerIndex).getUsername());
                 break;
@@ -157,6 +180,9 @@ public class Flow implements Runnable {
         }
     }
     
+    /**
+     * Gives one card to the player when they request to draw a card.
+     */
     private void giveCardToPlayer() {
         if (!Server.cardsStack.isEmpty()) {
             Card drawnCard = Server.cardsStack.pop();
@@ -165,6 +191,9 @@ public class Flow implements Runnable {
         }
     }
     
+    /**
+     * Gives a new card to the player when requested during gameplay.
+     */
     private void giveNewCardsToPlayer(){
         if (!Server.cardsStack.isEmpty()) {
             Card drawnCard = Server.cardsStack.pop();
@@ -173,7 +202,11 @@ public class Flow implements Runnable {
         }
     }
 
-
+    /**
+     * Disconnects a player from the game.
+     *
+     * @return true if disconnection is handled successfully
+     */
     private boolean disconectPlayer() {
         try {
             returnCardToTheStack();
@@ -187,6 +220,9 @@ public class Flow implements Runnable {
         return true;
     }
 
+    /**
+     * Checks if all players are ready to start the game.
+     */
     private void checkPlayersReady() {
         if (doFunctionPlayersReady && Server.players.size() >= 2 && playersReady()) {
             broadcast(playersReadyMessage);
@@ -194,6 +230,11 @@ public class Flow implements Runnable {
         }
     }
 
+    /**
+     * Prepares a message listing the number of cards each other player has.
+     *
+     * @return the formatted message
+     */
     private String numberOfCardsPerPlayer() {
         String responseStart = "START/";
 
@@ -206,6 +247,9 @@ public class Flow implements Runnable {
         return responseStart;
     }
 
+    /**
+     * Puts all players on hold except the one whose turn it is.
+     */
     private void putPlayersOnHold() {
         if (playersReady()) {
             synchronized (turnLock) {
@@ -225,6 +269,11 @@ public class Flow implements Runnable {
         }
     }
 
+    /**
+     * Adds the card(s) played to the queue and processes the turn change.
+     *
+     * @param request the request containing the card(s) played
+     */
     private synchronized void putCardInQueue(String request) {
         String responsePUT = "PUT/";
         String[] cards = request.split("/");
@@ -244,6 +293,12 @@ public class Flow implements Runnable {
         changeTurn(createObjectCard(cards[index - 1]), responsePUT);
     }
 
+    /**
+     * Creates a Card object from a string representation.
+     *
+     * @param card the string representation
+     * @return the created Card object
+     */
     private Card createObjectCard(String card) {
         String letterCard = card.substring(0, 1);
         String number = card.substring(1);
@@ -257,9 +312,15 @@ public class Flow implements Runnable {
         }
     }
 
+    /**
+     * Changes the current turn to the next player based on the game rules.
+     *
+     * @param topCard the last played card
+     * @param responsePUT the server's response message
+     */
     private synchronized void changeTurn(Card topCard, String responsePUT) {
 
-        synchronized (turnLock) { // cambia el turno del jugador
+        synchronized (turnLock) {
             Server.players.get(currentPlayerIndex).getFlow()
                     .sendMenssageToClient(responseWAIT,
                             "Error al poner en espera");
@@ -291,11 +352,16 @@ public class Flow implements Runnable {
        
         //broadcast(responsePUT );
         
-        //**no se ha probado** le envio al cliente el jugador que tiene el turno.**Falta manejo de cliente**
         broadcast(responseACTUAL
                 + Server.players.get(currentPlayerIndex).getUsername()); 
     }
     
+    /**
+     * Applies special effects based on the played skill card (e.g., +4, +2).
+     *
+     * @param card the card played
+     * @param index the index of the player affected
+     */
     public void skillsCards(String card, int index){
         Card _card;
         System.out.println("CARD_FLOW: " + card);
@@ -352,6 +418,11 @@ public class Flow implements Runnable {
         System.out.println("CARTAS: " + Server.players.get(index).getCards().size());
     }
 
+    /**
+     * Handles the logic to determine the next player based on special card effects.
+     *
+     * @param topCard the last played card
+     */
     private synchronized void handlePlayerTurns(Card topCard) {
 
         int aux = 1;
@@ -362,11 +433,16 @@ public class Flow implements Runnable {
 
         handlePosition(aux);
 
-        //check cancelation of tunr
-        checkLimitsOfVectorPlayers();// falta con la de skip
+        checkLimitsOfVectorPlayers();
 
     }
 
+    /**
+     * Checks if the last played card is a skip card and adjusts the turn accordingly.
+     *
+     * @param topCard the last played card
+     * @param aux a helper variable for adjusting turn index
+     */
     private void checkSkipCards(Card topCard, int aux) {
         for (String skipCard : skipCards) {
             if (skipCard.equals(topCard.toString())) {
@@ -375,6 +451,11 @@ public class Flow implements Runnable {
         }
     }
 
+    /**
+     * Checks if the last played card is an invert card and toggles the turn order.
+     *
+     * @param topCard the last played card
+     */
     private void checkInvertOrderOfPlayers(Card topCard) {
         for (String invertCard : invertCards) {
             if (invertCard.equals(topCard.toString())) {
@@ -382,8 +463,12 @@ public class Flow implements Runnable {
             }
         }
     }
-    /// hacer una funcion si es la carta de +4, entonces, al jugador actual se le da ese +4    
-
+       
+    /**
+     * Updates the current player index based on the turn direction and skips if needed.
+     *
+     * @param aux number of players to skip
+     */
     private void handlePosition(int aux) {
         if (invertOrder) {
             currentPlayerIndex -= aux;
@@ -393,6 +478,9 @@ public class Flow implements Runnable {
         System.out.println("cueeeeeeeeeeeee:" + currentPlayerIndex);
     }
 
+    /**
+     * Ensures the current player index is within bounds of the player list.
+     */
     private void checkLimitsOfVectorPlayers() { //*esto le falta que si esata con el ultimo y es un skip se brinque al 0 para que pase a 1*
         if (currentPlayerIndex > Server.players.size() - 1) {
             currentPlayerIndex = 0;
@@ -401,6 +489,11 @@ public class Flow implements Runnable {
         }
     }
 
+    /**
+     * Checks if all players are ready to start the game.
+     *
+     * @return true if all players are ready, false otherwise
+     */
     private static boolean playersReady() {
         for (Player playerAux : Server.players) {
             if (playerAux.isReady() == false) {
@@ -410,12 +503,21 @@ public class Flow implements Runnable {
         return true;
     }
 
+    /**
+     * Returns the player's cards to the deck if they disconnect.
+     */
     private void returnCardToTheStack() {
         for (Card card : this.player.getCards()) {
             Server.cardsStack.add(card);
         }
     }
 
+    /**
+     * Sends a message to the current client.
+     *
+     * @param message the message to send
+     * @param error the error message to display if sending fails
+     */
     public void sendMenssageToClient(String message, String error) {
         try {
             this.writeFlow.writeUTF(message);
@@ -425,6 +527,11 @@ public class Flow implements Runnable {
         }
     }
 
+    /**
+     * Sends a message to all connected clients (broadcast).
+     *
+     * @param message the message to broadcast
+     */
     public void broadcast(String message) {
         synchronized (Server.players) {
             Enumeration enumeration = Server.players.elements();

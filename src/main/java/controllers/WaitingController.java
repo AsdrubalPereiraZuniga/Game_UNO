@@ -28,12 +28,8 @@ import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 
 /**
- * Login controller class.
- *
- * @author Ismael Marchena Méndez.
- * @author Jorge Rojas Mena.
- * @author Asdrubal Pererira Zuñiga.
- * @author Cesar Fabian Arguedas León.
+ * Controller class for the waiting screen.
+ * Manages player readiness, animations, and transitions to the main game screen.
  */
 public class WaitingController implements Initializable {
 
@@ -60,7 +56,10 @@ public class WaitingController implements Initializable {
         startBouncingIcons();
     }
     
-        private void startBouncingIcons() {
+    /**
+     * Starts the background bouncing icons animation.
+     */
+    private void startBouncingIcons() {
         int rows = 5;
         int cols = 7;
         double spacing = 85;
@@ -86,6 +85,11 @@ public class WaitingController implements Initializable {
         }
     }
 
+    /**
+     * Applies bouncing animation to a specific icon.
+     *
+     * @param icon the ImageView representing the icon to animate
+     */
     private void animateBounce(ImageView icon) {
         TranslateTransition jump1 = new TranslateTransition(Duration.seconds(0.25), icon);
         jump1.setByY(-10);
@@ -125,6 +129,9 @@ public class WaitingController implements Initializable {
         bounce.play();
     }
     
+    /**
+     * Creates a pulsing background animation for the waiting screen.
+     */
     private void backAnimation(){
         bgWait.setStyle("-fx-background-color: #e63946;");
 
@@ -197,6 +204,10 @@ public class WaitingController implements Initializable {
         readyCheckThread.start();
     }
 
+    /**
+     * Handles the transition depending on whether the game is ready to start
+     * or the player was forbidden to join.
+     */
     private void handleStatusOfTheMessage() {
         Platform.runLater(() -> {
             if (client.isForbidden()) {
@@ -217,7 +228,9 @@ public class WaitingController implements Initializable {
         });
     }
 
-// Método para detener la verificación cuando sea necesario
+    /**
+     * Stops the player ready checking thread.
+     */
     public void stopPlayerReadyCheck() {
         stopChecking = true;
         if (readyCheckThread != null) {

@@ -63,6 +63,9 @@ public class LoginController implements Initializable {
         startBouncingIcons();
     }
    
+    /**
+     * Creates and starts the bouncing icons animation in the background.
+     */
     private void startBouncingIcons() {
         int rows = 5;
         int cols = 7;
@@ -89,6 +92,11 @@ public class LoginController implements Initializable {
         }
     }
 
+    /**
+     * Applies bouncing animation to a specific icon.
+     *
+     * @param icon the ImageView representing the icon to animate
+     */
     private void animateBounce(ImageView icon) {
         TranslateTransition jump1 = new TranslateTransition(Duration.seconds(0.25), icon);
         jump1.setByY(-10);
@@ -128,6 +136,9 @@ public class LoginController implements Initializable {
         bounce.play();
     }
     
+    /**
+     * Creates a background pulsing animation for the login screen.
+     */
     private void backAnimation(){
         bgLogin.setStyle("-fx-background-color: #e63946;");
 
@@ -152,9 +163,10 @@ public class LoginController implements Initializable {
     }
     
     /**
-     * Handle the event of the button.
-     * 
-     * @param event event.
+     * Handles the start button click event.
+     * Initializes the client and attempts to connect to the server.
+     *
+     * @param event the button click event
      */
     @FXML
     private void start(ActionEvent event) {

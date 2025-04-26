@@ -128,14 +128,9 @@ public class Client {
     }
 
     /**
-     * @param message of the server.
+     * Processes the message received from the server.
      *
-     * Handle the message of the server.
-     */
-    
-    /***
-     * 
-     * cuando entra el mensaje ACTUAL, mostrar el nombre del turno del jugador en la pantalla
+     * @param message the message received from the server
      */
     private void processServerMessage(String message) {
         System.out.println("message2222: " + message);
@@ -189,6 +184,11 @@ public class Client {
         }
     }
     
+    /**
+     * Updates the player's hand when receiving new cards.
+     *
+     * @param message the server message containing card information
+     */
     public void refreshCards(String message){
         String[] deck = message.split("/");
         System.out.println("DECK: " + deck.length);
@@ -198,6 +198,11 @@ public class Client {
         TurnHandler.updateTurn(deck[1] + ": " + String.valueOf(this.cards.size()));
     }    
     
+    /**
+     * Updates the top card placed on the table.
+     *
+     * @param message the server message containing the top card information
+     */
     private void setTopCard(String message) {        
         String value = message.split("/")[1];        
         this.topCard = getCard(value);
@@ -236,6 +241,11 @@ public class Client {
         }
     }
 
+    /**
+     * Updates the player's hand with cards received from the server.
+     *
+     * @param message the server message containing the full player deck
+     */
     private void setPlayerDeck(String message) {
         String[] deck = message.split("/");
         System.out.println("DECK: " + deck.length);
@@ -252,7 +262,12 @@ public class Client {
         }
     }
 
-
+    /**
+     * Converts a string code into a Card object (NumberCard, ActionCard, or WildCard).
+     *
+     * @param card the string representation of the card
+     * @return a new Card object corresponding to the code
+     */
     private Card getCard(String card) {
         String code = card.substring(0, 1);
         String value = card.substring(1);
@@ -267,7 +282,13 @@ public class Client {
         }
         return null;
     }
-
+    
+    
+    /**
+     * Initializes the list of other players in the game.
+     *
+     * @param message the server message containing other players' information
+     */
     private void initializeOtherPlayers(String message) {
         this.otherPlayers.clear();
         String[] players = message.split("/");
@@ -283,16 +304,23 @@ public class Client {
         }
     }
 
+    /**
+     * Sets the waiting mode for the player (true if waiting for turn).
+     *
+     * @param waiting whether the player must wait for their turn
+     */
     private void setWaitingMode(boolean waiting) {
         synchronized (turnLock) {
             myTurn = !waiting;
             if (!waiting) {
-                turnLock.notifyAll(); // Despertar al hilo principal
+                turnLock.notifyAll();
             }
         }
-        // Actualizar UI (disable/enable controles)
     }
 
+    /**
+     * Blocks the execution until it is the player's turn.
+     */
     public void waitForTurn() {
         synchronized (turnLock) {
             while (!myTurn) {
@@ -306,6 +334,12 @@ public class Client {
         }
     }
     
+    /**
+     * Creates a visual representation of a card as a VBox container.
+     *
+     * @param card the card to visualize
+     * @return the VBox containing the card's image
+     */
     private VBox getNewCard(Card card) {
         VBox cardContainer = new VBox();
         double NORMAL_WIDTH = HandleCards.getInstace().getNORMAL_WIDTH();

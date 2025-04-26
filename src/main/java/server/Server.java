@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package server;
 
 import cards.ActionCard;
@@ -23,10 +19,13 @@ import java.util.Queue;
 import java.util.Stack;
 
 /**
- * Server class that handles TCP socket connections. It listens on a specified
- * port and creates a new thread to manage each incoming client connection.
- *
- * @author jorge
+ * Server class that handles TCP socket connections.
+ * It listens on a specified port, manages incoming client connections,
+ * and initializes the game deck and game state.
+ * 
+ * It uses Flow to manage communication with each connected client.
+ * 
+ * Authors: Jorge
  */
 public class Server {
 
@@ -109,6 +108,12 @@ public class Server {
 
     }
 
+    /**
+     * Creates a new Flow thread for a player if the game has not already started.
+     *
+     * @param socket the socket for communication with the player
+     * @param playerName the name of the connecting player
+     */
     public static void createNewFlow(Socket socket, String playerName) {
         if (Flow.doFunctionPlayersReady) {
             Thread flow = new Thread(new Flow(socket, playerName));
@@ -119,6 +124,11 @@ public class Server {
         }
     }
 
+    /**
+     * Sends a forbidden response to a client trying to join after the game has started.
+     *
+     * @param socket the socket to send the forbidden message to
+     */
     public static void gameHasAlreadyBugun(Socket socket) {
 
         try {
@@ -133,6 +143,10 @@ public class Server {
 
     }
 
+    /**
+     * Initializes the deck by adding cards to the stack, shuffling them,
+     * and setting the first card into the queue.
+     */
     public static void initDeck() {
 
         System.out.println("Vamo a crear el mazo");
@@ -145,6 +159,9 @@ public class Server {
 
     }
 
+    /**
+     * Displays all cards currently in the stack (for debugging).
+     */
     public static void showStack() {
         for (int i = 0; i < cardsStack.size(); i++) {
 
@@ -152,6 +169,9 @@ public class Server {
         }
     }
 
+    /**
+     * Adds all game cards (number, action, and wild cards) to the stack and shuffles it.
+     */
     public static void addCardsToStackAndShuffle() {
 
         for (String color : colors) {

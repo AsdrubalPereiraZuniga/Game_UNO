@@ -19,12 +19,11 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 /**
- *
- * @author igmml
+ * This class handles the display, interaction, and management of player cards
+ * in the game UI, including hand cards and playable cards.
  */
 public class HandleCards {
 
-    // Constantes de diseño
     private static final double NORMAL_WIDTH = 80;
     private static final double HOVER_WIDTH = 80;
     private static final double CARD_HEIGHT = 120;
@@ -35,12 +34,22 @@ public class HandleCards {
     private GridPane grdPlayableCards;
     private ArrayList<Card> playableCards;
 
+    /**
+     * Configures the default properties of the cards GridPane.
+     */
     private void configureGridPane() {
         instance.grdCards.setHgap(10);
         instance.grdCards.setVgap(10);
         instance.grdCards.setAlignment(Pos.CENTER);
     }
 
+    /**
+     * Initializes the card handler with the main GridPane, client, and playable cards GridPane.
+     *
+     * @param grid the main hand GridPane
+     * @param client the Client instance
+     * @param gridPC the playable cards GridPane
+     */
     public void initialize(GridPane grid, Client client, GridPane gridPC) {
         instance.grdCards = grid;
         instance.client = client;
@@ -49,6 +58,13 @@ public class HandleCards {
         configureGridPane();
     }
 
+    /**
+     * Sets up the player's hand of cards in the main GridPane.
+     *
+     * @param grid the GridPane for hand cards
+     * @param client the Client instance
+     * @param gridPC the playable cards GridPane
+     */
     public void setCards(GridPane grid, Client client, GridPane gridPC) {
         initialize(grid, client, gridPC);
         instance.grdCards.getChildren().clear();
@@ -81,6 +97,14 @@ public class HandleCards {
         }
     }
 
+    /**
+     * Creates a visual container (VBox) for a specific card.
+     *
+     * @param cardText the string representation of the card
+     * @param cardIndex the index of the card in the list
+     * @param cards the list of cards
+     * @return a VBox representing the card
+     */
     private VBox createCardContainer(String cardText, int cardIndex,
         ArrayList<Card> cards) {
         VBox cardContainer = new VBox();
@@ -109,6 +133,11 @@ public class HandleCards {
         return cardContainer;
     }
 
+    /**
+     * Sets up hover effects (glow and zoom) for a card container.
+     *
+     * @param cardContainer the VBox container of the card
+     */
     private void setupHoverEffects(VBox cardContainer) {
         Glow glow = new Glow();
         glow.setLevel(0.5);
@@ -137,6 +166,12 @@ public class HandleCards {
         });
     }
 
+    /**
+     * Refreshes the cards displayed in the specified GridPane.
+     *
+     * @param grid the GridPane to refresh
+     * @param cards the list of cards to display
+     */
     private void refreshCards(GridPane grid, ArrayList<Card> cards) {
         grid.getChildren().clear();
         grid.getColumnConstraints().clear();
@@ -161,7 +196,6 @@ public class HandleCards {
             grid.getColumnConstraints().add(cc);
         }
 
-        // Crear cartas
         for (int i = 0; i < cardCount; i++) {
             VBox cardContainer
                     = createCardContainer(
@@ -170,6 +204,11 @@ public class HandleCards {
         }
     }
 
+    /**
+     * Moves a card from the hand to the playable cards list after clicking.
+     *
+     * @param cardIndex the index of the card to remove
+     */
     private void removeCard(int cardIndex) {
         //add
         instance.playableCards.add(instance.client.getCards().get(cardIndex));
@@ -180,6 +219,13 @@ public class HandleCards {
         refreshCards(instance.grdPlayableCards, instance.playableCards);
     }
 
+    /**
+     * Tries to remove a card from the playable cards list.
+     *
+     * @param cardIndex the index of the card to check
+     * @param value the expected value of the card
+     * @return true if the card was removed, false otherwise
+     */
     private boolean removeFromPlayableCards(int cardIndex, String value) {
         if (instance.playableCards.isEmpty()) {
             return false;
@@ -201,6 +247,12 @@ public class HandleCards {
         return false;
     }
 
+    /**
+     * Handles the logic executed when a card is clicked.
+     *
+     * @param cardIndex the index of the clicked card
+     * @param cardText the string representation of the clicked card
+     */
     private void handleCardClick(int cardIndex, String cardText) {
         if (instance.client.isWaiting()) {
             return;
@@ -219,6 +271,13 @@ public class HandleCards {
         }
     }
 
+    /**
+     * Verifies if the selected card can be played based on the value
+     * compared to the playable cards.
+     *
+     * @param cardIndex the index of the card to verify
+     * @return true if the card can be played, false otherwise
+     */
     private boolean verifiedCanPlayWithOtherCards(int cardIndex) {
         boolean canPlay = false;
         for (Card playableCard : instance.playableCards) {
@@ -230,6 +289,12 @@ public class HandleCards {
         return canPlay;
     }
 
+    
+    /**
+     * Returns the singleton instance of HandleCards.
+     *
+     * @return the HandleCards instance
+     */
     public static HandleCards getInstace() {
         if (HandleCards.instance == null) {
             HandleCards.instance = new HandleCards();
@@ -238,18 +303,38 @@ public class HandleCards {
         return HandleCards.instance;
     }
 
+    /**
+     * Returns the list of currently playable cards.
+     *
+     * @return the list of playable cards
+     */
     public ArrayList<Card> getPlayCards() {
         return instance.playableCards;
     }
 
+    /**
+     * Returns the normal width of a card.
+     *
+     * @return the normal card width
+     */
     public double getNORMAL_WIDTH() {
         return NORMAL_WIDTH;
     }
 
+    /**
+     * Returns the normal height of a card.
+     *
+     * @return the normal card height
+     */
     public double getCARD_HEIGTH() {
         return CARD_HEIGHT;
     }
-
+    
+    /**
+     * Sets the client instance and refreshes the cards shown on screen.
+     *
+     * @param client the Client instance
+     */
     public void setClient(Client client) {
         instance.client = client;
 
