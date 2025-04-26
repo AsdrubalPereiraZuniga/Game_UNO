@@ -158,6 +158,13 @@ public class Server {
         showStack();
     }
 
+    /**
+    * Selects the first valid card to start the game from the deck.
+    * 
+    * It ensures that the top card is not a wild card ("C") or an action card (value >= 10).
+    * If the top card is invalid, the deck is shuffled until a valid card is found.
+    * Once a valid card is found, it is moved from the stack to the queue to begin the game.
+    */
     private static void getTopCardOfStack() {
 
         Card card = cardsStack.peek();

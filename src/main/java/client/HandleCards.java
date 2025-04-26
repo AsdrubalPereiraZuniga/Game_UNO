@@ -225,13 +225,6 @@ public class HandleCards {
     }
 
     /**
-     * Remove clear the playable cards.
-     * 
-     * @param cardIndex card index.
-     * @param value value of the card. ex, R0, Y0, C0, B0, G0.
-     * @return if can continue or not.
-     */
-    /**
      * Tries to remove a card from the playable cards list.
      *
      * @param cardIndex the index of the card to check
@@ -259,12 +252,6 @@ public class HandleCards {
     }
 
     /**
-     * Handle the click of the card.
-     * 
-     * @param cardIndex card index.
-     * @param cardText value of the card. ex, R0, Y0, C0, B0, G0.
-     */
-    /**
      * Handles the logic executed when a card is clicked.
      *
      * @param cardIndex the index of the clicked card
@@ -289,12 +276,6 @@ public class HandleCards {
     }
 
     /**
-     * Verified if a card can be played with others.
-     * 
-     * @param cardIndex card index.
-     * @return if can continue or not.
-     */
-    /**
      * Verifies if the selected card can be played based on the value
      * compared to the playable cards.
      *
@@ -313,12 +294,6 @@ public class HandleCards {
     }
 
     /**
-     * Return the instance of the handle cards.
-     * 
-     * @return the instace of the handle cards.
-     */
-    
-    /**
      * Returns the singleton instance of HandleCards.
      *
      * @return the HandleCards instance
@@ -332,11 +307,6 @@ public class HandleCards {
     }
 
     /**
-     * Return the playable cards.
-     * 
-     * @return the playable cards.
-     */
-    /**
      * Returns the list of currently playable cards.
      *
      * @return the list of playable cards
@@ -345,11 +315,6 @@ public class HandleCards {
         return instance.playableCards;
     }
 
-    /**
-     * Return the constant NORMAL_WITH.
-     * 
-     * @return the constant NORMAL_WITH.
-     */
     /**
      * Returns the normal width of a card.
      *
@@ -360,10 +325,6 @@ public class HandleCards {
     }
 
     /**
-     * Return the constant CARD_HEIGTH.
-     * @return the constant CARD_HEIGTH.
-     */
-    /**
      * Returns the normal height of a card.
      *
      * @return the normal card height
@@ -371,12 +332,6 @@ public class HandleCards {
     public double getCARD_HEIGTH() {
         return CARD_HEIGHT;
     }
-
-    /**
-     * Set the client.
-     * 
-     * @param client client.
-     */
     
     /**
      * Sets the client instance and refreshes the cards shown on screen.

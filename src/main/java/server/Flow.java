@@ -184,6 +184,10 @@ public class Flow implements Runnable {
         }
     }
 
+    /**
+    * Gives a card from the deck to the current player.
+    * If the stack is empty, restocks it from the queue.
+    */
     private void giveCardToPlayer() {
         if (!Server.cardsStack.isEmpty()) {
             Card drawnCard = Server.cardsStack.pop();
@@ -194,6 +198,11 @@ public class Flow implements Runnable {
         }
     }
 
+    /**
+    * Returns a string representation of the current player's cards.
+    *
+    * @return a formatted string listing all cards of the player
+    */
     private String getPlayerCards() {
         String playerCards = "";
         for (Card card : Server.players.get(currentPlayerIndex).getCards()) {
@@ -202,6 +211,9 @@ public class Flow implements Runnable {
         return playerCards;
     }
 
+    /**
+    * Refills the card stack from the cards queue, shuffling the cards.
+    */
     private void restockStack() {
         for (int i = 0; i < Server.cardsQueue.size() - 1; i++) {
             System.out.println("aaa" + i);
@@ -210,6 +222,7 @@ public class Flow implements Runnable {
         Collections.shuffle(Server.cardsStack);
     }
 
+    
     private boolean disconectPlayer() {
         try {
             returnCardToTheStack();
@@ -312,6 +325,11 @@ public class Flow implements Runnable {
         }
     }
 
+    /**
+    * Removes the played card from the current player's hand.
+    *
+    * @param topCard the card that was played
+    */
     private void removeCardOfPlayer(Card topCard) {
         for (int i = 0; i < Server.players.get(currentPlayerIndex).getCards().size(); i++) {
             if (Server.players.get(currentPlayerIndex).getCards()
@@ -322,6 +340,12 @@ public class Flow implements Runnable {
         }
     }
 
+    /**
+    * Updates the turn to the next player based on the last played card,
+    * handling skips and reverses if necessary.
+    *
+    * @param topCard the last card played
+    */
     private synchronized void changeTurn(Card topCard) {
 
         synchronized (turnLock) {
@@ -349,6 +373,9 @@ public class Flow implements Runnable {
                 + Server.players.get(currentPlayerIndex).getUsername() + "/" + Server.players.get(currentPlayerIndex).getCards().size() + "/");
     }
 
+    /**
+    * Sends the updated cards of the current player to the client.
+    */
     private void sendUpdatedCards() {
         String responseInitialCards = "CARDS/";
 
@@ -366,6 +393,12 @@ public class Flow implements Runnable {
                 "Error al envia mensaje: ");
     }
 
+    /**
+    * Applies special effects (+2, +4) based on the played card.
+    *
+    * @param card the card played
+    * @param playerIndex the index of the affected player
+    */
     private void skillsCards(Card card, int playerIndex) {
 
         if (card.toString().equals("C1")) {
@@ -376,6 +409,12 @@ public class Flow implements Runnable {
         }
     }
 
+    /**
+    * Forces a player to draw a certain number of cards from the deck.
+    *
+    * @param playerIndex the index of the player
+    * @param amount the number of cards to draw
+    */
     private void eatCardFromStack(int playerIndex, int amount) {
         Card card;
         for (int i = 0; i < amount; i++) {
@@ -438,6 +477,12 @@ public class Flow implements Runnable {
 //        }
 //        System.out.println("CARTAS: " + Server.players.get(index).getCards().size());
 //    }
+    
+    /**
+    * Handles the turn change logic, considering skip and invert cards.
+    *
+    * @param topCard the last played card
+    */
     private synchronized void handlePlayerTurns(Card topCard) {
 
         this.skipAmount = 1;
@@ -453,6 +498,11 @@ public class Flow implements Runnable {
 
     }
 
+    /**
+    * Checks if the last played card is a skip card and adjusts skipAmount accordingly.
+    *
+    * @param topCard the last played card
+    */
     private void checkSkipCards(Card topCard) {
         System.out.println("SkipCard: " + topCard.toString());
         for (String skipCard : skipCards) {
@@ -464,10 +514,10 @@ public class Flow implements Runnable {
     }
 
     /**
-     * Checks if the last played card is an invert card and toggles the turn order.
-     *
-     * @param topCard the last played card
-     */
+    * Adjusts the order of player turns if an invert card was played.
+    *
+    * @param topCard the last played card
+    */
     private void checkInvertOrderOfPlayers(Card topCard) {
         for (String invertCard : invertCards) {
             if (invertCard.equals(topCard.toString())) {
@@ -476,6 +526,9 @@ public class Flow implements Runnable {
         }
     }
 
+    /**
+    * Moves the currentPlayerIndex according to skipAmount and invert order.
+    */
     private void handlePosition() {
         System.out.println("al mover skipAmount tinee:" + this.skipAmount);
         if (invertOrder) {
@@ -487,6 +540,9 @@ public class Flow implements Runnable {
         // [0,1,2] 
     }
 
+    /**
+    * Ensures that currentPlayerIndex stays within valid range after movement.
+    */
     private void checkLimitsOfVectorPlayers() {
         if (currentPlayerIndex > Server.players.size() - 1) {
             currentPlayerIndex = this.skipAmount - 1;

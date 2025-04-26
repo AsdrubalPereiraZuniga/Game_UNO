@@ -246,9 +246,6 @@ public class MainController implements Initializable {
     }
 
     /**
-     * Displays the color selection panel when a Wild Card is played.
-     */
-    /**
      * Show the selector of colors.
      */
     private void showColorSelector() {

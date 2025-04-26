@@ -211,9 +211,6 @@ public class WaitingController implements Initializable {
     }
 
     /**
-     * Handle the status of the message.
-     */
-    /**
      * Handles the transition depending on whether the game is ready to start
      * or the player was forbidden to join.
      */
@@ -236,10 +233,6 @@ public class WaitingController implements Initializable {
             }
         });
     }
-    
-    /**
-     * Stop the verification.
-     */
 
     /**
      * Stops the player ready checking thread.
