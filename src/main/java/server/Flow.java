@@ -284,18 +284,23 @@ public class Flow implements Runnable {
                     + Server.players.get(currentPlayerIndex).getCards().size());
 
             for (int i = 0; i < Server.players.get(currentPlayerIndex).getCards().size(); i++) {
+                System.out.println("xxxxxxxxx:" + Server.players.get(currentPlayerIndex).getCards()
+                        .get(i).toString());
+                   System.out.println("qqqqqqqqqqq:" + topCard.toString());
                 if (Server.players.get(currentPlayerIndex).getCards()
                         .get(i).toString().contains(topCard.toString())) {
                     Server.players.get(currentPlayerIndex).getCards().remove(i);
                     break;
                 }
             }
+
+
             System.out.println("Current player comming size eliminada: "
                     + Server.players.get(currentPlayerIndex).getCards().size());
 
             handlePlayerTurns(topCard);
 
-            System.out.println("Current player: " + currentPlayerIndex);
+            System.out.println("Current player: " + Server.players.get(currentPlayerIndex) +currentPlayerIndex);
 
             Flow nextPlayerFlow = Server.players.get(currentPlayerIndex).getFlow();
 
@@ -308,13 +313,6 @@ public class Flow implements Runnable {
         skillsCards(topCard.toString(), currentPlayerIndex);
 
         //Envia las cartas del jugador luego de que comió
-        sendUpdatedCards();
-
-        broadcast(responseACTUAL
-                + Server.players.get(currentPlayerIndex).getUsername() + "/" + Server.players.get(currentPlayerIndex).getCards().size() + "/");
-    }
-
-    private void sendUpdatedCards() {
         String responseInitialCards = "CARDS/";
 
         for (Card card : Server.players.get(currentPlayerIndex).getCards()) {
@@ -323,8 +321,22 @@ public class Flow implements Runnable {
         System.out.println("popopo:" + responseInitialCards);
         sendMenssageToClient(responseInitialCards,
                 "No se pudo enviar las cartas inciales, error: ");
+
+        broadcast(responseACTUAL
+                + Server.players.get(currentPlayerIndex).getUsername() + "/" + Server.players.get(currentPlayerIndex).getCards().size() + "/");
     }
 
+//    private void sendUpdatedCards() {
+//        String responseInitialCards = "CARDS/";
+//
+//        for (Card card : Server.players.get(currentPlayerIndex).getCards()) {
+//            responseInitialCards += card.toString() + "/";
+//        }
+//        System.out.println("popopo:" + responseInitialCards);
+//        sendMenssageToClient(responseInitialCards,
+//                "No se pudo enviar las cartas inciales, error: ");
+//    }
+    
     public void skillsCards(String card, int index) {
         Card _card;
         System.out.println("CARD_FLOW: " + card);
