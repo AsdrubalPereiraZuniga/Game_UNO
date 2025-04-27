@@ -195,7 +195,7 @@ public class Client {
         if (parts.length > 1) {
             String currentPlayer = parts[1];
             String cardsSize = parts[2];
-            TurnHandler.updateTurn(currentPlayer + ": " + cardsSize);
+            TurnHandler.updateTurn(currentPlayer + " > " + cardsSize);
         } else {
             System.err.println("Formato de mensaje ACTUAL inválido: " + message);
         }
@@ -210,7 +210,7 @@ public class Client {
         String[] deck = message.split("/");
         this.cards.add(getCard(deck[2]));
 
-        TurnHandler.updateTurn(deck[1] + ": " + String.valueOf(this.cards.size()));
+        TurnHandler.updateTurn(deck[1] + " > " + String.valueOf(this.cards.size()));
     } 
     
     /**

@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane fx:id="bgView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" stylesheets="@../../../style/css.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
    <children>
@@ -24,11 +25,15 @@
          </children>
       </AnchorPane>
       
-      <Label fx:id="lblCurrentTurn" layoutX="1050.0" layoutY="30.0" prefHeight="30.0" prefWidth="200.0" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Turno de: -" />
+      <Label fx:id="lblCurrentTurn" layoutX="1051.0" layoutY="14.0" prefHeight="61.0" prefWidth="200.0" style="-fx-font-size: 16px; -fx-font-weight: bold;" styleClass="modern-label" stylesheets="@../../../style/css.css" text="Turno: -" />
 
       <AnchorPane fx:id="player" layoutX="219.0" layoutY="506.0" prefHeight="200.0" prefWidth="851.0">
          <children>
-            <Label fx:id="lblPlayerName" layoutX="14.0" layoutY="14.0" text="Label" />
+            <Label fx:id="lblPlayerName" layoutX="42.0" layoutY="-9.0" prefHeight="40.0" prefWidth="125.0" text="Label" textFill="#f2f2f2">
+               <font>
+                  <Font name="System Bold" size="27.0" />
+               </font>
+            </Label>
             <ScrollPane fx:id="scrollCards" layoutX="42.0" layoutY="31.0" prefHeight="140.0" prefWidth="780.0" style="-fx-background: transparent; -fx-background-color: transparent;">
                <content>
                   <GridPane fx:id="grdCards" hgap="10" style="-fx-background-color: transparent;" vgap="10" />

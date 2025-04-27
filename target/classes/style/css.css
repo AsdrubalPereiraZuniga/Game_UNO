@@ -17,6 +17,17 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     -fx-transition-duration: 0.2s;
 }
 
+.modern-label {
+    -fx-background-color: white;
+    -fx-text-fill: #333333;
+    -fx-font-size: 27px;
+    -fx-alignment: center;
+    -fx-padding: 10 15;
+    -fx-background-radius: 6px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 8, 0, 0, 2);
+    -fx-border-radius: 6px;
+}
+
 .text-field {
     -fx-background-color: transparent;
     -fx-border-color: white;

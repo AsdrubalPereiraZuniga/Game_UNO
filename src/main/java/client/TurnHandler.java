@@ -50,7 +50,7 @@ public class TurnHandler {
                 } catch (Exception e) {
                     System.err.println("Error al reproducir el sonido: " + e.getMessage());
                 }
-                lblCurrentTurn.setText("Turno actual: " + username);
+                lblCurrentTurn.setText("Turno: " + username);
             });
         }
     }
