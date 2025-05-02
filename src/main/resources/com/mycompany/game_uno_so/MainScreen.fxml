@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="bgView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" stylesheets="@../../../style/css.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
+<AnchorPane fx:id="bgView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" stylesheets="@../../../style/css.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
    <children>
       <AnchorPane fx:id="usedCardsView" layoutX="668.0" layoutY="235.0" prefHeight="250.0" prefWidth="200.0" styleClass="anchor-pane-bordered" stylesheets="@../../../style/css.css" />
       <AnchorPane fx:id="deckView" layoutX="451.0" layoutY="235.0" prefHeight="250.0" prefWidth="200.0" styleClass="anchor-pane-bordered" stylesheets="@../../../style/css.css">
@@ -21,7 +21,7 @@
       </AnchorPane>
       <AnchorPane fx:id="players" layoutX="23.0" layoutY="14.0" prefHeight="200.0" prefWidth="716.0">
          <children>
-            <HBox fx:id="hbxOtherPlayers" layoutX="14.0" layoutY="14.0" prefHeight="173.0" prefWidth="688.0" />
+            <HBox fx:id="hbxOtherPlayers" layoutX="14.0" layoutY="14.0" prefHeight="173.0" prefWidth="688.0" visible="false" />
          </children>
       </AnchorPane>
       
@@ -42,7 +42,7 @@
          </children>
       </AnchorPane>
 
-      <HBox fx:id="colorSelector" alignment="CENTER" layoutX="500" layoutY="450.0" spacing="10" visible="false">
+      <HBox fx:id="colorSelector" alignment="CENTER" layoutX="500.0" layoutY="490.0" spacing="10" visible="false">
          <Button fx:id="btnRed" onAction="#selectColor" style="-fx-background-color: red; -fx-background-radius: 100%; -fx-min-width: 40px; -fx-min-height: 40px;" />
          <Button fx:id="btnGreen" onAction="#selectColor" style="-fx-background-color: green; -fx-background-radius: 100%; -fx-min-width: 40px; -fx-min-height: 40px;" />
          <Button fx:id="btnBlue" onAction="#selectColor" style="-fx-background-color: blue; -fx-background-radius: 100%; -fx-min-width: 40px; -fx-min-height: 40px;" />

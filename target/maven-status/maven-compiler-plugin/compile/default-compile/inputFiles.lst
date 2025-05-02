@@ -1,20 +1,20 @@
-C:\Users\Asdrubal\JAVA PROJECTS\Game_UNO_SO\src\main\java\client\TurnHandler.java
-C:\Users\Asdrubal\JAVA PROJECTS\Game_UNO_SO\src\main\java\controllers\MainController.java
-C:\Users\Asdrubal\JAVA PROJECTS\Game_UNO_SO\src\main\java\client\HandleCards.java
-C:\Users\Asdrubal\JAVA PROJECTS\Game_UNO_SO\src\main\java\client\OtherPlayers.java
-C:\Users\Asdrubal\JAVA PROJECTS\Game_UNO_SO\src\main\java\server\Flow.java
-C:\Users\Asdrubal\JAVA PROJECTS\Game_UNO_SO\src\main\java\controllers\WinnerController.java
-C:\Users\Asdrubal\JAVA PROJECTS\Game_UNO_SO\src\main\java\cards\ActionCard.java
-C:\Users\Asdrubal\JAVA PROJECTS\Game_UNO_SO\src\main\java\com\mycompany\game_uno_so\App.java
-C:\Users\Asdrubal\JAVA PROJECTS\Game_UNO_SO\src\main\java\controllers\WaitingController.java
-C:\Users\Asdrubal\JAVA PROJECTS\Game_UNO_SO\src\main\java\client\ViewCardsHandler.java
-C:\Users\Asdrubal\JAVA PROJECTS\Game_UNO_SO\src\main\java\client\Client.java
-C:\Users\Asdrubal\JAVA PROJECTS\Game_UNO_SO\src\main\java\server\Server.java
-C:\Users\Asdrubal\JAVA PROJECTS\Game_UNO_SO\src\main\java\players\Player.java
-C:\Users\Asdrubal\JAVA PROJECTS\Game_UNO_SO\src\main\java\cards\NumberCard.java
-C:\Users\Asdrubal\JAVA PROJECTS\Game_UNO_SO\src\main\java\client\SayOneHandler.java
-C:\Users\Asdrubal\JAVA PROJECTS\Game_UNO_SO\src\main\java\module-info.java
-C:\Users\Asdrubal\JAVA PROJECTS\Game_UNO_SO\src\main\java\controllers\LoginController.java
-C:\Users\Asdrubal\JAVA PROJECTS\Game_UNO_SO\src\main\java\cards\WildCard.java
-C:\Users\Asdrubal\JAVA PROJECTS\Game_UNO_SO\src\main\java\cards\Card.java
-C:\Users\Asdrubal\JAVA PROJECTS\Game_UNO_SO\src\main\java\controllers\BackgroundMain.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\client\SayOneHandler.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\client\OtherPlayers.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\client\TurnHandler.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\com\mycompany\game_uno_so\App.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\cards\WildCard.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\controllers\WaitingController.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\client\Client.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\module-info.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\server\Flow.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\server\Server.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\controllers\MainController.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\cards\Card.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\client\HandleCards.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\client\ViewCardsHandler.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\players\Player.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\cards\NumberCard.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\controllers\LoginController.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\cards\ActionCard.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\controllers\BackgroundMain.java
+C:\Users\jorge\OneDrive\Documentos\GitHub\Game_UNO\src\main\java\controllers\WinnerController.java
