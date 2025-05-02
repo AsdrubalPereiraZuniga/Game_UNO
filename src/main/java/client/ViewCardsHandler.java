@@ -55,4 +55,12 @@ public class ViewCardsHandler {
             });
         }
     }
+    
+    /**
+     *  method responsible for releasing resources of this class
+     */ 
+    public static void clear(){
+        gridPlayer.getChildren().clear();
+        anchorPane.getChildren().clear();
+    }
 }

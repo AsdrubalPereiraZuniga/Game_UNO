@@ -352,4 +352,16 @@ public class HandleCards {
         refreshCards(instance.grdCards, instance.client.getCards());
         refreshCards(instance.grdPlayableCards, instance.playableCards);
     }
+    
+    /**
+     *  method responsible for releasing resources of this class
+     */    
+    public void clear(){
+        instance = null;
+        playableCards.clear();
+        client = null;
+        grdCards.getChildren().clear();
+        grdPlayableCards.getChildren().clear();
+        scrollPane.setContent(null);
+    }
 }

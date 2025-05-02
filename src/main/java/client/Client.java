@@ -4,8 +4,10 @@ import cards.ActionCard;
 import cards.Card;
 import cards.NumberCard;
 import cards.WildCard;
+import com.mycompany.game_uno_so.App;
 import controllers.MainController;
 import controllers.WaitingController;
+import controllers.WinnerController;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -53,6 +55,7 @@ public class Client {
     private String host;
     private String playerName;
     private Thread listenerThread;
+        
 
     /**
      * @param playerName the name of the player.
@@ -76,8 +79,8 @@ public class Client {
 
         initializeConnection();
         startListening();
-    }
-
+    }        
+    
     /**
      * Initialize the connecction to the server.
      */
@@ -118,7 +121,7 @@ public class Client {
                     processServerMessage(message);
                 } catch (IOException e) {
                     System.out.println("Connection lost: " + e.getMessage());
-                    disconnect();
+                    disconnect(playerName);
                     break;
                 }
             }
@@ -142,6 +145,10 @@ public class Client {
      * WAIT: set the player to wait mode. 
      * TURN: notify the player that its his/her turn.
      * ACTUAL: show the actual player.
+     * SAY_ONE show say one animation in view
+     * WINNER show the winner view with the winner
+     * DISCONNECT disconnect a client of game
+     * RESTART It is used when a player restarts the game
      * @param message the message received from the server
      */
     private void processServerMessage(String message) {
@@ -180,11 +187,69 @@ public class Client {
             case "ACTUAL":
                 setActualPlayer(message);
                 break;
+            case "SAY_ONE":
+                showSayOne(message.split("/")[1] );
+                break;
+            case "WINNER":
+                showWinnerScreen(message.split("/")[1] );
+               break;
+            case "DISCONNECT":
+                this.otherPlayers.clear();
+                this.cards.clear();
+                disconnect( message.split("/")[1] );
+                break;
+            case "RESTART":
+                restarGame(message.split("/")[1]);
             default:
                 System.out.println(message);
         }
     }
-
+    
+    /**
+     * Method to handle the game restart event for the client
+     * all player are disconnected from the server
+     * 
+     * @param message name of a player
+     */
+    public void restarGame(String message){                
+        this.otherPlayers.clear();
+        this.cards.clear();
+        HandleCards.getInstace().clear();
+        ViewCardsHandler.clear();
+        TurnHandler.clear();
+        SayOneHandler.clear();
+        this.otherPlayers.clear();             
+        disconnect( message );
+    }
+    
+    /**
+     * Method to handle the event of displaying the SAY ONE animation.
+     * 
+     * @param name Player name that says ONE
+     */     
+    public void showSayOne(String name){
+        Platform.runLater(() ->{
+            SayOneHandler.showSayOne(name);
+        });
+    }
+    
+    /**
+     * Method for managing the winner view event
+     * 
+     * @param winnerName winner name of game
+     */
+    public void showWinnerScreen(String winnerName){
+        if(this.connect){
+            WinnerController.setClient(
+                    MainController.getInstanceController().getClient());
+            
+            WinnerController.setWinnerName(winnerName);
+            Platform.runLater(()-> {
+               App.setRoot("WinnerScreen"); 
+            });                                
+        }
+    }
+    
     /**
      * Handle the actual player chande.
      * 
@@ -236,18 +301,19 @@ public class Client {
                 output.flush();
             } catch (IOException e) {
                 System.out.println("Error sending message: " + e.getMessage());
-                disconnect();
+                disconnect(this.playerName);
             }
         }
     }
 
     /**
      * Close the connection with the server.
+     * @param name
      */
-    public void disconnect() {
+    public void disconnect(String name) {        
         this.connect = false;
         try {
-            if (socket != null && !socket.isClosed()) {
+            if (socket != null && !socket.isClosed() && this.playerName.contains(name)) {
                 socket.close();
             }
         } catch (IOException e) {
@@ -547,5 +613,5 @@ public class Client {
     public void setMainController(MainController controller) {
         this.mainController = controller;
     }
-
+        
 }

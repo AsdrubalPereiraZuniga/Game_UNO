@@ -42,6 +42,8 @@ public class Server {
     public static ArrayList<String> colors = new ArrayList<>(Arrays.asList("R", "G", "B", "Y"));
     public ArrayList<String> values = new ArrayList<>(Arrays.asList(""));
     public static int numberOfCardsByColor = 12;
+    
+    public static boolean isRestar = false;
 
     /**
      * initializes the servesr and starts listening for client connections.
@@ -78,8 +80,8 @@ public class Server {
             System.exit(1);
         }
         return null;
-    }
-
+    }   
+    
     /**
      * Continuously waits for client connections and starts a new thread to
      * handle each connection using the Flow class.
@@ -141,6 +143,31 @@ public class Server {
             ex.printStackTrace();
         }
 
+    }
+    
+    /**
+     * method responsible of restarting the server components to restart new game
+     */
+    public static void restarGameServer(){
+        
+        try {
+            if(!isRestar){
+                System.out.println("SERVIDOR REINICIADO");
+                
+                // clear server attributes
+                cardsStack.clear();
+                cardsQueue.clear();                           
+
+                // initial server attributes
+                initDeck();
+               
+            }   
+            else{
+                System.out.println("SERVIDOR YA REINICIADO");
+            }
+        } catch (Exception e) {
+            System.out.println("Error/Server/restarGame: " + e.getMessage());
+        }                   
     }
 
     /**

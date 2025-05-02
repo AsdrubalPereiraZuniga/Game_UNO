@@ -69,5 +69,12 @@ public class OtherPlayers {
     public String toString() {
         return name + " : " + amountOfCards;
     }
-
+    
+    /**
+     *  method responsible for releasing resources of this class
+     */ 
+    public void clear(){
+        this.amountOfCards = 0;
+        this.name = null;
+    }
 }

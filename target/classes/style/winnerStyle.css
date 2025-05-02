@@ -1,0 +1,38 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 29 abr. 2025, 17:58:16
+    Author     : Asdrubal
+*/
+
+.modern-label{
+    
+    -fx-background-color: #00c8b0;         /* fondo celeste */
+    -fx-background-radius: 50px;             /* curva en las esquinas */
+    -fx-font-family: 'Gilker';               /* fuente personalizada */
+    -fx-font-size: 40px;
+    -fx-padding: 20px;    
+    -fx-text-fill: white;
+    
+}
+
+.modern-label2{
+    
+    -fx-background-color: #00c8b0;         /* fondo celeste */
+    -fx-background-radius: 20px;             /* curva en las esquinas */                   /* fuente personalizada */
+    -fx-font-size: 40px;
+    -fx-padding: 10px 20px;
+    -fx-text-fill: white;    
+}
+
+#button{
+    
+    -fx-background-color: #000000;         /* fondo celeste */
+    -fx-background-radius: 20px;             /* curva en las esquinas */
+    -fx-font-family: 'Gilker';               /* fuente personalizada */
+    -fx-font-size: 24px;
+    -fx-padding: 10px 20px;
+    -fx-text-fill: white;   
+}

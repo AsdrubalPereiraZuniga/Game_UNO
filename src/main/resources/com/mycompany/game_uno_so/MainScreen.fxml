@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="bgView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" stylesheets="@../../../style/css.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
+<AnchorPane fx:id="bgView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" stylesheets="@../../../style/css.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
    <children>
       <AnchorPane fx:id="usedCardsView" layoutX="668.0" layoutY="235.0" prefHeight="250.0" prefWidth="200.0" styleClass="anchor-pane-bordered" stylesheets="@../../../style/css.css" />
       <AnchorPane fx:id="deckView" layoutX="451.0" layoutY="235.0" prefHeight="250.0" prefWidth="200.0" styleClass="anchor-pane-bordered" stylesheets="@../../../style/css.css">
@@ -95,5 +95,7 @@
             <Image url="@../../../images/more/imgCarPut2.png" />
          </image>
       </ImageView>
+      <Label fx:id="lblSayOne" layoutX="27.0" layoutY="231.0" prefHeight="61.0" prefWidth="385.0" style="-fx-font-size: 16px; -fx-font-weight: bold;" styleClass="modern-label" stylesheets="@../../../style/css.css" visible="false" />
+      <ImageView fx:id="imgSayOne" fitHeight="186.0" fitWidth="200.0" layoutX="120.0" layoutY="337.0" pickOnBounds="true" preserveRatio="true" visible="false" />
    </children>
 </AnchorPane>

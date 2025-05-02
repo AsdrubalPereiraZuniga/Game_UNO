@@ -2,11 +2,13 @@ package controllers;
 
 import cards.Card;
 import cards.WildCard;
+import client.SayOneHandler;
 import client.Client;
 import client.HandleCards;
 import client.OtherPlayers;
 import client.TurnHandler;
 import client.ViewCardsHandler;
+import com.mycompany.game_uno_so.App;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -95,6 +97,10 @@ public class MainController implements Initializable {
     private BackgroundMain backgroundAnimation;
     @FXML
     private ScrollPane scrollCards;
+    @FXML
+    private Label lblSayOne;
+    @FXML
+    private ImageView imgSayOne;
     
     
     /**
@@ -121,6 +127,10 @@ public class MainController implements Initializable {
         TurnHandler.setLabel(lblCurrentTurn);
         ViewCardsHandler.setGridPlayerCards(grdPlayableCards);
         ViewCardsHandler.setAnchorPane(usedCardsView);
+        
+        SayOneHandler.setLabel(lblSayOne);
+        SayOneHandler.setImageView(imgSayOne);
+                
         instanceController.client.sendMessage("GET_TURN/");
         setupHoverEffects(btnRed);
         setupHoverEffects(btnGreen);
@@ -219,6 +229,15 @@ public class MainController implements Initializable {
     public void setClient(Client client) {
         MainController.instanceController.client = client;
     }
+    
+    /**
+     * get the client
+     * 
+     * @return client instance
+     */
+    public Client getClient(){
+        return MainController.instanceController.client;
+    }
 
     /**
      * Call one.
@@ -226,7 +245,12 @@ public class MainController implements Initializable {
      * @param event event.
      */
     @FXML
-    private void callOne(ActionEvent event) {
+    private void callOne(ActionEvent event) {                                                  
+        
+        if(instanceController.client.getCards().size() == 1){
+            instanceController.client.sendMessage("SAY_ONE/"+instanceController.client.getPlayerName());   
+        }        
+        
     }
 
     /**
@@ -240,6 +264,7 @@ public class MainController implements Initializable {
         Platform.runLater(() -> {
             MainController.getInstanceController().refreshHand();
         });
+                
         if (HandleCards.getInstace().getPlayCards().isEmpty()) {
             return;
         }
@@ -251,7 +276,7 @@ public class MainController implements Initializable {
             return;
         }
 
-        proceedWithCard();
+        proceedWithCard();         
     }
 
     /**
@@ -281,7 +306,7 @@ public class MainController implements Initializable {
             }
             HandleCards.getInstace().getPlayCards().clear();
             HandleCards.getInstace().setClient(instanceController.client);
-        }
+        }                
     }
 
 

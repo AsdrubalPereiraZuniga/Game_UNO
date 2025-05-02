@@ -37,7 +37,7 @@ public class Flow implements Runnable {
     private static String responseActiveButtom = "ACTIVE/";
     private static String responseWAIT = "WAIT/";
     private static String responseTURN = "TURN/";
-    private static String responseACTUAL = "ACTUAL/";
+    private static String responseACTUAL = "ACTUAL/";    
 
     private static String responseTOP = "TOP/";
 
@@ -178,12 +178,52 @@ public class Flow implements Runnable {
             case "COLORSELECTED":
                 broadcast("PUT/" + request.split("/")[1]);
                 break;
-
+            case "SAY_ONE":
+                broadcast("SAY_ONE/" + request.split("/")[1]);
+                break;
+            case "WINNER":
+                broadcast("WINNER/" + request.split("/")[1]);
+                break;
+            case "DISCONNECT":
+                System.out.println("Cliente a desconectar: " + this.player.getUsername());
+                disconectPlayer();
+                break;
+            case "RESTART":               
+                restarFlowGame();
+                break;
             default:
                 System.out.println("No se reccibio nah");
         }
     }
-
+    
+    /**
+     * method for managing server flow restarts
+     * closes all server flows and removes all server players
+     */
+    public void restarFlowGame(){
+        try {                                    
+            
+            for(Player pl : Server.players ){
+                
+                pl.getFlow().sendMenssageToClient("RESTART/"+pl.getUsername(),
+                        "ERROR/restartFlowGame");
+                pl.getFlow().socket.close();
+            }
+                        
+            Server.players.removeAllElements();                                    
+            doFunctionPlayersReady=true;
+            
+            if(!Server.isRestar){
+                
+                Server.restarGameServer();
+                Server.isRestar = true;
+            }            
+            
+        } catch (Exception e) {
+            System.out.println("ERROR/Flow/restarGame: " + e.getMessage() );
+        }
+    }
+        
     /**
     * Gives a card from the deck to the current player.
     * If the stack is empty, restocks it from the queue.
@@ -192,7 +232,8 @@ public class Flow implements Runnable {
         if (!Server.cardsStack.isEmpty()) {
             Card drawnCard = Server.cardsStack.pop();
             Server.players.get(currentPlayerIndex).getCards().add(drawnCard);
-            sendMenssageToClient("CARDS/" + getPlayerCards() + "/", "No se pudo enviar carta robada");
+            sendMenssageToClient("CARDS/" + getPlayerCards() + "/", 
+                    "No se pudo enviar carta robada");
         } else {
             restockStack();
         }
@@ -222,19 +263,21 @@ public class Flow implements Runnable {
         Collections.shuffle(Server.cardsStack);
     }
 
-    
+    /**
+     * method to handle the event of a player disconnecting from the game
+     */
     private boolean disconectPlayer() {
         try {
-            returnCardToTheStack();
-            Server.players.removeElement(this.player);
-            broadcast("El jugador " + this.name + "se ha desconectado");
+            returnCardToTheStack();            
+            broadcast("DISCONNECT/" + this.name);
+            Server.players.removeElement(this.player);            
             this.socket.close();
             System.out.println("El jugador " + this.name + "se ha desconectado");
         } catch (IOException ex) {
             System.out.println("Erro cerrando la conexion :" + ex);
         }
         return true;
-    }
+    }        
 
     /**
      * Checks if all players are ready to start the game.
@@ -243,6 +286,7 @@ public class Flow implements Runnable {
         if (doFunctionPlayersReady && Server.players.size() >= 2 && playersReady()) {
             broadcast(playersReadyMessage);
             doFunctionPlayersReady = false;
+            Server.isRestar=false;
         }
     }
 
@@ -296,14 +340,21 @@ public class Flow implements Runnable {
 
         int index = 1;
         while (index < cards.length) {
-            Server.cardsQueue.add(createObjectCard(cards[index]));
-            // handlePlayerTurns(createObjectCard(cards[index]));
+            Server.cardsQueue.add(createObjectCard(cards[index]));            
             index++;
         }
         responsePUT += createObjectCard(cards[index - 1]).toString();
 
         broadcast(responsePUT);
-        changeTurn(createObjectCard(cards[index - 1]));
+        
+        System.out.println("PLAYER_getCardsSIZE: " + this.player.getCards().size());
+        
+        
+        if(this.player.getCards().size() == 1){
+            broadcast("WINNER/"+this.player.getUsername());
+        } else{
+            changeTurn(createObjectCard(cards[index - 1]));
+        }        
     }
 
     /**
@@ -422,61 +473,6 @@ public class Flow implements Runnable {
             Server.players.get(playerIndex).getCards().add(card);
         }
     }
-
-//    public void skillsCards(String card, int index) {
-//
-//        Card _card;
-//        System.out.println("CARD_FLOW: " + card);
-//        switch (card) {
-//            case "C1":
-//                System.out.println("Is +4");
-//                for (int i = 0; i < 4; i++) {
-//                    _card = Server.cardsStack.pop();
-//                    Server.players.get(index).getCards().add(_card);
-////                    sendMenssageToClient("NEWCARDS/" + Server.players.get(index).getUsername() + "/" + _card.toString() + "/",
-////                            "No se pudo enviar el refresh");
-//                }
-//                break;
-//            case "B10":
-//                System.out.println("Is +2 B");
-//                for (int i = 0; i < 2; i++) {
-//                    _card = Server.cardsStack.pop();
-//                    Server.players.get(index).getCards().add(_card);
-////                    sendMenssageToClient("NEWCARDS/" + Server.players.get(index).getUsername() + "/" + _card.toString() + "/",
-////                            "No se pudo enviar el refresh");
-//                }
-//                break;
-//            case "G10":
-//                System.out.println("Is +2G");
-//                for (int i = 0; i < 2; i++) {
-//                    _card = Server.cardsStack.pop();
-//                    Server.players.get(index).getCards().add(_card);
-////                    sendMenssageToClient("NEWCARDS/" + Server.players.get(index).getUsername() + "/" + _card.toString() + "/",
-////                            "No se pudo enviar el refresh");
-//                }
-//                break;
-//            case "R10":
-//                System.out.println("Is +2R");
-//                for (int i = 0; i < 2; i++) {
-//                    _card = Server.cardsStack.pop();
-//                    Server.players.get(index).getCards().add(_card);
-////                    sendMenssageToClient("NEWCARDS/" + Server.players.get(index).getUsername() + "/" + _card.toString() + "/",
-////                            "No se pudo enviar el refresh");
-//                }
-//                break;
-//            case "Y10":
-//                System.out.println("Is +2Y");
-//                for (int i = 0; i < 2; i++) {
-//                    _card = Server.cardsStack.pop();
-//                    Server.players.get(index).getCards().add(_card);
-////                    sendMenssageToClient("NEWCARDS/" + Server.players.get(index).getUsername() + "/" + _card.toString() + "/",
-////                            "No se pudo enviar el refresh");
-//                }
-//                break;
-//            default:
-//        }
-//        System.out.println("CARTAS: " + Server.players.get(index).getCards().size());
-//    }
     
     /**
     * Handles the turn change logic, considering skip and invert cards.

@@ -54,4 +54,12 @@ public class TurnHandler {
             });
         }
     }
+    
+    /**
+     *  method responsible for releasing resources of this class
+     */ 
+    public static void clear(){
+        lblCurrentTurn.setText("");
+        mediaPlayer = null;
+    }
 }

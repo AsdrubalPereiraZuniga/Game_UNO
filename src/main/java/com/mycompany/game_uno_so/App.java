@@ -1,5 +1,6 @@
 package com.mycompany.game_uno_so;
 
+import controllers.WinnerController;
 import java.io.DataOutputStream;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -23,14 +24,14 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("LoginScreen"));
+        scene = new Scene(loadFXML("LoginScreen") );
         stage.setScene(scene);
         stage.show();
     }
     
 
     public static void setRoot(String fxml) {
-        try {
+        try {                       
             scene.setRoot(loadFXML(fxml));
             Stage stage = (Stage) scene.getWindow();
             stage.sizeToScene();
